@@ -1,0 +1,9 @@
+teve
+*.swp
+
+# Licensing?
+AdobeHDS.php
+
+# Bad gnu!
+*~
+[#]*[#]

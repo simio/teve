@@ -1,0 +1,39 @@
+teve [t̪eːveː] is CLI streamer and downloader for online TV sites.
+The name is derived from "tee video", which is one of the main points of
+the program.
+
+The current implementation (written for Chicken Scheme) is a prototype
+and work in progress. The language used in the final implementation has
+yet to be decided.
+
+teve will eventually replace SVTPlay.sh as soon as feature-by-feature
+compatiblity is achieved. SVTPlay.sh is freely available from
+https://github.com/simio/media-scripts, though it's written in Swedish.
+
+
+1. REQUIREMENTS
+
+Chicken Scheme is required to run and compile, preferably 4.7 or later.
+If your package manager does not contain Chicken, or the latest version
+is outdated, building from source is mind-numbingly simple on most
+platforms.
+
+The source is available from here:
+
+	http://code.call-cc.org/
+
+After installing Chicken, you'll also need to install a few eggs:
+
+    $ chicken-install -s utf8 uri-common intarweb srfi-37 json \
+          http-client vector-lib irregex
+
+
+2. BUILDING
+
+Just 'make' to get a binary, and then run it:
+
+    $ ./teve -h
+
+Optionally, teve can be interpreted like any script:
+
+    $ csi -s teve.scm -h
