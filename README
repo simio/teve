@@ -6,9 +6,9 @@ The current implementation (written for Chicken Scheme) is a prototype
 and work in progress. The language used in the final implementation has
 yet to be decided.
 
-teve will eventually replace SVTPlay.sh as soon as feature-by-feature
-compatiblity is achieved. SVTPlay.sh is freely available from
-https://github.com/simio/media-scripts, though it's written in Swedish.
+teve will replace SVTPlay.sh as soon as feature-by-feature compatiblity
+is achieved. SVTPlay.sh is freely available from
+https://github.com/simio/media-scripts, though it speaks Swedish.
 
 
 1. REQUIREMENTS
