@@ -28,20 +28,7 @@ The source code is available from the Chicken home page:
 After installing Chicken, you'll also need to install a few eggs:
 
     # chicken-install utf8 uri-common intarweb srfi-37 json \
-          http-client vector-lib irregex free-gettext
-
-On some systems (or rather, on any system without GNU libc), the above
-will fail when trying to install the iconv egg (which is pulled in by
-free-gettext).
-
-This issue is easily resolved by installing the iconv egg separately,
-before running the above chicken-install command.
-
-    # env CSC_OPTIONS="-L/usr/local/lib/ -I/usr/local/include/" \
-          chicken-install iconv
-
-Make sure the -L path points to the location of libiconv.so, and the -I
-path to the location of iconv.h. The above is correct on OpenBSD.
+          http-client vector-lib irregex
 
 
 2. BUILDING
