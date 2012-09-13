@@ -57,9 +57,10 @@
              (resolution (assoc "RESOLUTION" pairs))
              (bandwidth (assoc "BANDWIDTH" pairs)))
             (cons
-             (list (cons 'resolution (cdr resolution))
-                   (cons 'bitrate (cdr bitrate))
-                   (cons 'url (uri-decode-string slat)))
+             (list (cons 'resolution (or (x-sep-resolution->pair (cdr resolution))
+                                         (cdr resolution)))
+                   (cons 'bitrate (/ (cdr bandwidth) 1000))
+                   (cons 'url (uri-decode-string (cadr slat))))
              tail)))
 
 (define (svt:parse-hls-playlist str)
@@ -81,7 +82,7 @@
         #f
         (svt:parse-hls-playlist playlist))))
 
-(define (svt:swf-player-in url)
+(define (svt:swf-player-for url)
   (let* ((source (with-input-from-request url #f read-string))
          (match (irregex-search (string->irregex "\"([^\"]+.swf)") source)))
     (if (irregex-match-data? match)
@@ -96,6 +97,7 @@
                     (let* ((url (assoc "url" raw))
                            (bitrate (assoc "bitrate" raw))
                            (player-type (assoc "playerType" raw))
+                           ;; This might fail, obviously.
                            (stream-type (svt:stream-type-of (cdr url) (cdr bitrate) (cdr player-type))))
                       (if (and url (eq? stream-type 'hls))
                           (append
@@ -117,7 +119,7 @@
                                              (if subtitles (cons 'subtitles subtitles) #f)
                                              (if stream-type (cons 'stream-type stream-type) #f)
                                              (if (eq? stream-type 'rtmp)
-                                                 (cons 'swf-player (svt:swf-player-in play-url))
+                                                 (cons 'swf-player (svt:swf-player-for play-url))
                                                  #f)))
                            videos))))
                   '()

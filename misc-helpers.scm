@@ -83,4 +83,14 @@
                                                       (cadr pair))))
                                result)
                          result))))))
-    
+
+(define (x-sep-resolution->pair str)
+  (let find-split ((chars (string->list str))
+                   (x-res '()))
+    (cond ((null? (cdr chars)) #f)
+          ((or (eqv? #\x (car chars))
+               (eqv? #\X (car chars)))
+           (cons (string->number (apply conc (reverse x-res)))
+                 (string->number (apply conc (cdr chars)))))
+          (else
+           (find-split (cdr chars) (cons (car chars) x-res))))))
