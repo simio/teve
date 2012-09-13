@@ -115,7 +115,9 @@
                                                                      "?hdcore"
                                                                      "")))
                                                  #f)
-                                             (if bitrate (cons 'bitrate (cdr bitrate)) #f)
+                                             (if (and bitrate
+                                                      (< 0 (cdr bitrate)))
+                                                 (cons 'bitrate (cdr bitrate)) #f)
                                              (if subtitles (cons 'subtitles subtitles) #f)
                                              (if stream-type (cons 'stream-type stream-type) #f)
                                              (if (eq? stream-type 'rtmp)
