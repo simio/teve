@@ -12,6 +12,47 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+(require-extension srfi-1 srfi-13)
+
+;;; Dispatcher
+(define (url->video url)
+  (svt:json-data->video (svt:download-json-data url)))
+
+;;; Stream/video makers, accessors and updaters
+(define (stream-value-ref value stream)
+  (let ((ret (assoc value stream)))
+    (if ret (cdr ret) #f)))
+
+(define (update-stream video new-values)
+  (append new-values (filter (lambda (pair)
+                               (let look-through ((keys (map car new-values)))
+                                 (cond ((null? keys))
+                                       ((equal? (car keys) (car pair)) #f)
+                                       (else look-through (cdr keys)))))
+                             video)))
+(define (stream-ref id video)
+  (list-ref video id))
+
+(define (make-stream alist-of-values)
+  (update-stream '() alist-of-values))
+
+(define (stream-length stream)
+  (length stream))
+
+(define (update-video video stream)
+  (cons stream (filter (lambda (old-stream)
+                         ;; Let's just assume that if the url and bitrates are the same, it's a dupe
+                         (not (and (equal? (assoc 'url old-stream) (assoc 'url stream))
+                                   (equal? (assoc 'bitrate old-stream) (assoc 'bitrate stream)))))
+                       video)))
+
+(define (make-video streams)
+  (apply update-video (cons '() streams)))
+
+(define (video-length video)
+  (length video))
+
+;;; (pretty)-printers
 (define (stream-printer stream)
   (let print-values ((rest stream)
                      (output ""))
@@ -30,10 +71,11 @@
         output
         (print-streams (cdr rest)
                        (conc output
-                             (string-pad-right "id:" 20) id #\newline
+                             (string-pad-right "stream id:" 20) id #\newline
                              (stream-printer (car rest)) #\newline)
                        (+ 1 id)))))
 
+;;; Produce download(/playback/tee-playback) commands for the shell
 (define (video->download-command video outfile)
   (case (cdr (assv 'stream-type video))
     ((hds)
@@ -59,6 +101,3 @@
            " \"" (cdr (assv 'url video)) "\""))
     (else
      #f)))
-
-(define (url->video url)
-  (svt:json-data->video (svt:download-json-data url)))
