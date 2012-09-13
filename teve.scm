@@ -27,58 +27,8 @@
 (include "talk-is-cheap.scm")
 (include "misc-helpers.scm")
 (include "parse-flags.scm")
+(include "video.scm")
 (include "svt.scm")
-
-(define (stream-printer stream)
-  (let print-values ((rest stream)
-                     (output ""))
-    (if (null? rest)
-        output
-        (print-values (cdr rest)
-                      (conc output
-                            (string-pad-right (conc (caar rest) ":") 20)
-                            (cdar rest) #\newline)))))
-
-(define (video-printer video)
-  (let print-streams ((rest video)
-                      (output "")
-                      (id 0))
-    (if (null? rest)
-        output
-        (print-streams (cdr rest)
-                       (conc output
-                             (string-pad-right "id:" 20) id #\newline
-                             (stream-printer (car rest)) #\newline)
-                       (+ 1 id)))))
-
-(define (video->download-command video outfile)
-  (case (cdr (assv 'stream-type video))
-    ((hds)
-     (conc "php AdobeHDS.php"
-           " --manifest \"" (cdr (assv 'url video)) "\""
-           " --debug"
-           " --outfile \"" outfile ".flv\""))
-    ((hls)
-     (conc "ffmpeg"
-           " -i \"" (cdr (assv 'url video)) "\""
-           " -acodec copy -vcodec copy -absf aac_adtstoasc"
-           " \"" outfile ".avi\""))
-    ((rtmp)
-     (conc "rtmpdump"
-           " -r \"" (cdr (assv 'url video)) "\""
-           " -o \"" outfile ".flv\""
-           " -W \"" (cdr (assv 'swf-player video)) "\""))
-    ((http wmv)
-     (conc "curl"
-           " -Lo \"" outfile (if (eqv? 'http (cdr (assv 'stream-type video)))
-                               ".flv"
-                               ".wmv") "\""
-           " \"" (cdr (assv 'url video)) "\""))
-    (else
-     #f)))
-
-(define (url->video url)
-  (svt:json-data->video (svt:download-json-data url)))
 
 ;;; Do something
 (let ((command-line-args (parse-flags)))
