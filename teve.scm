@@ -13,6 +13,7 @@
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 (use utf8)
+;; TODO: Get rid of these, e.g. move them to where they are used.
 (require-extension srfi-37 json http-client vector-lib irregex)
 
 (define program-name "teve")
