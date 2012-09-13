@@ -13,6 +13,7 @@
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 (use utf8)
+
 ;; TODO: Get rid of these, e.g. move them to where they are used.
 ;; Also, separate the builtins from the chicken-install:ed.
 (require-extension srfi-37 json http-client vector-lib irregex)
@@ -48,7 +49,7 @@
                      (print "$ " download-command)
                      (print "Unknown stream type: #" id)))
                (print "Could not find stream #" id "." #\newline
-                      "Please verify #id with '" program-filename " -l " url "'")))
+                      "Please verify id from output of '" program-filename " -l " url "'")))
           (else
            (print "Pardon?"))))))
 (exit 0)
