@@ -52,27 +52,34 @@
      (else
       #f))))
 
+(define (svt:parse-hls-stream/push mesh slat tail)
+  (and-let* ((pairs (varlist->alist mesh))
+             (resolution (assoc "RESOLUTION" pairs))
+             (bandwidth (assoc "BANDWIDTH" pairs)))
+            (cons
+             (list (cons 'resolution (cdr resolution))
+                   (cons 'bitrate (cdr bitrate))
+                   (cons 'url (uri-decode-string slat)))
+             tail)))
+
+(define (svt:parse-hls-playlist str)
+  (let read-entries ((playlist (cdr (string-split str (string #\newline))))
+                     (streams '()))
+    (cond ((or (null? playlist)
+               (null? (cdr playlist)))
+           streams)
+          (else (read-entries (cddr playlist)
+                              (or (svt:parse-hls-stream/push (car playlist)
+                                                             (cdr playlist)
+                                                             streams)
+                                  streams))))))
+
 (define (svt:ios-explode playlist-url)
   (let ((playlist (with-input-from-request (make-emo-request playlist-url) #f read-string)))
-    (if (not (string? playlist))
+    (if (not (and (string? playlist)
+                  (string-contains playlist (string #\newline))))
         #f
-        (let make-videos ((m3u8 (cdr (string-split playlist (string #\newline))))
-                          (videos '()))
-          (if (or (null? m3u8)
-                  (null? (cdr m3u8)))
-              videos
-              (let* ((raw-vars (varlist->alist (car m3u8)))
-                     (resolution (assoc "RESOLUTION" raw-vars))
-                     (bandwidth (assoc "BANDWIDTH" raw-vars)))
-                (make-videos
-                 (cddr m3u8)
-                 (if (or (not resolution)
-                         (not bandwidth))
-                     videos
-                     (cons (list (if resolution (cons 'resolution (cdr resolution)) #f)
-                                 (if bandwidth (cons 'bitrate (/ (cdr bandwidth) 1000)) #f)
-                                 (cons 'url (uri-decode-string (cadr m3u8))))
-                           videos)))))))))
+        (svt:parse-hls-playlist playlist))))
 
 (define (svt:swf-player-in url)
   (let* ((source (with-input-from-request url #f read-string))
