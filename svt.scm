@@ -13,7 +13,7 @@
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 (require-extension srfi-1 srfi-12 irregex intarweb uri-common
-                  http-client json)
+                   http-client json)
 
 (include "intarweb-hack.scm")
 
@@ -64,7 +64,7 @@
               (let* ((raw-vars (varlist->alist (car m3u8)))
                      (resolution (assoc "RESOLUTION" raw-vars))
                      (bandwidth (assoc "BANDWIDTH" raw-vars)))
-		(make-videos
+                (make-videos
                  (cddr m3u8)
                  (if (or (not resolution)
                          (not bandwidth))
@@ -85,33 +85,33 @@
   (let ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
         (play-url (conc "http://www.svtplay.se" (json-ref json-data "context" "popoutUrl"))))
     (remove not
-    (fold (lambda (raw videos)
-            (let* ((url (assoc "url" raw))
-                   (bitrate (assoc "bitrate" raw))
-                   (player-type (assoc "playerType" raw))
-                   (stream-type (svt:stream-type-of (cdr url) (cdr bitrate) (cdr player-type))))
-              (if (and url (eq? stream-type 'hls))
-                  (append
-                   (remove not
-                           (map (lambda (x)
-                                  (cons (cons 'stream-type 'hls)
-                                        (cons (if subtitles (cons 'subtitles subtitles) #f)
-                                              x)))
-                                (svt:ios-explode (cdr url))))
-                   videos)
-                  (cons
-                   (remove not (list (if url (cons 'url
-                                                   (conc (uri-decode-string (cdr url))
-                                                         (if (eqv? stream-type 'hds)
-                                                             "?hdcore"
-                                                             "")))
-                                         #f)
-                                     (if bitrate (cons 'bitrate (cdr bitrate)) #f)
-                                     (if subtitles (cons 'subtitles subtitles) #f)
-                                     (if stream-type (cons 'stream-type stream-type) #f)
-                                     (if (eq? stream-type 'rtmp)
-                                         (cons 'swf-player (svt:swf-player-in play-url))
-                                         #f)))
-                   videos))))
-          '()
-          (json-ref json-data "video" "videoReferences")))))
+            (fold (lambda (raw videos)
+                    (let* ((url (assoc "url" raw))
+                           (bitrate (assoc "bitrate" raw))
+                           (player-type (assoc "playerType" raw))
+                           (stream-type (svt:stream-type-of (cdr url) (cdr bitrate) (cdr player-type))))
+                      (if (and url (eq? stream-type 'hls))
+                          (append
+                           (remove not
+                                   (map (lambda (x)
+                                          (cons (cons 'stream-type 'hls)
+                                                (cons (if subtitles (cons 'subtitles subtitles) #f)
+                                                      x)))
+                                        (svt:ios-explode (cdr url))))
+                           videos)
+                          (cons
+                           (remove not (list (if url (cons 'url
+                                                           (conc (uri-decode-string (cdr url))
+                                                                 (if (eqv? stream-type 'hds)
+                                                                     "?hdcore"
+                                                                     "")))
+                                                 #f)
+                                             (if bitrate (cons 'bitrate (cdr bitrate)) #f)
+                                             (if subtitles (cons 'subtitles subtitles) #f)
+                                             (if stream-type (cons 'stream-type stream-type) #f)
+                                             (if (eq? stream-type 'rtmp)
+                                                 (cons 'swf-player (svt:swf-player-in play-url))
+                                                 #f)))
+                           videos))))
+                  '()
+                  (json-ref json-data "video" "videoReferences")))))
