@@ -1,39 +1,61 @@
-teve [te:ve:] is CLI streamer and downloader for online TV sites.
-The name is derived from "tee video", which is one of the main points of
-the program.
+teve [te:ve:] is a work-in-progress CLI streamer and downloader for
+online TV sites. The name is derived from "tee video", which is one of
+the main points of the program.
 
-The current implementation (written for Chicken Scheme) is a prototype
-and work in progress. The language used in the final implementation has
-yet to be decided.
+The current implementation (written in Scheme) is a prototype. Which
+programming language the final implementation will use has yet to be
+decided.
 
 teve will replace SVTPlay.sh as soon as feature-by-feature compatiblity
-is achieved. SVTPlay.sh is freely available from
-https://github.com/simio/media-scripts, though it speaks Swedish.
+is achieved. The script is freely available from this GitHub page:
+
+    https://github.com/simio/media-scripts
+
+Please be aware that it will only talk you in Swedish.
 
 
 1. REQUIREMENTS
 
 Chicken Scheme is required to run and compile, preferably 4.7 or later.
-If your package manager does not contain Chicken, or the latest version
-is outdated, building from source is mind-numbingly simple on most
-platforms.
+If your package manager does not contain Chicken, or contains only an
+outdated version, building it from source is mind-numbingly simple on
+most platforms.
 
-The source is available from here:
+The source code is available from the Chicken home page:
 
 	http://code.call-cc.org/
 
 After installing Chicken, you'll also need to install a few eggs:
 
-    $ chicken-install -s utf8 uri-common intarweb srfi-37 json \
-          http-client vector-lib irregex
+    # chicken-install utf8 uri-common intarweb srfi-37 json \
+          http-client vector-lib irregex free-gettext
 
+On some systems (or rather, on any system without GNU libc), the above
+will fail when trying to install the iconv egg (which is pulled in by
+free-gettext).
+
+This issue is easily resolved by installing the iconv egg separately,
+before running the above chicken-install command.
+
+    # env CSC_OPTIONS="-L/usr/local/lib/ -I/usr/local/include/" \
+          chicken-install iconv
+
+Make sure the -L path points to the location of libiconv.so, and the -I
+path to the location of iconv.h. The above is correct on OpenBSD.
 
 2. BUILDING
 
 Just 'make' to get a binary, and then run it:
 
     $ ./teve -h
+    teve prototype-1
+    Usage: teve [-hlv] [-d id] [-o outfile] url
+      -d <id>   Download stream #<id>
+      -h        Show this message.
+      -l        List available streams.
+      -o <file> Download to <file>. (Default is 'movie'.)
+      -v        Be verbose.
 
-Optionally, teve can be interpreted like any script:
+If you would rather run teve as a script, that's fine too:
 
     $ csi -s teve.scm -h
