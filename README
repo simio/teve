@@ -43,6 +43,7 @@ before running the above chicken-install command.
 Make sure the -L path points to the location of libiconv.so, and the -I
 path to the location of iconv.h. The above is correct on OpenBSD.
 
+
 2. BUILDING
 
 Just 'make' to get a binary, and then run it:
