@@ -14,6 +14,7 @@
 
 (use utf8)
 ;; TODO: Get rid of these, e.g. move them to where they are used.
+;; Also, separate the builtins from the chicken-install:ed.
 (require-extension srfi-37 json http-client vector-lib irregex)
 
 (define program-name "teve")
