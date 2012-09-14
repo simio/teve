@@ -52,6 +52,8 @@
      (else
       #f))))
 
+;;; parse-hls-stream/push, parse-hls-playlist and ios-explode should
+;;; eventually end up in apple-hls.scm or something of the sorts.
 (define (svt:parse-hls-stream/push mesh slat tail)
   (and-let* ((pairs (varlist->alist mesh))
              (resolution (assoc "RESOLUTION" pairs))
@@ -63,6 +65,7 @@
                    (cons 'url (uri-decode-string (car slat))))
              tail)))
 
+;;; see above note
 (define (svt:parse-hls-playlist str)
   (let read-entries ((playlist (cdr (string-split str (string #\newline))))
                      (streams '()))
@@ -75,6 +78,7 @@
                                                              streams)
                                   streams))))))
 
+;;; see above note
 (define (svt:ios-explode playlist-url)
   (let ((playlist (with-input-from-request (make-emo-request playlist-url) #f read-string)))
     (if (not (and (string? playlist)
