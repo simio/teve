@@ -23,13 +23,15 @@
   (let ((ret (assoc value stream)))
     (if ret (cdr ret) #f)))
 
-(define (update-stream video new-values)
-  (append new-values (filter (lambda (pair)
-                               (let look-through ((keys (map car new-values)))
-                                 (cond ((null? keys))
-                                       ((equal? (car keys) (car pair)) #f)
-                                       (else look-through (cdr keys)))))
-                             video)))
+(define (update-stream stream alist-of-new-values)
+  (append alist-of-new-values
+          (filter
+           (lambda (pair)
+             (let look-through ((keys (map car alist-of-new-values)))
+               (cond ((null? keys))
+                     ((equal? (car keys) (car pair)) #f)
+                     (else look-through (cdr keys)))))
+           stream)))
 (define (stream-ref id video)
   (list-ref video id))
 
@@ -40,14 +42,10 @@
   (length stream))
 
 (define (update-video video stream)
-  (cons stream (filter (lambda (old-stream)
-                         ;; Let's just assume that if the url and bitrates are the same, it's a dupe
-                         (not (and (equal? (assoc 'url old-stream) (assoc 'url stream))
-                                   (equal? (assoc 'bitrate old-stream) (assoc 'bitrate stream)))))
-                       video)))
+  (cons stream (remove (lambda (old-stream) (equal? old-stream stream)) video)))
 
-(define (make-video streams)
-  (apply update-video (cons '() streams)))
+(define (make-video stream)
+  (update-video '() stream))
 
 (define (video-length video)
   (length video))
