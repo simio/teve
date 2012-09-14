@@ -36,8 +36,7 @@
 (define (make-stream alist-of-values)
   (update-stream '() (remove not alist-of-values)))
 
-(define (stream-length stream)
-  (length stream))
+(define stream-length length)
 
 (define (update-video video stream)
   (if stream
@@ -47,8 +46,7 @@
 (define (make-video stream)
   (update-video '() (or stream '())))
 
-(define (video-length video)
-  (length video))
+(define video-length length)
 
 ;;; (pretty)-printers
 (define (stream-printer stream)
