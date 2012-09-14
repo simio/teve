@@ -12,7 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension intarweb srfi-13)
+(require-extension intarweb srfi-13 uri-common)
 
 ;;; Akamai is emotionally unstable and needs special treatment.
 ;;; The http servers might choke on url:s in GET requests containing
