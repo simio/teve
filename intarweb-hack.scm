@@ -23,10 +23,10 @@
 (define (hacks:url-decode-commas str)
   (string-translate* str '(("%2C" . ","))))
 
-;;; This function unmodified from intarweb.scm
+;;; This function UNMODIFIED from intarweb.scm
 (define http-method->string symbol->string)
 
-;;; This function is modified from intarweb.scm
+;;; This function is MODIFIED from intarweb.scm
 (define (write-request-line/decode-commas request)
   (fprintf (request-port request)
            "~A ~A HTTP/~A.~A\r\n"
@@ -36,7 +36,7 @@
            (request-major request)
            (request-minor request)))
 
-;;; This function is unmodified from intarweb.scm
+;;; This function is MODIFIED from intarweb.scm
 (define (http-1.0-request-unparser/decode-commas request)
   (and-let* (((= (request-major request) 1))
              ((= (request-minor request) 0))
