@@ -12,10 +12,11 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension srfi-1 srfi-12 irregex intarweb uri-common
-                   http-client json)
+(require-extension srfi-12)
+(require-extension http-client json irregex uri-common)
 
-(include "intarweb-hack.scm")
+(include "misc-helpers.scm")
+(include "apple-hls.scm")
 
 ;;; Get JSON-data from SVT Play
 ;;; Return values:
@@ -54,43 +55,6 @@
      (else
       #f))))
 
-;;; parse-hls-stream/push, parse-hls-playlist and ios-explode should
-;;; eventually end up in apple-hls.scm or something of the sorts.
-(define (svt:parse-hls-stream/push mesh slat)
-  (and-let* ((pairs (varlist->alist mesh))
-             (resolution (assoc "RESOLUTION" pairs))
-             (bandwidth (assoc "BANDWIDTH" pairs)))
-            (make-stream
-             (list (cons 'resolution
-                         (or (x-sep-resolution->pair (cdr resolution))
-                             (cdr resolution)))
-                   (cons 'bitrate (/ (cdr bandwidth) 1000))
-                   (cons 'url (uri-decode-string (car slat)))))))
-
-;;; see above note
-(define (svt:parse-hls-playlist str)
-  (let read-entries ((playlist (cdr (string-split str (string #\newline))))
-                     (video '()))
-    (cond ((or (null? playlist)
-               (null? (cdr playlist)))
-           video)
-          (else (read-entries (cddr playlist)
-                              (or (update-video
-                                   video
-                                   (svt:parse-hls-stream/push (car playlist)
-                                                              (cdr playlist)))
-                                  video))))))
-
-;;; see above note
-(define (svt:ios-explode playlist-url)
-  (let ((playlist (with-input-from-request (make-emo-request playlist-url)
-                                           #f
-                                           read-string)))
-    (if (not (and (string? playlist)
-                  (string-contains playlist (string #\newline))))
-        #f
-        (svt:parse-hls-playlist playlist))))
-
 (define (svt:swf-player-for url)
   (let* ((source (with-input-from-request url #f read-string))
          (match (irregex-search (string->irregex "\"([^\"]+.swf)") source)))
@@ -120,7 +84,7 @@
                                                           (cons 'subtitles
                                                                 subtitles) #f)
                                                       x)))
-                                        (svt:ios-explode (cdr url))))
+                                        (hls-master->video (cdr url))))
                            videos)
                           (cons
                            (remove not
