@@ -60,7 +60,7 @@
              (list (cons 'resolution (or (x-sep-resolution->pair (cdr resolution))
                                          (cdr resolution)))
                    (cons 'bitrate (/ (cdr bandwidth) 1000))
-                   (cons 'url (uri-decode-string (cadr slat))))
+                   (cons 'url (uri-decode-string (car slat))))
              tail)))
 
 (define (svt:parse-hls-playlist str)
