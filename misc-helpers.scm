@@ -26,7 +26,7 @@
 ;;; Accessor for values in a tree returned by json->vector->alist/deep
 ;;; keys are strings (for use with alists) or numbers (for use with list-ref).
 ;;; Use multiple keys to go deeper into the tree. For example,
-;;; (json-ref tree "vids" 5 "url") corresponds to tree["vids"][5]["url"] in pseudocode.
+;;; (json-ref tree "vids" 5 "url") is "url" in item 5 in "vids" in tree.
 ;;;
 ;;; Return values:
 ;;;   A list or a pair	(if the specified key exists and its value isn't #f)
@@ -38,7 +38,8 @@
          (apply json-ref (cons (list-ref json (car keys)) (cdr keys))))
         ((string? (car keys))
          (let ((pairs-only (filter-map (lambda (x) (if (pair? x) x #f)) json)))
-           (apply json-ref (cons (cdr (assoc (car keys) pairs-only)) (cdr keys)))))
+           (apply json-ref (cons (cdr (assoc (car keys) pairs-only))
+                                 (cdr keys)))))
         (else #f)))
 
 ;;; Get transport protocol identifier from a URL.
@@ -75,14 +76,15 @@
                     (result '()))
      (if (null? raw-pairs)
          result
-         (make-pairs (cdr raw-pairs)
-                     (if (string-contains (car raw-pairs) "=")
-                         (cons (let ((pair (string-split (car raw-pairs) "=")))
-                                 (cons (car pair) (if (string->number (cadr pair))
-                                                      (string->number (cadr pair))
-                                                      (cadr pair))))
-                               result)
-                         result))))))
+         (make-pairs
+          (cdr raw-pairs)
+          (if (string-contains (car raw-pairs) "=")
+              (cons (let ((pair (string-split (car raw-pairs) "=")))
+                      (cons (car pair) (if (string->number (cadr pair))
+                                           (string->number (cadr pair))
+                                           (cadr pair))))
+                    result)
+              result))))))
 
 (define (x-sep-resolution->pair str)
   (let find-split ((chars (string->list str))

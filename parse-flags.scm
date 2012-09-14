@@ -20,7 +20,8 @@
      '(#\h) #f #f
      (lambda _
        (stderr (conc program-name " " program-version))
-       (stderr (conc "Usage: " program-filename " [-hlv] [-d id] [-o outfile] url"))
+       (stderr (conc "Usage: " program-filename
+                     " [-hlv] [-d id] [-o outfile] url"))
        (stderr "  -d <id>   Download stream #<id>")
        (stderr "  -h        Show this message.")
        (stderr "  -l        List available streams.")
@@ -58,7 +59,8 @@
   (reverse
    (args-fold
     (command-line-arguments)
-    (list flag-usage flag-list-streams flag-download-id flag-outfile flag-verbose)
+    (list flag-usage flag-list-streams flag-download-id
+          flag-outfile flag-verbose)
     (lambda (option name arg seeds)
       (stdout (conc "Unrecognized option " name)))
     cons

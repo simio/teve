@@ -25,7 +25,9 @@
   (json-vector->alist/deep
    (handle-exceptions exn #f
                       (with-input-from-request
-                       (add-http-get-query-var url "output" "json") #f json-read))))
+                       (add-http-get-query-var url "output" "json")
+                       #f
+                       json-read))))
 
 (define (svt:stream-type-of url bitrate player-type)
   (let ((protocol (url->protocol url)))
@@ -59,8 +61,9 @@
              (resolution (assoc "RESOLUTION" pairs))
              (bandwidth (assoc "BANDWIDTH" pairs)))
             (cons
-             (list (cons 'resolution (or (x-sep-resolution->pair (cdr resolution))
-                                         (cdr resolution)))
+             (list (cons 'resolution
+                         (or (x-sep-resolution->pair (cdr resolution))
+                             (cdr resolution)))
                    (cons 'bitrate (/ (cdr bandwidth) 1000))
                    (cons 'url (uri-decode-string (car slat))))
              tail)))
@@ -80,7 +83,9 @@
 
 ;;; see above note
 (define (svt:ios-explode playlist-url)
-  (let ((playlist (with-input-from-request (make-emo-request playlist-url) #f read-string)))
+  (let ((playlist (with-input-from-request (make-emo-request playlist-url)
+                                           #f
+                                           read-string)))
     (if (not (and (string? playlist)
                   (string-contains playlist (string #\newline))))
         #f
@@ -95,38 +100,49 @@
 
 (define (svt:json-data->video json-data)
   (let ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
-        (play-url (conc "http://www.svtplay.se" (json-ref json-data "context" "popoutUrl"))))
+        (play-url (conc "http://www.svtplay.se"
+                        (json-ref json-data "context" "popoutUrl"))))
     (remove not
             (fold (lambda (raw videos)
                     (let* ((url (assoc "url" raw))
                            (bitrate (assoc "bitrate" raw))
                            (player-type (assoc "playerType" raw))
                            ;; This might fail, obviously.
-                           (stream-type (svt:stream-type-of (cdr url) (cdr bitrate) (cdr player-type))))
+                           (stream-type (svt:stream-type-of (cdr url)
+                                                            (cdr bitrate)
+                                                            (cdr player-type))))
                       (if (and url (eq? stream-type 'hls))
                           (append
                            (remove not
                                    (map (lambda (x)
                                           (cons (cons 'stream-type 'hls)
-                                                (cons (if subtitles (cons 'subtitles subtitles) #f)
+                                                (cons (if subtitles
+                                                          (cons 'subtitles
+                                                                subtitles) #f)
                                                       x)))
                                         (svt:ios-explode (cdr url))))
                            videos)
                           (cons
-                           (remove not (list (if url (cons 'url
-                                                           (conc (uri-decode-string (cdr url))
-                                                                 (if (eqv? stream-type 'hds)
-                                                                     "?hdcore"
-                                                                     "")))
-                                                 #f)
-                                             (if (and bitrate
-                                                      (< 0 (cdr bitrate)))
-                                                 (cons 'bitrate (cdr bitrate)) #f)
-                                             (if subtitles (cons 'subtitles subtitles) #f)
-                                             (if stream-type (cons 'stream-type stream-type) #f)
-                                             (if (eq? stream-type 'rtmp)
-                                                 (cons 'swf-player (svt:swf-player-for play-url))
-                                                 #f)))
+                           (remove not
+                                   (list
+                                    (if url
+                                        (cons 'url
+                                              (conc (uri-decode-string (cdr url))
+                                                    (if (eqv? stream-type 'hds)
+                                                        "?hdcore"
+                                                        "")))
+                                        #f)
+                                    (if (and bitrate
+                                             (< 0 (cdr bitrate)))
+                                        (cons 'bitrate (cdr bitrate)) #f)
+                                    (if subtitles
+                                        (cons 'subtitles subtitles) #f)
+                                    (if stream-type
+                                        (cons 'stream-type stream-type) #f)
+                                    (if (eq? stream-type 'rtmp)
+                                        (cons 'swf-player
+                                              (svt:swf-player-for play-url))
+                                        #f)))
                            videos))))
                   '()
                   (json-ref json-data "video" "videoReferences")))))
