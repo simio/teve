@@ -12,7 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension srfi-13)
+(require-extension srfi-1 srfi-13)
 
 ;;; Recurse through the vector/alist mess returned by json-read,
 ;;; converting vectors to alists.
