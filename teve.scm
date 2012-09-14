@@ -48,7 +48,7 @@
           ((download)
            (if (<= 0 id (length video))
                (let ((download-command
-                      (video->download-command (list-ref video id) outfile)))
+                      (stream->download-command (list-ref video id) outfile)))
                  (if download-command
                      (print "$ " download-command)
                      (print "Unknown stream type: #" id)))
