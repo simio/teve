@@ -33,6 +33,10 @@
 (include "video.scm")
 (include "svt.scm")
 
+;;; Dispatcher
+(define (url->video url)
+  (svt:json-data->video (svt:download-json-data url)))
+
 ;;; Do something
 (let ((command-line-args (parse-flags)))
   (if (not (null? command-line-args))

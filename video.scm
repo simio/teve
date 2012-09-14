@@ -14,10 +14,6 @@
 
 (require-extension srfi-1 srfi-13)
 
-;;; Dispatcher
-(define (url->video url)
-  (svt:json-data->video (svt:download-json-data url)))
-
 ;;; Stream/video makers, accessors and updaters
 (define (stream-value-ref value stream)
   (let ((ret (assoc value stream)))
