@@ -15,33 +15,37 @@
 (require-extension srfi-1 srfi-13)
 
 ;;; Stream/video makers, accessors and updaters
-(define (stream-value-ref value stream)
-  (let ((ret (assoc value stream)))
+(define (stream-ref key stream)
+  (let ((ret (assoc key stream)))
     (if ret (cdr ret) #f)))
 
 (define (update-stream stream alist-of-new-values)
   (append alist-of-new-values
           (filter
            (lambda (pair)
-             (let look-through ((keys (map car alist-of-new-values)))
-               (cond ((null? keys))
-                     ((equal? (car keys) (car pair)) #f)
-                     (else look-through (cdr keys)))))
+             (and (pair? pair)
+                  (let look-through ((keys (map car alist-of-new-values)))
+                    (cond ((null? keys))
+                          ((equal? (car keys) (car pair)) #f)
+                          (else look-through (cdr keys))))))
            stream)))
-(define (stream-ref id video)
-  (list-ref video id))
+
+(define (video-ref number video)
+  (list-ref video number))
 
 (define (make-stream alist-of-values)
-  (update-stream '() alist-of-values))
+  (update-stream '() (remove not alist-of-values)))
 
 (define (stream-length stream)
   (length stream))
 
 (define (update-video video stream)
-  (cons stream (remove (lambda (old-stream) (equal? old-stream stream)) video)))
+  (if stream
+      (cons stream (remove (lambda (old-stream) (equal? old-stream stream)) video))
+      video))
 
 (define (make-video stream)
-  (update-video '() stream))
+  (update-video '() (or stream '())))
 
 (define (video-length video)
   (length video))
@@ -70,28 +74,28 @@
                        (+ 1 id)))))
 
 ;;; Produce download(/playback/tee-playback) commands for the shell
-(define (video->download-command video outfile)
-  (case (cdr (assv 'stream-type video))
+(define (stream->download-command stream outfile)
+  (case (stream-ref 'stream-type stream)
     ((hds)
      (conc "php AdobeHDS.php"
-           " --manifest \"" (cdr (assv 'url video)) "\""
+           " --manifest \"" (stream-ref 'url stream) "\""
            " --debug"
            " --outfile \"" outfile ".flv\""))
     ((hls)
      (conc "ffmpeg"
-           " -i \"" (cdr (assv 'url video)) "\""
+           " -i \"" (stream-ref 'url stream) "\""
            " -acodec copy -vcodec copy -absf aac_adtstoasc"
            " \"" outfile ".avi\""))
     ((rtmp)
      (conc "rtmpdump"
-           " -r \"" (cdr (assv 'url video)) "\""
+           " -r \"" (stream-ref 'url stream) "\""
            " -o \"" outfile ".flv\""
-           " -W \"" (cdr (assv 'swf-player video)) "\""))
+           " -W \"" (stream-ref 'swf-player stream) "\""))
     ((http wmv)
      (conc "curl"
-           " -Lo \"" outfile (if (eqv? 'http (cdr (assv 'stream-type video)))
+           " -Lo \"" outfile (if (eqv? 'http (stream-ref 'stream-type stream))
                                ".flv"
                                ".wmv") "\""
-           " \"" (cdr (assv 'url video)) "\""))
+           " \"" (stream-ref 'url stream) "\""))
     (else
      #f)))
