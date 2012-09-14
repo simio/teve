@@ -42,8 +42,7 @@
           ((list)
            (print* (video-printer video)))
           ((download)
-           (if (and (< id (length video))
-                    (not (negative? id)))
+           (if (<= 0 id (length video))
                (let ((download-command (video->download-command (list-ref video id) outfile)))
                  (if download-command
                      (print "$ " download-command)
