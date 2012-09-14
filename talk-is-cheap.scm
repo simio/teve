@@ -12,21 +12,36 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(define (print-to-port stuff port)
+;;; Let's ignore syntax for a while...
+
+(define (print-to-port* stuff port)
   (if (string? stuff)
       (display stuff port)
-      (pretty-print stuff port))
+      (pretty-print stuff port)))
+
+(define (print-to-port stuff port)
+  (print-to-port* stuff port)
   (newline port))
 
 (define (stdout stuff)
   (print-to-port stuff (current-output-port)))
 
+(define (stdout* stuff)
+  (print-to-port* stuff (current-output-port)))
+
 (define (stderr stuff)
   (print-to-port stuff (current-error-port)))
+
+(define (stderr* stuff)
+  (print-to-port* stuff (current-error-port)))
 
 (define (debug stuff)
   (if verbosity
       (stderr stuff)))
+
+(define (debug* stuff)
+  (if verbosity
+      (stderr* stuff)))
 
 (define (debug-wrap-with-prefix prefix stuff)
   (begin
@@ -36,12 +51,30 @@
             (stderr (cons prefix (list stuff)))))
     stuff))
 
+(define (debug-wrap-with-prefix* prefix stuff)
+  (begin
+    (if verbosity
+	(if (string? stuff)
+            (stderr* (conc prefix stuff))
+            (stderr* (cons prefix (list stuff)))))
+    stuff))
+
 (define (debug-wrap stuff)
   (begin
     (debug-wrap-with-prefix "" stuff)
     stuff))
 
+(define (debug-wrap* stuff)
+  (begin
+    (debug-wrap-with-prefix* "" stuff)
+    stuff))
+
 (define (debug-wrap-with-parser parser stuff)
   (begin
     (debug-wrap (apply parser (list stuff)))
+    stuff))
+
+(define (debug-wrap-with-parser* parser stuff)
+  (begin
+    (debug-wrap* (apply parser (list stuff)))
     stuff))

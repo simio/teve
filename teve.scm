@@ -44,17 +44,17 @@
              (video (url->video url)))
         (case action
           ((list)
-           (print* (video-printer video)))
+           (stderr* (video-printer video)))
           ((download)
            (if (<= 0 id (length video))
                (let ((download-command
                       (stream->download-command (list-ref video id) outfile)))
                  (if download-command
-                     (print "$ " download-command)
-                     (print "Unknown stream type: #" id)))
-               (print "Could not find stream #" id "." #\newline
+                     (stdout download-command)
+                     (stderr "Unknown stream type: #" id)))
+               (stderr "Could not find stream #" id "." #\newline
                       "Please verify id from output of '"
                       program-filename " -l " url "'")))
           (else
-           (print "Pardon?"))))))
+           (stderr "Pardon?"))))))
 (exit 0)
