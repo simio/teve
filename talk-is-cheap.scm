@@ -15,7 +15,8 @@
 ;;; Let's ignore syntax for a while...
 
 (define (print-to-port* port . stuff)
-  (if (every (lambda (o) (or (string? o) (number? o))) stuff)
+  (if (every (lambda (o) (or (string? o) (number? o) (char? o)))
+             stuff)
       (display (apply conc stuff) port)
       (pretty-print stuff port)))
 
