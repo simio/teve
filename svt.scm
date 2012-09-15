@@ -65,8 +65,8 @@
 (define (svt:json-data->video json-data)
   (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
          (popout-url (json-ref json-data "context" "popoutUrl"))
-         (play-url (if popoutUrl
-                       (conc "http://www.svtplay.se" popoutUrl)
+         (play-url (if popout-url
+                       (conc "http://www.svtplay.se" popout-url)
                        #f)))
     (remove not
             (fold (lambda (raw videos)
