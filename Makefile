@@ -5,13 +5,13 @@ SOURCE_FILES=*.scm
 EXTRA_FILES=Makefile README
 DISTFILES=$(SOURCE_FILES) $(EXTRA_FILES)
 
-EGGS=utf8 intarweb srfi-37 json http-client vector-lib irregex regex \
+EGGS=utf8 intarweb srfi-37 json http-client vector-lib \
 	packrat openssl base64 defstruct uri-common matchable uri-generic \
 	message-digest
 
-OTHER_DEPLOY_FILES=type-checks type-errors blob-hexadecimal to-hex \
-	string-hexadecimal blob-set-int md5 string-utils memoized-string \
-	lookup-table unicode-utils sendfile variable-item
+OTHER_DEPLOY_FILES=type-checks type-errors regex blob-hexadecimal to-hex \
+	string-hexadecimal variable-item blob-set-int md5 string-utils \
+	memoized-string lookup-table unicode-utils sendfile
 
 SO=.so
 
