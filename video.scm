@@ -108,9 +108,15 @@
     ((http wmv)
      (conc "curl \\" #\newline
            "    -Lo " outfile (if (eqv? 'http
-                                          (stream-ref 'stream-type stream))
-                               ".flv"
-                               ".wmv") " \\" #\newline
+                                        (stream-ref 'stream-type stream))
+                                  ".flv"
+                                  ".wmv") " \\" #\newline
+                                  "    " (stream-ref 'url stream)))
+    ((mms rtsp)
+     (conc "mplayer \\" #\newline
+           "    -dumpstream -dumpfile " outfile
+           (if (eqv? 'mms (stream-ref 'stream-type stream)) ".wmv" ".mp4")
+           " \\" #\newline
            "    " (stream-ref 'url stream)))
     (else
      #f)))
