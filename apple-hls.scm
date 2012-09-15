@@ -26,12 +26,13 @@
     (and-let* ((pairs (varlist->alist mesh))
                (resolution (assoc "RESOLUTION" pairs))
                (bandwidth (assoc "BANDWIDTH" pairs)))
-              (make-stream
-               (list (cons 'resolution
-                           (or (x-sep-resolution->pair (cdr resolution))
-                               (cdr resolution)))
-                     (cons 'bitrate (/ (cdr bandwidth) 1000))
-                     (cons 'url (uri-decode-string (car slat)))))))
+              (apply make-stream
+                     (list (cons 'resolution
+                                 (or (x-sep-resolution->pair (cdr resolution))
+                                     (cdr resolution)))
+                           (cons 'bitrate (/ (cdr bandwidth) 1000))
+                           (cons 'url (uri-decode-string (car slat)))))))
+  
   (let read-entries ((playlist (cdr (string-split str (string #\newline))))
                      (video '()))
     (cond ((or (null? playlist)

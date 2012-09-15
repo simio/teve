@@ -15,38 +15,52 @@
 (require-extension srfi-1 srfi-13)
 
 ;;; Stream/video makers, accessors and updaters
+;;; An object is a valid video iff it is a list where every item is a stream.
+;;; An object is a valid stream iff it is an alist and the car of every
+;;; item is a symbol.
+;;;
+;;; Do not rely on lists of streams being valid videos outside of this file.
+;;;
+;;; Streams may not contain the values #t or #f, since #f is returned by
+;;; stream-ref to signify the specified key does not exist.
+
 (define (stream-ref key stream)
   (let ((ret (assoc key stream)))
     (if ret (cdr ret) #f)))
 
-(define (update-stream stream alist-of-new-values)
-  (append alist-of-new-values
-          (filter
-           (lambda (pair)
-             (and (pair? pair)
-                  (let look-through ((keys (map car alist-of-new-values)))
-                    (cond ((null? keys))
-                          ((equal? (car keys) (car pair)) #f)
-                          (else look-through (cdr keys))))))
-           stream)))
+(define (stream-value? obj)
+  (and (pair? obj)
+       (symbol? (car obj))))
+
+(define (make-stream-value key val)
+  (cons key val))
+
+(define (stream? obj)
+  (and (list? obj)
+       (every (lambda (p) (and (pair? p) (symbol? (car p)))) obj)))
+
+(define (update-stream stream . values)
+  (delete-duplicates
+   (append (filter stream-value? values) stream)
+   (lambda (o1 o2) (equal? o1 o2))))
+  
+(define (make-stream . values)
+  (apply update-stream (cons '() (filter stream-value? values))))
+
+(define stream-length length)
 
 (define (video-ref number video)
   (list-ref video number))
 
-(define (make-stream alist-of-values)
-  (update-stream '() (remove not alist-of-values)))
+(define (video? obj)
+  (and (list? obj)
+       (every stream? obj)))
 
-(define stream-length length)
+(define (update-video video . streams)
+  (delete-duplicates (append (filter stream? streams) video)))
 
-(define (update-video video stream)
-  (if stream
-      (cons stream (remove (lambda (old-stream)
-                             (equal? old-stream stream))
-                           video))
-      video))
-
-(define (make-video stream)
-  (update-video '() (or stream '())))
+(define (make-video . streams)
+  (apply update-video (cons '() (filter stream? streams))))
 
 (define video-length length)
 
