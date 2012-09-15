@@ -29,8 +29,8 @@
 ;;; (json-ref tree "vids" 5 "url") is "url" in item 5 in "vids" in tree.
 ;;;
 ;;; Return values:
-;;;   A list or a pair	(if the specified key exists and its value isn't #f)
-;;;   #f		(otherwise)
+;;;   A list or a pair  (if the specified key exists and its value isn't #f)
+;;;   #f                (otherwise)
 (define (json-ref json . keys)
   (cond ((null? keys) json)
         ((and (number? (car keys))
@@ -44,8 +44,8 @@
 
 ;;; Get transport protocol identifier from a URL.
 ;;; Return values:
-;;;   A string		(if url contains "://")
-;;;   #f		(otherwise)
+;;;   A string          (if url contains "://")
+;;;   #f                (otherwise)
 ;;; Unspecified if url is not a string or char.
 (define (url->protocol url)
   (let ((index (string-contains-ci url "://")))
@@ -67,8 +67,8 @@
 ;;; Converts a string of the form "VAR=VAL,VAR2=VAL2,..." to an alist.
 ;;; Numerical values are converted to numbers, while everything else is strings.
 ;;; Return values:
-;;;   An alist		(if input is valid)
-;;;   #f		(otherwise)
+;;;   An alist          (if input is valid)
+;;;   #f                (otherwise)
 (define (varlist->alist str)
   (handle-exceptions
    exn #f
