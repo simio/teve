@@ -106,6 +106,7 @@
                                         (cons 'subtitles subtitles) #f)
                                     (if stream-type
                                         (cons 'stream-type stream-type) #f)
+                                    (cons 'view-at play-url)
                                     (if (eq? stream-type 'rtmp)
                                         (cons 'swf-player
                                               (svt:swf-player-for play-url))
