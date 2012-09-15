@@ -12,8 +12,8 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension srfi-12)
-(require-extension http-client json irregex uri-common)
+(require-extension srfi-12 srfi-13)
+(require-extension http-client uri-common)
 
 (include "misc-helpers.scm")
 (include "apple-hls.scm")
@@ -23,12 +23,28 @@
 ;;;   A list/alist tree         (if valid JSON data is available for url)
 ;;;   #f                        (otherwise)
 (define (svt:download-json-data url)
-  (json-vector->alist/deep
-   (handle-exceptions exn #f
-                      (with-input-from-request
-                       (add-http-get-query-var url "output" "json")
-                       #f
-                       json-read))))
+  (download-json (add-http-get-query-var url "output" "json")))
+
+(define (find-first-quoted-swf)
+  (let ((ending (string-reverse ".swf")))
+    (let find-first-swf ((stack "")
+                         (is-discarding #t)
+                         (ch (read-char)))
+      (cond
+       ((eof-object? ch) #f)
+       ((and (char=? #\" ch) (string-prefix? ending stack))
+        (let discard-until-eof ((ch (read-char)))
+          (if (eof-object? ch)
+              (string-reverse stack)
+              (discard-until-eof (read-char)))))
+       (else
+        (find-first-swf (if is-discarding "" (conc ch stack))
+                        (not-if (char=? #\" ch) is-discarding)
+                        (read-char)))))))
+
+(define (svt:swf-player-for url)
+  (and-let* ((swf (with-input-from-request url #f find-first-quoted-swf)))
+    (conc "http://www.svtplay.se" swf)))
 
 (define (svt:stream-type-of url bitrate player-type)
   (let ((protocol (url->protocol url)))
@@ -54,13 +70,6 @@
       'mms)
      (else
       #f))))
-
-(define (svt:swf-player-for url)
-  (let* ((source (with-input-from-request url #f read-string))
-         (match (irregex-search (string->irregex "\"([^\"]+.swf)") source)))
-    (if (irregex-match-data? match)
-        (conc "http://www.svtplay.se" (irregex-match-substring match 1))
-        #f)))
 
 (define (svt:json-data->video json-data)
   (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))

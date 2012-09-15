@@ -13,18 +13,10 @@
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 (require-extension srfi-1 srfi-13)
+(require-extension http-client json)
 
-;;; Recurse through the vector/alist mess returned by json-read,
-;;; converting vectors to alists.
-(define (json-vector->alist/deep vector)
-  (cond ((null? vector) vector)
-        ((pair? vector) (cons (json-vector->alist/deep (car vector))
-                              (json-vector->alist/deep (cdr vector))))
-        ((vector? vector) (json-vector->alist/deep (vector->list vector)))
-        (else vector)))
-
-;;; Accessor for values in a tree returned by json->vector->alist/deep
-;;; keys are strings (for use with alists) or numbers (for use with list-ref).
+;;; Accessor for values in a tree returned by parse-json.
+;;; Keys are strings (for use with alists) or numbers (for use with list-ref).
 ;;; Use multiple keys to go deeper into the tree. For example,
 ;;; (json-ref tree "vids" 5 "url") is "url" in item 5 in "vids" in tree.
 ;;;
@@ -41,6 +33,23 @@
            (apply json-ref (cons (cdr (assoc (car keys) pairs-only))
                                  (cdr keys)))))
         (else #f)))
+
+;;; Download and sanitise a json object from url
+(define (download-json url)
+  ;; Recurse through the vector/alist mess returned by json-read,
+  ;; converting vectors to alists.
+  (define (sanitise obj)
+    (cond ((null? obj) obj)
+          ((pair? obj) (cons (sanitise (car obj)) (sanitise (cdr obj))))
+          ((vector? obj) (sanitise (vector->list obj)))
+          (else obj)))
+  (handle-exceptions
+   exn #f
+   (sanitise (with-input-from-request url #f json-read))))
+
+;;; TODO: syntax
+(define (not-if test boolean)
+  (if test (not boolean) boolean))
 
 ;;; Get transport protocol identifier from a URL.
 ;;; Return values:
