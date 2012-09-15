@@ -23,15 +23,14 @@
 ;;; Return values:
 ;;;   A list or a pair  (if the specified key exists and its value isn't #f)
 ;;;   #f                (otherwise)
-(define (json-ref json . keys)
-  (cond ((null? keys) json)
+(define (json-ref obj . keys)
+  (cond ((null? keys) obj)
         ((and (number? (car keys))
-              (< (car keys) (length json)))
-         (apply json-ref (cons (list-ref json (car keys)) (cdr keys))))
+              (< (car keys) (length obj)))
+         (apply json-ref (cons (list-ref obj (car keys)) (cdr keys))))
         ((string? (car keys))
-         (let ((pairs-only (filter-map (lambda (x) (if (pair? x) x #f)) json)))
-           (apply json-ref (cons (cdr (assoc (car keys) pairs-only))
-                                 (cdr keys)))))
+         (apply json-ref (cons (cdr (assoc (car keys) (filter pair? obj)))
+                               (cdr keys))))
         (else #f)))
 
 ;;; Download and sanitise a json object from url
