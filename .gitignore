@@ -1,5 +1,7 @@
 teve
 *.swp
+*.core
+deploy
 
 # Licensing?
 AdobeHDS.php
