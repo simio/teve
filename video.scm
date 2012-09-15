@@ -37,7 +37,7 @@
 
 (define (stream? obj)
   (and (list? obj)
-       (every (lambda (p) (and (pair? p) (symbol? (car p)))) obj)))
+       (every stream-value? obj)))
 
 (define (update-stream stream . values)
   (delete-duplicates
