@@ -51,10 +51,11 @@
                       (stream->download-command (list-ref video id) outfile)))
                  (if download-command
                      (stdout download-command)
-                     (stderr "Unknown stream type: #" id)))
-               (stderr "Could not find stream #" id "." #\newline
-                      "Please verify id from output of '"
-                      program-filename " -l " url "'")))
+                     (stderr "I don't know how to download #" id)))
+               (stderr "Error: Could not find stream #" id "." #\newline
+                       "Please verify that this id exists for the "
+                       "specified url, by checking the" #\newline
+                       "output of '" program-filename " -l " url "'")))
           (else
            (stderr "Pardon?"))))))
 (exit 0)
