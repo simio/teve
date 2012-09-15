@@ -14,34 +14,34 @@
 
 ;;; Let's ignore syntax for a while...
 
-(define (print-to-port* stuff port)
-  (if (string? stuff)
-      (display stuff port)
+(define (print-to-port* port . stuff)
+  (if (every (lambda (o) (or (string? o) (number? o))) stuff)
+      (display (apply conc stuff) port)
       (pretty-print stuff port)))
 
-(define (print-to-port stuff port)
-  (print-to-port* stuff port)
+(define (print-to-port port . stuff)
+  (apply print-to-port* (cons port stuff))
   (newline port))
 
-(define (stdout stuff)
-  (print-to-port stuff (current-output-port)))
+(define (stdout . stuff)
+  (apply print-to-port (cons (current-output-port) stuff)))
 
-(define (stdout* stuff)
-  (print-to-port* stuff (current-output-port)))
+(define (stdout* . stuff)
+  (apply print-to-port* (cons (current-output-port) stuff)))
 
-(define (stderr stuff)
-  (print-to-port stuff (current-error-port)))
+(define (stderr . stuff)
+  (apply print-to-port (cons (current-error-port) stuff)))
 
-(define (stderr* stuff)
-  (print-to-port* stuff (current-error-port)))
+(define (stderr* . stuff)
+  (apply print-to-port* (cons (current-error-port) stuff)))
 
-(define (debug stuff)
+(define (debug . stuff)
   (if verbosity
-      (stderr stuff)))
+      (apply stderr stuff)))
 
-(define (debug* stuff)
+(define (debug* . stuff)
   (if verbosity
-      (stderr* stuff)))
+      (apply stderr* stuff)))
 
 (define (debug-wrap-with-prefix prefix stuff)
   (begin
