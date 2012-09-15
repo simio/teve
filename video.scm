@@ -92,25 +92,25 @@
 (define (stream->download-command stream outfile)
   (case (stream-ref 'stream-type stream)
     ((hds)
-     (conc "php AdobeHDS.php"
-           " --manifest \"" (stream-ref 'url stream) "\""
-           " --debug"
-           " --outfile \"" outfile ".flv\""))
+     (conc "php AdobeHDS.php \\" #\newline
+           "    --manifest " (stream-ref 'url stream) " \\" #\newline
+           "    --debug --outfile " outfile ".flv"))
     ((hls)
-     (conc "ffmpeg"
-           " -i \"" (stream-ref 'url stream) "\""
-           " -acodec copy -vcodec copy -absf aac_adtstoasc"
-           " \"" outfile ".avi\""))
+     (conc "ffmpeg \\" #\newline
+           "    -i " (stream-ref 'url stream) " \\" #\newline
+           "    -acodec copy -vcodec copy -absf aac_adtstoasc \\" #\newline
+           "    " outfile ".avi"))
     ((rtmp)
-     (conc "rtmpdump"
-           " -r \"" (stream-ref 'url stream) "\""
-           " -o \"" outfile ".flv\""
-           " -W \"" (stream-ref 'swf-player stream) "\""))
+     (conc "rtmpdump \\" #\newline
+           "    -r " (stream-ref 'url stream) " \\" #\newline
+           "    -W " (stream-ref 'swf-player stream) " \\" #\newline
+           "    -o " outfile ".flv"))
     ((http wmv)
-     (conc "curl"
-           " -Lo \"" outfile (if (eqv? 'http (stream-ref 'stream-type stream))
+     (conc "curl \\" #\newline
+           "    -Lo " outfile (if (eqv? 'http
+                                          (stream-ref 'stream-type stream))
                                ".flv"
-                               ".wmv") "\""
-           " \"" (stream-ref 'url stream) "\""))
+                               ".wmv") " \\" #\newline
+           "    " (stream-ref 'url stream)))
     (else
      #f)))
