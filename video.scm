@@ -40,7 +40,9 @@
 
 (define (update-video video stream)
   (if stream
-      (cons stream (remove (lambda (old-stream) (equal? old-stream stream)) video))
+      (cons stream (remove (lambda (old-stream)
+                             (equal? old-stream stream))
+                           video))
       video))
 
 (define (make-video stream)
