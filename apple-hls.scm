@@ -15,6 +15,7 @@
 ;;; These functions actually don't parse HLS playlists. All they
 ;;; do is pretend.
 
+(require-extension srfi-2)
 (require-extension http-client)
 
 (include "intarweb-hack.scm")

@@ -12,7 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension srfi-12 srfi-13)
+(require-extension srfi-2 srfi-12 srfi-13)
 (require-extension http-client uri-common)
 
 (include "misc-helpers.scm")

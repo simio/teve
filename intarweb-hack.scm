@@ -12,6 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+(require-extension srfi-2)
 (require-extension intarweb srfi-13 uri-common)
 
 ;;; Akamai is emotionally unstable and needs special treatment.
