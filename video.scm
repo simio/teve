@@ -67,25 +67,26 @@
 ;;; (pretty)-printers
 (define (stream-printer stream)
   (let print-values ((rest stream)
-                     (output ""))
+                     (output '()))
     (if (null? rest)
-        output
+        (apply conc (reverse output))
         (print-values (cdr rest)
-                      (conc output
-                            (string-pad-right (conc (caar rest) ":") 20)
-                            (cdar rest) #\newline)))))
+                      (fold cons output
+                            (list (string-pad-right (conc (caar rest) ":") 20)
+                                  (cdar rest) #\newline))))))
 
 (define (video-printer video)
   (let print-streams ((rest video)
-                      (output "")
+                      (output '())
                       (id 0))
     (if (null? rest)
-        output
+        (apply conc (reverse output))
         (print-streams (cdr rest)
-                       (conc output
-                             (string-pad-right "stream id:" 20) id #\newline
-                             (stream-printer (car rest)) #\newline)
-                       (+ 1 id)))))
+                       (fold cons output
+                             (list
+                              (string-pad-right "stream id:" 20) id #\newline
+                              (stream-printer (car rest)) #\newline))
+                             (+ 1 id)))))
 
 ;;; Produce download(/playback/tee-playback) commands for the shell
 (define (stream->download-command stream outfile)
