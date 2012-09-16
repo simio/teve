@@ -95,6 +95,7 @@
                     result)
               result))))))
 
+;;; Make a pair out of strings like "1x2" or "1024X768"
 (define (x-sep-resolution->pair str)
   (let find-split ((chars (string->list str))
                    (x-res '()))
@@ -105,3 +106,12 @@
                  (string->number (apply conc (cdr chars)))))
           (else
            (find-split (cdr chars) (cons (car chars) x-res))))))
+
+;;; Get cdr of PAIR or #f if it's not a pair (Cdr IF Pair)
+(define-syntax cifp
+  (syntax-rules ()
+    ((cifp expr)
+     (let ((val expr))
+       (if (pair? val)
+           (cdr val)
+           #f)))))
