@@ -13,70 +13,88 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-;;; Let's ignore syntax for a while...
+(require-extension srfi-1)
 
-(define (print-to-port* port . stuff)
-  (if (every (lambda (o) (or (string? o) (number? o) (char? o)))
-             stuff)
-      (display (apply conc stuff) port)
-      (pretty-print stuff port)))
+(define talk-prints-debug-messages #f)
+(define current-debug-port (current-error-port))
 
-(define (print-to-port port . stuff)
-  (apply print-to-port* (cons port stuff))
-  (newline port))
+;;; Print stuff. If stuff consists entirely of strings, numbers and chars,
+;;; they are conced and displayed instead of pretty-printed.
+;;; The return value is the last member of stuff, in parallel with (begin).
+;;; Calling talk-is-cheap with less than 3 arguments is an error.
+(define (talk-is-cheap port prepend append wrapper-mode mapper . stuff)
+  (let* ((data (delay stuff))
+         (print-data (if mapper
+                         (map mapper (force data))
+                         (force data))))
+    (display prepend port)
+    (if (every (lambda (obj) (or (string? obj) (number? obj) (char? obj)))
+               (force data))
+        (display (apply conc print-data) port)
+        (pretty-print print-data port))
+    (if wrapper-mode
+        (begin
+          (display append port)
+          (last (force data)))
+        (display append port))))
 
-(define (stdout . stuff)
-  (apply print-to-port (cons (current-output-port) stuff)))
+(define-syntax print-to-port*
+  (syntax-rules ()
+    ((print-to-port* port stuff ...)
+     (talk-is-cheap port "" "" #f #f stuff ...))))
 
-(define (stdout* . stuff)
-  (apply print-to-port* (cons (current-output-port) stuff)))
+(define-syntax print-to-port
+  (syntax-rules ()
+    ((print-to-port port stuff ...)
+     (talk-is-cheap port "" #\newline #f #f stuff ...))))
 
-(define (stderr . stuff)
-  (apply print-to-port (cons (current-error-port) stuff)))
+(define-syntax debug-is-cheap
+  (syntax-rules (nl: prepend: mapper:)
+    ((debug-is-cheap nl: newline prepend: prepend mapper: mapper stuff ...)
+     (if talk-prints-debug-messages
+         (talk-is-cheap current-debug-port
+                        (conc prepend ": ")
+                        (if newline #\newline "")	; append
+                        #t				; wrapper-mode
+                        mapper
+                        stuff ...)
+         (begin stuff ...)))
+    ((debug-is-cheap nl: newline prepend: prepend stuff ...)
+     (debug-is-cheap nl: newline prepend: prepend mapper: #f stuff ...))
+    ((debug-is-cheap nl: newline mapper: mapper prepend: prepend stuff ...)
+     (debug-is-cheap nl: newline prepend: prepend mapper: mapper stuff ...))
+    ((debug-is-cheap nl: newline mapper: mapper stuff ...)
+     (debug-is-cheap nl: newline prepend: "" mapper: mapper stuff ...))
+    ((debug-is-cheap nl: newline stuff ...)
+     (debug-is-cheap nl: newline prepend: "" stuff ...))))
 
-(define (stderr* . stuff)
-  (apply print-to-port* (cons (current-error-port) stuff)))
+(define-syntax stdout
+  (syntax-rules ()
+    ((stdout stuff ...)
+     (print-to-port (current-output-port) stuff ...))))
 
-(define (debug . stuff)
-  (if verbosity
-      (apply stderr stuff)))
+(define-syntax stdout*
+  (syntax-rules ()
+    ((stdout* stuff ...)
+     (print-to-port* (current-output-port) stuff ...))))
 
-(define (debug* . stuff)
-  (if verbosity
-      (apply stderr* stuff)))
+(define-syntax stderr
+  (syntax-rules ()
+    ((stderr stuff ...)
+     (print-to-port (current-error-port) stuff ...))))
 
-(define (debug-wrap-with-prefix prefix stuff)
-  (begin
-    (if verbosity
-	(if (string? stuff)
-            (stderr (conc prefix stuff))
-            (stderr (cons prefix (list stuff)))))
-    stuff))
+(define-syntax stderr*
+  (syntax-rules ()
+    ((stderr* stuff ...)
+     (print-to-port* (current-error-port) stuff ...))))
 
-(define (debug-wrap-with-prefix* prefix stuff)
-  (begin
-    (if verbosity
-	(if (string? stuff)
-            (stderr* (conc prefix stuff))
-            (stderr* (cons prefix (list stuff)))))
-    stuff))
+(define-syntax debug
+  (syntax-rules ()
+    ((debug stuff ...)
+     (debug-is-cheap nl: #t stuff ...))))
 
-(define (debug-wrap stuff)
-  (begin
-    (debug-wrap-with-prefix "" stuff)
-    stuff))
+(define-syntax debug*
+  (syntax-rules ()
+    ((debug* stuff ...)
+     (debug-is-cheap nl: #f stuff ...))))
 
-(define (debug-wrap* stuff)
-  (begin
-    (debug-wrap-with-prefix* "" stuff)
-    stuff))
-
-(define (debug-wrap-with-parser parser stuff)
-  (begin
-    (debug-wrap (apply parser (list stuff)))
-    stuff))
-
-(define (debug-wrap-with-parser* parser stuff)
-  (begin
-    (debug-wrap* (apply parser (list stuff)))
-    stuff))
