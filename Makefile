@@ -21,6 +21,9 @@ DEPLOY_CSC_OPTIONS="-C -Os -strip"
 all: $(SOURCE_FILES)
 	csc $(TARGET).scm
 
+install-eggs:
+	chicken-install $(EGGS)
+
 # wip, won't work
 deploy: $(SOURCE_FILES) deploy-eggs deploy-others
 	mkdir -p $(DEPLOY_PATH)/$(TARGET)
@@ -51,3 +54,6 @@ source-tarball:
 
 distclean: clean
 	rm -f $(DISTNAME).tar.gz
+
+print-eggs:
+	@echo $(EGGS)

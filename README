@@ -27,8 +27,13 @@ The source code is available from the Chicken home page:
 
 After installing Chicken, you'll also need to install a few eggs:
 
-    # chicken-install utf8 uri-common intarweb srfi-37 json \
-          http-client vector-lib irregex
+	# make install-eggs
+
+Or if you'd like to see what you're installing:
+
+	# make print-eggs
+	utf8 intarweb srfi-37 json http-client vector-lib packrat ...
+    # chicken-install $(make print-eggs)
 
 
 2. BUILDING
