@@ -41,9 +41,11 @@
        (every stream-value? obj)))
 
 (define (update-stream stream . values)
-  (delete-duplicates
-   (append (filter stream-value? values) stream)
-   (lambda (o1 o2) (equal? o1 o2))))
+  (if (stream? stream)
+      (delete-duplicates
+       (append (filter stream-value? values) stream)
+       (lambda (o1 o2) (equal? o1 o2)))
+      #f))
   
 (define (make-stream . values)
   (apply update-stream (cons '() (filter stream-value? values))))
@@ -62,7 +64,10 @@
        (every stream? obj)))
 
 (define (update-video video . streams)
-  (delete-duplicates (append (filter stream? streams) video)))
+  (if (video? video)
+      (delete-duplicates
+       (append (filter stream? streams) video))
+      #f))
 
 (define (make-video . streams)
   (apply update-video (cons '() (filter stream? streams))))
