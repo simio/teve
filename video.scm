@@ -48,6 +48,10 @@
 (define (make-stream . values)
   (apply update-stream (cons '() (filter stream-value? values))))
 
+(define-syntax pairs->stream
+  (syntax-rules ()
+    ((pairs->stream pairs) (apply make-stream pairs))))
+
 (define stream-length length)
 
 (define (video-ref number video)
@@ -62,6 +66,10 @@
 
 (define (make-video . streams)
   (apply update-video (cons '() (filter stream? streams))))
+
+(define-syntax streams->video
+  (syntax-rules ()
+    ((streams->video streams) (apply make-video streams))))
 
 (define video-length length)
 
