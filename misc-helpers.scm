@@ -47,9 +47,10 @@
    exn #f
    (sanitise (with-input-from-request url #f json-read))))
 
-;;; TODO: syntax
-(define (not-if test boolean)
-  (if test (not boolean) boolean))
+(define-syntax not-if
+  (syntax-rules ()
+    ((not-if test value)
+     (if test (not value) value))))
 
 ;;; Get transport protocol identifier from a URL.
 ;;; Return values:
