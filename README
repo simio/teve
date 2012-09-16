@@ -23,7 +23,7 @@ most platforms.
 
 The source code is available from the Chicken home page:
 
-	http://code.call-cc.org/
+    http://code.call-cc.org/
 
 After installing Chicken, you'll also need to install a few eggs:
 
