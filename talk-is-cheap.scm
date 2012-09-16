@@ -19,9 +19,9 @@
 (define current-debug-port (current-error-port))
 
 ;;; Print stuff. If stuff consists entirely of strings, numbers and chars,
-;;; they are conced and displayed instead of pretty-printed.
-;;; The return value is the last member of stuff, in parallel with (begin).
-;;; Calling talk-is-cheap with less than 3 arguments is an error.
+;;; they are conced and displayed instead of pretty-printed. The return
+;;; value is the last member of stuff (like with (begin)). Calling
+;;; talk-is-cheap with less than 6 arguments is an error.
 (define (talk-is-cheap port prepend append wrapper-mode mapper . stuff)
   (let* ((data (delay stuff))
          (print-data (if mapper
