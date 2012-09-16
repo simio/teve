@@ -13,8 +13,8 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension srfi-2 srfi-12 srfi-13)
-(require-extension http-client uri-common)
+(require-extension srfi-1 srfi-2 srfi-12 srfi-13)
+(require-extension miscmacros http-client uri-common)
 
 (include "misc-helpers.scm")
 (include "apple-hls.scm")
@@ -43,7 +43,7 @@
                         (not-if (char=? #\" ch) is-discarding)
                         (read-char)))))))
 
-(define (svt:swf-player-for url)
+(define (svt:swf-player-in url)
   (and-let* ((swf (with-input-from-request url #f find-first-quoted-swf)))
     (conc "http://www.svtplay.se" swf)))
 
@@ -72,55 +72,47 @@
      (else
       #f))))
 
+(define (svt:json-stream->streams jstr)
+  (and-let* ((supplied-url (cdip (assoc "url" jstr)))
+             (bitrate (cdip (assoc "bitrate" jstr)))
+             (player-type (cdip (assoc "playerType" jstr)))
+             (stream-type (svt:stream-type-of supplied-url bitrate player-type))
+             (url (if (eq? stream-type 'hds)
+                      (conc supplied-url "?hdcore")
+                      supplied-url)))
+    (case stream-type
+      ((hls)
+       (hls-master->streams url))
+      (else
+       (list (make-stream (make-stream-value 'url url)
+                          (make-stream-value 'stream-type stream-type)
+                          (if (< 0 bitrate)
+                              (make-stream-value 'bitrate bitrate))))))))
+
+
 (define (svt:json-data->video json-data)
   (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
+         (references (json-ref json-data "video" "videoReferences"))
          (popout-url (json-ref json-data "context" "popoutUrl"))
          (play-url (if popout-url
                        (conc "http://www.svtplay.se" popout-url)
-                       #f)))
-    (remove not
-            (fold (lambda (raw videos)
-                    (let* ((url (assoc "url" raw))
-                           (bitrate (assoc "bitrate" raw))
-                           (player-type (assoc "playerType" raw))
-                           ;; This might fail, obviously.
-                           (stream-type (svt:stream-type-of (cdr url)
-                                                            (cdr bitrate)
-                                                            (cdr player-type))))
-                      (if (and url (eq? stream-type 'hls))
-                          (append
-                           (remove not
-                                   (map (lambda (x)
-                                          (cons (cons 'stream-type 'hls)
-                                                (cons (if subtitles
-                                                          (cons 'subtitles
-                                                                subtitles)
-                                                          #f)
-                                                      x)))
-                                        (hls-master->video (cdr url))))
-                           videos)
-                          (cons
-                           (remove not
-                                   (list
-                                    (if url
-                                        (cons 'url
-                                              (conc (uri-decode-string (cdr url))
-                                                    (if (eqv? stream-type 'hds)
-                                                        "?hdcore"
-                                                        "")))
-                                        #f)
-                                    (if (and bitrate
-                                             (< 0 (cdr bitrate)))
-                                        (cons 'bitrate (cdr bitrate)) #f)
-                                    (if subtitles
-                                        (cons 'subtitles subtitles) #f)
-                                    (if stream-type
-                                        (cons 'stream-type stream-type) #f)
-                                    (cons 'view-at play-url)
-                                    (if (eq? stream-type 'rtmp)
-                                        (cons 'swf-player
-                                              (svt:swf-player-for play-url))
-                                        #f)))
-                           videos))))
-                  '()
-                  (json-ref json-data "video" "videoReferences")))))
+                       #f))
+         (swf-player (svt:swf-player-in play-url)))
+    (apply
+     make-video
+     (fold
+      (lambda (objs streams)
+        (append
+         (filter-map
+          (lambda (obj)
+            (if (not (stream? obj))
+                #f
+                (update-stream obj
+                               (make-stream-value 'subtitles subtitles)
+                               (make-stream-value 'view-at play-url)
+                               (if (eq? 'rtmp (stream-ref 'stream-type obj))
+                                   (make-stream-value 'swf-player swf-player)))))
+          objs)
+         streams))
+      '()
+      (map svt:json-stream->streams references)))))
