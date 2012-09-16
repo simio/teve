@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-;;; These functions actually don't parse HLS playlists. All they
+;;; These procedures actually don't parse HLS playlists. All they
 ;;; do is pretend.
 
 (require-extension srfi-2)
@@ -28,12 +28,12 @@
     (and-let* ((pairs (varlist->alist mesh))
                (resolution (assoc "RESOLUTION" pairs))
                (bandwidth (assoc "BANDWIDTH" pairs)))
-              (apply make-stream
-                     (list (cons 'resolution
-                                 (or (x-sep-resolution->pair (cdr resolution))
-                                     (cdr resolution)))
-                           (cons 'bitrate (/ (cdr bandwidth) 1000))
-                           (cons 'url (uri-decode-string (car slat)))))))
+              (pairs->stream
+               (cons 'resolution
+                     (or (x-sep-resolution->pair (cdr resolution))
+                         (cdr resolution)))
+               (cons 'bitrate (/ (cdr bandwidth) 1000))
+               (cons 'url (uri-decode-string (car slat))))))
   
   (let read-entries ((playlist (cdr (string-split str (string #\newline))))
                      (streams '()))
@@ -53,4 +53,12 @@
     (if (not (and (string? playlist)
                   (string-contains playlist (string #\newline))))
         #f
-        (hls:parse-playlist playlist))))
+        (filter-map
+         (lambda (stream)
+           (if (not (stream? stream))
+               #f
+               (update-stream stream
+                              (make-stream-value 'stream-type 'hls)
+                              (make-stream-value 'master-playlist
+                                                 playlist-url))))
+        (hls:parse-playlist playlist)))))
