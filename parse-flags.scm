@@ -41,7 +41,7 @@
     (option
      '(#\v) #f #f
      (lambda (option name arg seeds)
-       (set! verbosity #t)
+       (set! talk-prints-debug-messages #t)
        (debug "Verbose mode.")
        seeds)))
   (define flag-outfile

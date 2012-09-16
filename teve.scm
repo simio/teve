@@ -19,7 +19,6 @@
 (define program-filename program-name)
 (define program-version "prototype-1")
 
-(define verbosity #f)
 (define action 'nothing)
 (define id -1)
 (define outfile "movie")
