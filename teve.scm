@@ -32,7 +32,7 @@
 
 ;;; Dispatcher
 (define (url->video url)
-  (svt:json-data->video (svt:download-json-data url)))
+  (svt:url->video url))
 
 ;;; Do something
 (let ((command-line-args (parse-flags)))

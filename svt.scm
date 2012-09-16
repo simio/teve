@@ -116,3 +116,6 @@
          streams))
       '()
       (map svt:json-stream->streams references)))))
+
+(define (svt:url->video url)
+  (svt:json-data->video (svt:download-json-data url)))
