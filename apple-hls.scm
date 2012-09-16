@@ -17,7 +17,7 @@
 ;;; do is pretend.
 
 (require-extension srfi-2)
-(require-extension http-client)
+(require-extension miscmacros http-client)
 
 (include "intarweb-hack.scm")
 (include "misc-helpers.scm")
@@ -36,18 +36,17 @@
                            (cons 'url (uri-decode-string (car slat)))))))
   
   (let read-entries ((playlist (cdr (string-split str (string #\newline))))
-                     (video '()))
+                     (streams '()))
     (cond ((or (null? playlist)
                (null? (cdr playlist)))
-           video)
-          (else (read-entries (cddr playlist)
-                              (or (update-video
-                                   video
-                                   (read-stream (car playlist)
-                                                (cdr playlist)))
-                                  video))))))
+           streams)
+          (else
+           (read-entries (cddr playlist)
+                         (if* (read-stream (car playlist) (cdr playlist))
+                              (cons it streams)
+                              streams))))))
 
-(define (hls-master->video playlist-url)
+(define (hls-master->streams playlist-url)
   (let ((playlist (with-input-from-request (make-emo-request playlist-url)
                                            #f
                                            read-string)))
