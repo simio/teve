@@ -107,10 +107,19 @@
           (else
            (find-split (cdr chars) (cons (car chars) x-res))))))
 
-;;; Get cdr of PAIR or #f if it's not a pair (Cdr IF Pair)
-(define-syntax cifp
+;;; Get cdr of PAIR or #f if it's not a pair (CDr If Pair)
+(define-syntax cdip
   (syntax-rules ()
-    ((cifp expr)
+    ((cdip expr)
+     (let ((val expr))
+       (if (pair? val)
+           (cdr val)
+           #f)))))
+
+;;; Get car of PAIR or #f if it's not a pair (CAr If Pair)
+(define-syntax caip
+  (syntax-rules ()
+    ((caip expr)
      (let ((val expr))
        (if (pair? val)
            (cdr val)
