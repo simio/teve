@@ -97,24 +97,19 @@
          (play-url (if popout-url
                        (conc "http://www.svtplay.se" popout-url)
                        #f))
-         (swf-player (svt:swf-player-in play-url))
+         (swf-player (delay (svt:swf-player-in play-url)))
          (add-video-values (lambda (stream)
                              (update-stream
                               stream
                               (make-stream-value 'subtitles subtitles)
                               (make-stream-value 'view-at play-url)
                               (if (eq? 'rtmp (stream-ref 'stream-type stream))
-                                  (make-stream-value 'swf-player swf-player))))))
+                                  (make-stream-value 'swf-player
+                                                     (force swf-player)))))))
     (streams->video
-     (fold
-      (lambda (objs streams)
-        (append
-         (filter-map (lambda (obj)
-                       (if (not (stream? obj))
-                           #f
-                           (add-video-values obj)))
-                     objs)
-         streams))
+     (fold (lambda (objs streams)
+             (append (filter-map add-video-values objs)
+                     streams))
       '()
       (map svt:json-stream->streams references)))))
 
