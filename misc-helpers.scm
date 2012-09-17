@@ -123,5 +123,5 @@
     ((caip expr)
      (let ((val expr))
        (if (pair? val)
-           (cdr val)
+           (car val)
            #f)))))
