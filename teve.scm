@@ -54,4 +54,3 @@
                        "output of '" program-filename " -l " url "'")))
           (else
            (stderr "Pardon?"))))))
-(exit 0)
