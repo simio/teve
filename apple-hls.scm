@@ -28,7 +28,7 @@
     (and-let* ((pairs (varlist->alist mesh))
                (resolution (assoc "RESOLUTION" pairs))
                (bandwidth (assoc "BANDWIDTH" pairs)))
-              (pairs->stream
+              (make-stream
                (cons 'resolution
                      (or (x-sep-resolution->pair (cdr resolution))
                          (cdr resolution)))
