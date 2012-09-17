@@ -22,10 +22,12 @@
      (lambda _
        (stderr (conc program-name " " program-version))
        (stderr (conc "Usage: " program-filename
-                     " [-hlv] [-d id] [-o outfile] url"))
+                     " [options] <url>"))
+       (stderr #\newline " Options:")
        (stderr "  -d <id>   Download stream #<id>")
        (stderr "  -h        Show this message.")
        (stderr "  -l        List available streams.")
+       (stderr "  -l<id>    List stream #<x>.")
        (stderr "  -o <file> Download to <file>. (Default is 'movie'.)")
        (stderr "  -v        Be verbose.")
        (exit))))
@@ -53,9 +55,11 @@
        seeds)))
   (define flag-list-streams
     (option
-     '(#\l) #f #f
+     '(#\l) #f #t
      (lambda (option name arg seeds)
        (set! action 'list)
+       (if arg
+           (set! id (string->number arg)))
        seeds)))
   (reverse
    (args-fold

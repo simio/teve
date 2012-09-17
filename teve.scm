@@ -20,7 +20,7 @@
 (define program-version "prototype-1")
 
 (define action 'nothing)
-(define id -1)
+(define id #f)
 (define outfile "movie")
 
 (include "talk-is-cheap.scm")
@@ -40,9 +40,12 @@
              (video (url->video url)))
         (case action
           ((list)
-           (stderr* (video-printer video)))
+           (if (number? id)
+               (stderr* (stream-printer (video-ref id video)))
+               (stderr* (video-printer video))))
           ((download)
-           (if (<= 0 id (length video))
+           (if (and (number? id)
+                    (<= 0 id (length video)))
                (let ((download-command
                       (stream->download-command (list-ref video id) outfile)))
                  (if download-command
