@@ -113,30 +113,32 @@
   (case (stream-ref 'stream-type stream)
     ((hds)
      (conc "php AdobeHDS.php \\" #\newline
-           "    --manifest " (stream-ref 'url stream) " \\" #\newline
-           "    --debug --outfile " outfile ".flv"))
+           "    --manifest " (shell-escape (stream-ref 'url stream))
+           " \\" #\newline
+           "    --debug --outfile " (shell-escape outfile) ".flv"))
     ((hls)
      (conc "ffmpeg \\" #\newline
-           "    -i " (stream-ref 'url stream) " \\" #\newline
+           "    -i " (shell-escape (stream-ref 'url stream)) " \\" #\newline
            "    -acodec copy -vcodec copy -absf aac_adtstoasc \\" #\newline
-           "    " outfile ".avi"))
+           "    " (shell-escape outfile) ".avi"))
     ((rtmp)
      (conc "rtmpdump \\" #\newline
-           "    -r " (stream-ref 'url stream) " \\" #\newline
-           "    -W " (stream-ref 'swf-player stream) " \\" #\newline
+           "    -r " (shell-escape (stream-ref 'url stream)) " \\" #\newline
+           "    -W " (shell-escape (stream-ref 'swf-player stream))
+           " \\" #\newline
            "    -o " outfile ".flv"))
     ((http wmv)
      (conc "curl \\" #\newline
-           "    -Lo " outfile (if (eqv? 'http
-                                        (stream-ref 'stream-type stream))
-                                  ".flv"
-                                  ".wmv") " \\" #\newline
-                                  "    " (stream-ref 'url stream)))
+           "    -Lo " (shell-escape outfile)
+           (if (eqv? 'http (stream-ref 'stream-type stream))
+               ".flv"
+               ".wmv") " \\" #\newline
+               "    " (shell-escape (stream-ref 'url stream))))
     ((mms rtsp)
      (conc "mplayer \\" #\newline
-           "    -dumpstream -dumpfile " outfile
+           "    -dumpstream -dumpfile " (shell-escape outfile)
            (if (eqv? 'mms (stream-ref 'stream-type stream)) ".wmv" ".mp4")
            " \\" #\newline
-           "    " (stream-ref 'url stream)))
+           "    " (shell-escape (stream-ref 'url stream))))
     (else
      #f)))

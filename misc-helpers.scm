@@ -134,3 +134,16 @@
         appendix
         (make-rnd-string (- len 1) (conc char appendix)))))
   
+(define (shell-escape str)
+  (let escape ((rest (string->list str))
+               (result '()))
+    (cond
+     ((null? rest)
+      (list->string (reverse result)))
+     ((or (eq? #\& (car rest))
+          (eq? #\| (car rest))
+          (eq? #\\ (car rest)))
+      (escape (cdr rest) (cons (car rest) (cons #\\ result))))
+     (else
+      (escape (cdr rest) (cons (car rest) result))))))
+        
