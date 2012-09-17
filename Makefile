@@ -1,6 +1,8 @@
 TARGET = teve
 DISTNAME = teve-prototype1
 
+PREFIX ?= /usr/opt/bin
+
 SOURCE_FILES=*.scm
 EXTRA_FILES=Makefile README
 DISTFILES=$(SOURCE_FILES) $(EXTRA_FILES)
@@ -18,8 +20,13 @@ SO=.so
 DEPLOY_PATH=$(PWD)/deploy
 DEPLOY_CSC_OPTIONS="-C -Os -strip"
 
-all: $(SOURCE_FILES)
+$(TARGET):
 	csc $(TARGET).scm
+
+all: $(SOURCE_FILES) $(TARGET)
+
+install: $(TARGET)
+	install -m 755 $(TARGET) $(PREFIX)
 
 install-eggs:
 	chicken-install $(EGGS)

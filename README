@@ -49,6 +49,12 @@ Just 'make' to get a binary, and then run it:
       -o <file> Download to <file>. (Default is 'movie'.)
       -v        Be verbose.
 
-If you would rather run teve as a script, that's fine too:
+You may optionally install it somewhere:
+
+    # make PREFIX=/usr/local/bin install
+
+The default path is /usr/opt/bin.
+
+If you don't like binaries, you may run teve as a script:
 
     $ csi -s teve.scm -h
