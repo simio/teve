@@ -1,7 +1,7 @@
 TARGET = teve
 DISTNAME = teve-prototype1
 
-PREFIX ?= /usr/opt/bin
+PREFIX ?= /usr/opt
 
 SOURCE_FILES=*.scm
 EXTRA_FILES=Makefile README
@@ -26,7 +26,7 @@ $(TARGET):
 all: $(SOURCE_FILES) $(TARGET)
 
 install: $(TARGET)
-	install -m 755 $(TARGET) $(PREFIX)
+	install -m 755 $(TARGET) $(PREFIX)/bin
 
 install-eggs:
 	chicken-install $(EGGS)

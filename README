@@ -51,9 +51,9 @@ Just 'make' to get a binary, and then run it:
 
 You may optionally install it somewhere:
 
-    # make PREFIX=/usr/local/bin install
+    # make PREFIX=/usr/local install
 
-The default path is /usr/opt/bin.
+The default PREFIX is /usr/opt, which puts the binary in /usr/opt/bin.
 
 If you don't like binaries, you may run teve as a script:
 
