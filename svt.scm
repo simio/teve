@@ -78,7 +78,8 @@
              (player-type (cdip (assoc "playerType" jstr)))
              (stream-type (svt:stream-type-of supplied-url bitrate player-type))
              (url (if (eq? stream-type 'hds)
-                      (conc supplied-url "?hdcore")
+                      (conc supplied-url "?hdcore=2.9.4&g="
+                            (string-upcase (make-rnd-string 12)))
                       supplied-url)))
     (case stream-type
       ((hls)

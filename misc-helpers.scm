@@ -125,3 +125,12 @@
        (if (pair? val)
            (car val)
            #f)))))
+  
+(define (make-rnd-string len . tail)
+  (let* ((str "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+         (char (string-ref str (random (string-length str))))
+         (appendix (if (null? tail) "" (car tail))))
+    (if (> 1 len)
+        appendix
+        (make-rnd-string (- len 1) (conc char appendix)))))
+  
