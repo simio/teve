@@ -47,12 +47,15 @@
        (lambda (o1 o2) (equal? o1 o2)))
       #f))
   
+;;; Pass one or more pairs as args
 (define (make-stream . values)
   (apply update-stream (cons '() (filter stream-value? values))))
 
+;;; Allow passing all values in a single list of values
 (define-syntax pairs->stream
   (syntax-rules ()
-    ((pairs->stream pairs) (apply make-stream pairs))))
+    ((pairs->stream pairs)
+     (apply make-stream pairs))))
 
 (define stream-length length)
 
@@ -69,12 +72,15 @@
        (append (filter stream? streams) video))
       #f))
 
+;;; Pass one or more streams as args
 (define (make-video . streams)
   (apply update-video (cons '() (filter stream? streams))))
 
+;;; Allow passing all streams in a single list of streams
 (define-syntax streams->video
   (syntax-rules ()
-    ((streams->video streams) (apply make-video streams))))
+    ((streams->video streams)
+     (apply make-video streams))))
 
 (define video-length length)
 
