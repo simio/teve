@@ -26,12 +26,13 @@
 (define (hls:parse-playlist str)
   (define (read-stream mesh slat)
     (and-let* ((pairs (varlist->alist mesh))
-               (resolution (assoc "RESOLUTION" pairs))
+               (res-str (assoc "RESOLUTION" pairs))
+               (resolution (or (x-sep-resolution->pair (cdr res-str))
+                               (cdr res-str)))
                (bandwidth (assoc "BANDWIDTH" pairs)))
               (make-stream
-               (cons 'resolution
-                     (or (x-sep-resolution->pair (cdr resolution))
-                         (cdr resolution)))
+               (cons 'video-width (car resolution))
+               (cons 'video-height (cdr resolution))
                (cons 'bitrate (/ (cdr bandwidth) 1000))
                (cons 'url (uri-decode-string (car slat))))))
   
