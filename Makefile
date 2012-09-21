@@ -20,7 +20,7 @@ SO=.so
 DEPLOY_PATH=$(PWD)/deploy
 DEPLOY_CSC_OPTIONS="-C -Os -strip"
 
-$(TARGET):
+$(TARGET): $(SOURCE_FILES)
 	csc $(TARGET).scm
 
 all: $(SOURCE_FILES) $(TARGET)
