@@ -58,3 +58,13 @@ The default PREFIX is /usr/opt, which puts the binary in /usr/opt/bin.
 If you don't like binaries, you may run teve as a script:
 
     $ csi -s teve.scm -h
+
+
+3. TESTING
+
+The tests are contained in tests/. They require the srfi-78 egg to be
+installed:
+
+    # chicken-install srfi-78
+
+The 'check' make target will perform all tests in one run.
