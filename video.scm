@@ -13,7 +13,9 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension srfi-1 srfi-13)
+(require-extension miscmacros srfi-1 srfi-13)
+
+(include "misc-helpers.scm")
 
 ;;; Stream/video makers, accessors and updaters
 ;;; An object is a valid video iff it is a list where every item is a stream.
@@ -26,15 +28,19 @@
 ;;; stream-ref to signify the specified key does not exist.
 
 (define (stream-ref key stream)
-  (let ((ret (assoc key stream)))
-    (if ret (cdr ret) #f)))
+  (and-let* ((ret (if (list? stream)
+                      (assoc key stream)
+                      #f)))
+    (cdr ret)))
 
 (define (stream-value? obj)
   (and (pair? obj)
        (symbol? (car obj))))
 
 (define (make-stream-value key val)
-  (cons key val))
+  (if (symbol? key)
+      (cons key val)
+      #f))
 
 (define (stream? obj)
   (and (list? obj)
@@ -44,9 +50,9 @@
   (if (stream? stream)
       (delete-duplicates
        (append (filter stream-value? values) stream)
-       (lambda (o1 o2) (equal? o1 o2)))
+       (lambda (o1 o2) (equal? (car o1) (car o2))))
       #f))
-  
+
 ;;; Pass one or more pairs as args
 (define (make-stream . values)
   (apply update-stream (cons '() (filter stream-value? values))))
@@ -60,7 +66,11 @@
 (define stream-length length)
 
 (define (video-ref number video)
-  (list-ref video number))
+  (and-let* ((ret (if (and (video? video)
+                           (< -1 number (video-length video)))
+                      (list-ref video number)
+                      #f)))
+    ret))
 
 (define (video? obj)
   (and (list? obj)
@@ -106,7 +116,7 @@
                              (list
                               (string-pad-right "stream id:" 20) id #\newline
                               (stream-printer (car rest)) #\newline))
-                             (+ 1 id)))))
+                       (+ 1 id)))))
 
 ;;; Produce download(/playback/tee-playback) commands for the shell
 (define (stream->download-command stream outfile)
