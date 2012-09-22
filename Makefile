@@ -4,6 +4,7 @@ DISTNAME = teve-prototype1
 PREFIX ?= /usr/opt
 
 SOURCE_FILES=*.scm
+TEST_FILES=./tests/*.scm
 EXTRA_FILES=Makefile README
 DISTFILES=$(SOURCE_FILES) $(EXTRA_FILES)
 
@@ -24,6 +25,11 @@ $(TARGET): $(SOURCE_FILES)
 	csc $(TARGET).scm
 
 all: $(SOURCE_FILES) $(TARGET)
+
+check: $(SOURCE_FILES) $(TEST_FILES)
+	for file in tests/*.scm; do \
+		csi -s $$file; \
+	done
 
 install: $(TARGET)
 	install -m 755 $(TARGET) $(PREFIX)/bin
