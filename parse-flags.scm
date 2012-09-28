@@ -36,8 +36,8 @@
      '(#\d) #t #f
      (lambda (option name arg seeds)
        (set! action 'download)
-       (set! id (string->number arg))
-       (debug (conc "Heading for stream id " id))
+       (set! stream-id (string->number arg))
+       (debug (conc "Heading for stream id " stream-id))
        seeds)))
   (define flag-verbose
     (option
@@ -59,7 +59,7 @@
      (lambda (option name arg seeds)
        (set! action 'list)
        (if arg
-           (set! id (string->number arg)))
+           (set! stream-id (string->number arg)))
        seeds)))
   (reverse
    (args-fold

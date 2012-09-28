@@ -114,5 +114,14 @@
       '()
       (map svt:json-stream->streams references)))))
 
-(define (svt:url->video url)
-  (svt:json-data->video (svt:download-json-data url)))
+(define (svt:url-is-compatible? url)
+  (or (string-contains url "://www.svtplay.se/")
+      (string-contains url "://svtplay.se/")))
+
+(define (svt:url->videos url)
+  (and-let* ((data (and (svt:url-is-compatible? url)
+                        (svt:download-json-data url))))
+    (list (svt:json-data->video data))))
+
+;;; Add svt:url->video to global scraper-table
+(add-scraper svt:url->videos)

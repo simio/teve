@@ -17,42 +17,42 @@
 
 (define program-name "teve")
 (define program-filename program-name)
-(define program-version "prototype-1")
+(define program-version "0.1")
 
 (define action 'nothing)
-(define id #f)
+(define stream-id #f)
+(define video-id 1)		; No multiple video support just yet
 (define outfile "movie")
 
 (include "talk-is-cheap.scm")
 (include "misc-helpers.scm")
 (include "parse-flags.scm")
 (include "video.scm")
-(include "svt.scm")
-
-;;; Dispatcher
-(define (url->video url)
-  (svt:url->video url))
+(include "url2vid.scm")
 
 ;;; Do something
 (let ((command-line-args (parse-flags)))
   (if (not (null? command-line-args))
       (let* ((url (car command-line-args))
-             (video (url->video url)))
+             ;; Until multiple videos are supported, video-id is always 1,
+             ;; so we can just take the car instead of looping.
+             (video (car (url->videos url))))
         (case action
           ((list)
-           (if (number? id)
-               (stderr* (stream-printer (video-ref id video)))
+           (if (number? stream-id)
+               (stderr* (stream-printer (video-ref stream-id video)))
                (stderr* (video-printer video))))
           ((download)
-           (if (and (number? id)
-                    (<= 0 id (length video)))
+           (if (and (number? stream-id)
+                    (<= 0 stream-id (length video)))
                (let ((download-command
-                      (stream->download-command (list-ref video id) outfile)))
+                      (stream->download-command (list-ref video stream-id)
+                                                outfile)))
                  (if download-command
                      (stdout download-command)
-                     (stderr "I don't know how to download #" id)))
-               (stderr "Error: Could not find stream #" id "." #\newline
-                       "Please verify that this id exists for the "
+                     (stderr "I don't know how to download #" stream-id)))
+               (stderr "Error: Could not find stream #" stream-id "." #\newline
+                       "Please verify that this stream-id exists for the "
                        "specified url, by checking the" #\newline
                        "output of '" program-filename " -l " url "'")))
           (else
