@@ -62,9 +62,9 @@ If you don't like binaries, you may run teve as a script:
 
 3. TESTING
 
-The tests are contained in tests/. They require the srfi-78 egg to be
-installed:
+The tests are contained in tests/. They use the srfi-78 egg, so you
+will need to install that before running the tests:
 
     # chicken-install srfi-78
 
-The 'check' make target will perform all tests in one run.
+To run all tests in a batch, just 'make check'.
