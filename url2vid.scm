@@ -1,11 +1,11 @@
 (require-extension srfi-1)
 
 ;;; The scrape-list is a list of all url->video procedures
-(define scraper-list '())
+(define *scraper-list* '())
 
 ;;; Allow "plugins" in sites/ to add procedures to the scraper-list
 (define (add-scraper procedure)
-  (set! scraper-list (cons procedure scraper-list)))
+  (set! *scraper-list* (cons procedure *scraper-list*)))
 
 (include "sites/svt.scm")
 (include "sites/tv4.scm")
@@ -15,4 +15,4 @@
 ;;; videos are appended into a video-list, which is returned.
 (define (url->videos url)
   (delete-duplicates
-   (apply append (filter-map (lambda (u->v) (u->v url)) scraper-list))))
+   (apply append (filter-map (lambda (u->v) (u->v url)) *scraper-list*))))
