@@ -14,7 +14,7 @@
  |#
 
 (require-extension srfi-1 srfi-13)
-(require-extension http-client json)
+(require-extension miscmacros http-client json)
 
 ;;; Accessor for values in a tree returned by parse-json.
 ;;; Keys are strings (for use with alists) or numbers (for use with list-ref).
@@ -151,3 +151,20 @@
       (escape (cdr rest) (cons (car rest) (cons #\\ result))))
      (else
       (escape (cdr rest) (cons (car rest) result))))))
+
+;;; s/needle/replacement/g
+(define (string-replace-every needle replacement string)
+  (let loop ((rest string)
+             (chunks '()))
+    (if* (string-contains rest needle)
+         (loop (string-drop rest (+ it (string-length needle)))
+               (cons replacement (cons (string-take rest it) chunks)))
+         (apply conc (reverse (cons rest chunks))))))
+        
+;;; Get (un)quoted value of first html attribute style key-value pair.
+(define (first-html-attribute attribute source)
+  (and-let* ((attr-index (string-contains-ci source attribute))
+             (begin-index (+ 1 (string-index source #\" attr-index)))
+             (end-index (string-index source #\" begin-index) begin-index))
+    (substring/shared source begin-index end-index)))
+             
