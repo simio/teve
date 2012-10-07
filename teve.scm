@@ -34,26 +34,29 @@
 (let ((command-line-args (parse-flags)))
   (if (not (null? command-line-args))
       (let* ((url (car command-line-args))
-             ;; Until multiple videos are supported, video-id is always 1,
-             ;; so we can just take the car instead of looping.
-             (video (car (url->videos url))))
-        (case action
-          ((list)
-           (if (number? stream-id)
-               (stderr* (stream-printer (video-ref stream-id video)))
-               (stderr* (video-printer video))))
-          ((download)
-           (if (and (number? stream-id)
-                    (<= 0 stream-id (length video)))
-               (let ((download-command
-                      (stream->download-command (list-ref video stream-id)
-                                                outfile)))
-                 (if download-command
-                     (stdout download-command)
-                     (stderr "I don't know how to download #" stream-id)))
-               (stderr "Error: Could not find stream #" stream-id "." #\newline
-                       "Please verify that this stream-id exists for the "
-                       "specified url, by checking the" #\newline
-                       "output of '" program-filename " -l " url "'")))
-          (else
-           (stderr "Pardon?"))))))
+             (videos (url->videos url)))
+        (if (null? videos)
+            (stderr "No videos found at that url.")
+            ;; Until multiple videos are supported, video-id is always 1,
+            ;; so we can just take the car instead of looping.
+            (let ((video (car videos)))
+              (case action
+                ((list)
+                 (if (number? stream-id)
+                     (stderr* (stream-printer (video-ref stream-id video)))
+                     (stderr* (video-printer video))))
+                ((download)
+                 (if (and (number? stream-id)
+                          (<= 0 stream-id (length video)))
+                     (let ((download-command
+                            (stream->download-command (list-ref video stream-id)
+                                                      outfile)))
+                       (if download-command
+                           (stdout download-command)
+                           (stderr "I don't know how to download #" stream-id)))
+                     (stderr "Error: Could not find stream #" stream-id "." #\newline
+                             "Please verify that this stream-id exists for the "
+                             "specified url, by checking the" #\newline
+                             "output of '" program-filename " -l " url "'")))
+                (else
+                 (stderr "Pardon?"))))))))
