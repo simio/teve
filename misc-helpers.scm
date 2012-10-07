@@ -27,6 +27,7 @@
 (define (json-ref obj . keys)
   (cond ((null? keys) obj)
         ((and (number? (car keys))
+              (list? obj)
               (< (car keys) (length obj)))
          (apply json-ref (cons (list-ref obj (car keys)) (cdr keys))))
         ((string? (car keys))
