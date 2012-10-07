@@ -34,18 +34,20 @@
                                (cdr keys))))
         (else #f)))
 
+;; Recurse through the vector/alist mess returned by json-read,
+;; converting vectors to alists.
+(define (sanitise-json-input obj)
+  (cond ((null? obj) obj)
+        ((pair? obj) (cons (sanitise-json-input (car obj))
+                           (sanitise-json-input (cdr obj))))
+        ((vector? obj) (sanitise-json-input (vector->list obj)))
+        (else obj)))
+
 ;;; Download and sanitise a json object from url
 (define (download-json url)
-  ;; Recurse through the vector/alist mess returned by json-read,
-  ;; converting vectors to alists.
-  (define (sanitise obj)
-    (cond ((null? obj) obj)
-          ((pair? obj) (cons (sanitise (car obj)) (sanitise (cdr obj))))
-          ((vector? obj) (sanitise (vector->list obj)))
-          (else obj)))
   (handle-exceptions
-   exn #f
-   (sanitise (with-input-from-request url #f json-read))))
+      exn #f
+    (sanitise-json-input (with-input-from-request url #f json-read))))
 
 (define-syntax not-if
   (syntax-rules ()
@@ -58,7 +60,8 @@
 ;;;   #f                (otherwise)
 ;;; Unspecified if url is not a string or char.
 (define (url->protocol url)
-  (let ((index (string-contains-ci url "://")))
+  (let ((index (and (string? url)
+                    (string-contains-ci url "://"))))
     (if index
         (string-take url index)
         #f)))
@@ -68,11 +71,13 @@
 ;;;   A string
 ;;; Unspecified if url, var or val is not a string or char.
 (define (add-http-get-query-var url var val)
-  (conc url
-        (if (string-index url #\?)
-            "&"
-            "?")
-        var #\= val))
+  (if (string? url)
+      (conc url
+            (if (string-index url #\?)
+                "&"
+                "?")
+            var #\= val)
+      #f))
 
 ;;; Converts a string of the form "VAR=VAL,VAR2=VAL2,..." to an alist.
 ;;; Numerical values are converted to numbers, while everything else is strings.
@@ -146,4 +151,3 @@
       (escape (cdr rest) (cons (car rest) (cons #\\ result))))
      (else
       (escape (cdr rest) (cons (car rest) result))))))
-        
