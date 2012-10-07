@@ -36,7 +36,7 @@
       (let* ((url (car command-line-args))
              (videos (url->videos url)))
         (if (null? videos)
-            (stderr "No videos found at that url.")
+            (stderr "No videos found.")
             ;; Until multiple videos are supported, video-id is always 1,
             ;; so we can just take the car instead of looping.
             (let ((video (car videos)))
