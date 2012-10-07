@@ -1,6 +1,6 @@
 (require-extension srfi-1)
 
-;;; The scrape-list is a list of every url->video procedures.
+;;; The scrape-list is a list of all url->video procedures
 (define scraper-list '())
 
 ;;; Allow "plugins" in sites/ to add procedures to the scraper-list
