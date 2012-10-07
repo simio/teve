@@ -14,7 +14,7 @@
  |#
 
 (require-extension srfi-1 srfi-2 srfi-12 srfi-13)
-(require-extension miscmacros http-client uri-common)
+(require-extension miscmacros http-client uri-common uri-generic)
 
 (include "misc-helpers.scm")
 (include "apple-hls.scm")
@@ -114,14 +114,32 @@
       '()
       (map svt:json-stream->streams references)))))
 
-(define (svt:url-is-compatible? url)
-  (or (string-contains url "://www.svtplay.se/")
-      (string-contains url "://svtplay.se/")))
+;;; Return a list of videos constructed from the json object
+;;; downloaded from the supplied url, or return #f.
+(define (svt:json-url->videos url)
+  (and-let* ((data (download-json url)))
+    (list (svt:json-data->video data))))
+
+;;; Return a JSON url extracted from an embedded svtplay video, or
+;;; return #f.
+(define (svt:embedded-player->json-url url)
+  (and-let* ((source (with-input-from-request url #f read-string))
+             (value (first-html-attribute "data-json-href" source)))
+    (string-replace-every "&amp;" "&" (uri-decode-string value))))
 
 (define (svt:url->videos url)
-  (and-let* ((data (and (svt:url-is-compatible? url)
-                        (svt:download-json-data url))))
-    (list (svt:json-data->video data))))
+  (cond
+   ((or (string-contains url "://www.svtplay.se/")
+        (string-contains url "://svtplay.se/"))
+    (svt:json-url->videos (add-http-get-query-var url "output" "json")))
+   ((or (string-contains url "://www.svt.se/")
+        (string-contains url "://svt.se/"))
+    (and-let* ((json-url (svt:embedded-player->json-url url)))
+      (if json-url
+          (svt:json-url->videos json-url)
+          (display "FEL!"))))
+   (else
+    '())))
 
 ;;; Add svt:url->video to global scraper-table
 (add-scraper svt:url->videos)
