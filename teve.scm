@@ -54,7 +54,8 @@
                        (if download-command
                            (stdout download-command)
                            (stderr "I don't know how to download #" stream-id)))
-                     (stderr "Error: Could not find stream #" stream-id "." #\newline
+                     (stderr "Error: Could not find stream #" stream-id
+                             "." #\newline
                              "Please verify that this stream-id exists for the "
                              "specified url, by checking the" #\newline
                              "output of '" program-filename " -l " url "'")))
