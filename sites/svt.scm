@@ -135,9 +135,7 @@
    ((or (string-contains url "://www.svt.se/")
         (string-contains url "://svt.se/"))
     (and-let* ((json-url (svt:embedded-player->json-url url)))
-      (if json-url
-          (svt:json-url->videos json-url)
-          (display "FEL!"))))
+      (svt:json-url->videos json-url)))
    (else
     '())))
 
