@@ -3,7 +3,7 @@ DISTNAME = teve-prototype1
 
 PREFIX ?= /usr/opt
 
-SOURCE_FILES=*.scm
+SOURCE_FILES=*.scm sites/*.scm
 TEST_FILES=./tests/*.scm
 EXTRA_FILES=Makefile README
 DISTFILES=$(SOURCE_FILES) $(EXTRA_FILES)
