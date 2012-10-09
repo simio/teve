@@ -111,8 +111,8 @@
      (fold (lambda (objs streams)
              (append (filter-map add-video-values objs)
                      streams))
-      '()
-      (map svt:json-stream->streams references)))))
+           '()
+           (filter-map svt:json-stream->streams references)))))
 
 ;;; Return a list of videos constructed from the json object
 ;;; downloaded from the supplied url, or return #f.
