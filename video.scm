@@ -136,6 +136,9 @@
            "    -r " (shell-escape (stream-ref 'url stream)) " \\" #\newline
            "    -W " (shell-escape (stream-ref 'swf-player stream))
            " \\" #\newline
+           (if (stream-ref 'live stream)
+               (conc "    -v \\" #\newline)
+               "")
            "    -o " (shell-escape outfile) ".flv"))
     ((http wmv)
      (conc "curl \\" #\newline
