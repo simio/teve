@@ -137,7 +137,7 @@
     (and-let* ((json-url (svt:embedded-player->json-url url)))
       (svt:json-url->videos json-url)))
    (else
-    '())))
+    #f)))
 
 ;;; Add svt:url->video to global scraper-table
 (add-scraper svt:url->videos)
