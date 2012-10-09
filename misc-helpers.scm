@@ -14,9 +14,9 @@
  |#
 
 (require-extension srfi-1 srfi-13)
-(require-extension miscmacros http-client json)
+(require-extension miscmacros http-client json ssax)
 
-;;; Accessor for values in a tree returned by parse-json.
+;;; Accessor for values in a tree, as those returned by parse-json.
 ;;; Keys are strings (for use with alists) or numbers (for use with list-ref).
 ;;; Use multiple keys to go deeper into the tree. For example,
 ;;; (json-ref tree "vids" 5 "url") is "url" in item 5 in "vids" in tree.
@@ -24,16 +24,21 @@
 ;;; Return values:
 ;;;   A list or a pair  (if the specified key exists and its value isn't #f)
 ;;;   #f                (otherwise)
-(define (json-ref obj . keys)
+(define (quick-ref obj . keys)
   (cond ((null? keys) obj)
         ((and (number? (car keys))
               (list? obj)
               (< (car keys) (length obj)))
-         (apply json-ref (cons (list-ref obj (car keys)) (cdr keys))))
+         (apply quick-ref (cons (list-ref obj (car keys)) (cdr keys))))
+        ((symbol? (car keys))
+         (apply quick-ref (cons (cdr (assq (car keys) (filter pair? obj)))
+                                (cdr keys))))
         ((string? (car keys))
-         (apply json-ref (cons (cdr (assoc (car keys) (filter pair? obj)))
-                               (cdr keys))))
+         (apply quick-ref (cons (cdr (assoc (car keys) (filter pair? obj)))
+                                (cdr keys))))
         (else #f)))
+
+(define json-ref quick-ref)
 
 ;; Recurse through the vector/alist mess returned by json-read,
 ;; converting vectors to alists.
@@ -168,4 +173,20 @@
              (begin-index (+ 1 (string-index source #\" attr-index)))
              (end-index (string-index source #\" begin-index) begin-index))
     (substring/shared source begin-index end-index)))
-             
+
+;;; Thunk which reads XML from current-input-port and returns sxml.
+;;; The ssax does not have a thunk reader (like json-read of the json egg).
+(define (xml-read)
+  (ssax:xml->sxml (current-input-port) '()))
+
+;;; Download an XML document object from url
+(define (download-xml url)
+  (handle-exceptions
+      exn #f
+    (with-input-from-request url #f xml-read)))
+
+(define (sxml-ref data . keys)
+  (let ((val (apply quick-ref (cons data keys))))
+    (if (and (list val) (= 1 (length val)))
+        (car val)
+        val)))
