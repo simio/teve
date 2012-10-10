@@ -1,4 +1,4 @@
-(use srfi-78)
+(use srfi-13 srfi-14 srfi-78)
 
 (include "misc-helpers.scm")
 
@@ -125,3 +125,80 @@
 (check (add-http-get-query-var "a" 'symbol '(list)) => "a?symbol=(list)")
 
 ;; varlist->alist
+(define hls-style-varlist
+  (conc "VAR1=hej,NUMBER=1024,BOOLEAN=#t,FALSE_WORD=false,FALSE_SYMBOL='false,"
+        "VAR-WITHOUT-VALUE,1=2,symbol='en-symbol,false=#f,not-false='#f"))
+(check (varlist->alist hls-style-varlist ",")
+       => '(("not-false" . |#f|)
+            ("false" . #f)
+            ("symbol" . en-symbol)
+            ("1" . 2)
+            ("FALSE_SYMBOL" . false)
+            ("FALSE_WORD" . "false")
+            ("BOOLEAN" . #t)
+            ("NUMBER" . 1024)
+            ("VAR1" . "hej")))
+(check (varlist->alist "" ",") => '())
+(check (varlist->alist "nothing" "") => '())
+(check (varlist->alist 'symbol 5) => #f)
+(check (varlist->alist (list) (list)) => #f)
+
+;; string-drop-to
+(check (string-drop-to "meddelande: hejsan" ": ") => "hejsan")
+(check (string-drop-to "teckenkontroll: ok" #\space) => "ok")
+(check (string-drop-to "hela strängen tack" #\') => "hela strängen tack")
+(check/expect-error (string-drop-to '() 5))
+(check (string-drop-to "1234567" 3) => "4567")
+(check (string-drop-to "abcde" "a") => "bcde")
+(check (string-drop-to "abcde" "e") => "")
+(check (string-drop-to "" 0) => "")
+(check (string-drop-to "a be ce de e äff" 'de) => " e äff")
+
+;; x-sep-resolution->pair
+(check (x-sep-resolution->pair "1024x768") => '(1024 . 768))
+(check (x-sep-resolution->pair "10X20") => '(10 . 20))
+(check (x-sep-resolution->pair "") => #f)
+(check/expect-error (x-sep-resolution->pair (list)))
+(check/expect-error (x-sep-resolution->pair 'symbol))
+(check (x-sep-resolution->pair "5xb") => #f)
+(check (x-sep-resolution->pair "aX1") => #f)
+(check (x-sep-resolution->pair "aXb") => #f)
+
+;; cdip
+(check (cdip '(a . b)) => 'b)
+(check (cdip '(a)) => '())
+(check (cdip 'symbol) => #f)
+(check (cdip (list)) => #f)
+
+;; caip
+(check (caip '(a . b)) => 'a)
+(check (caip '(a)) => 'a)
+(check (caip 'symbol) => #f)
+(check (caip (list)) => #f)
+
+;; make-rnd-string
+(check (equal? (make-rnd-string 5) (make-rnd-string 5)) => #f)
+(check (string-length (make-rnd-string 50)) => 50)
+(check (string-delete char-set:letter (make-rnd-string 257)) => "")
+(check (string-length (string-filter char-set:letter (make-rnd-string 1000)))
+       => 1000)
+
+(check (string-length (make-rnd-string 50 "7 chars")) => 57)
+(check (string-delete char-set:letter (make-rnd-string 257 "&")) => "&")
+(check (string-length (string-filter
+                       char-set:letter
+                       (make-rnd-string 1000 "")))
+       => 1000)
+(check (string-suffix? "()" (make-rnd-string 5 (list))) => #t)
+(check (string-length (make-rnd-string 5 (list))) => 7)
+
+;; shell-escape
+(define shell-special-chars "&|$\"'\\()[]{}<>#~=;,*")
+(define shell-normal-chars (conc "abcdefghijklmnopqrstuvwxyzåäö"
+                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ"
+                                 "0123456789_-.:!%/"))
+(check (shell-escape shell-special-chars)
+       => "\\&\\|\\$\\\"\\'\\\\\\(\\)\\[\\]\\{\\}\\<\\>\\#\\~\\=\\;\\,\\*")
+(check (shell-escape shell-normal-chars) => shell-normal-chars)
+(check/expect-error (shell-escape 'symbol))
+(check/expect-error (shell-escape (list)))

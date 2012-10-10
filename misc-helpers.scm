@@ -101,9 +101,18 @@
           (cdr raw-pairs)
           (if (string-contains (car raw-pairs) "=")
               (cons (let ((pair (string-split (car raw-pairs) "=")))
-                      (cons (car pair) (if (string->number (cadr pair))
-                                           (string->number (cadr pair))
-                                           (cadr pair))))
+                      (cons (car pair) (cond
+                                        ((string->number (cadr pair))
+                                         (string->number (cadr pair)))
+                                        ((string=? "#f" (cadr pair))
+                                         #f)
+                                        ((string=? "#t" (cadr pair))
+                                         #t)
+                                        ((and (< 0 (string-length (cadr pair)))
+                                              (eq? #\' (string-ref (cadr pair) 0)))
+                                         (string->symbol (string-drop (cadr pair) 1)))
+                                        (else
+                                         (cadr pair)))))
                     result)
               result))))))
 
@@ -112,20 +121,27 @@
 ;;; remainder of the string. If the string does not contain the
 ;;; substring, the whole string is returned.
 (define (string-drop-to str to-this)
-  (let ((pos (string-contains str to-this)))
+  (let* ((splitter (->string to-this))
+         (pos (string-contains str splitter)))
     (if pos
-        (string-drop str (+ pos (string-length to-this)))
+        (string-drop str (+ pos (string-length splitter)))
         str)))
 
 ;;; Make a pair out of strings like "1x2" or "1024X768"
+;;; If impossible, return #f
 (define (x-sep-resolution->pair str)
   (let find-split ((chars (string->list str))
                    (x-res '()))
-    (cond ((null? (cdr chars)) #f)
+    (cond ((null? chars) #f)
           ((or (eqv? #\x (car chars))
                (eqv? #\X (car chars)))
-           (cons (string->number (apply conc (reverse x-res)))
-                 (string->number (apply conc (cdr chars)))))
+           (let ((left (string->number (apply conc (reverse x-res))))
+                 (right (if (< 1 (length chars))
+                            (string->number (apply conc (cdr chars)))
+                            0)))
+             (if (and left right)
+                 (cons left right)
+                 #f)))
           (else
            (find-split (cdr chars) (cons (car chars) x-res))))))
 
@@ -154,19 +170,18 @@
     (if (> 1 len)
         appendix
         (make-rnd-string (- len 1) (conc char appendix)))))
-  
+
 (define (shell-escape str)
-  (let escape ((rest (string->list str))
-               (result '()))
-    (cond
-     ((null? rest)
-      (list->string (reverse result)))
-     ((or (eq? #\& (car rest))
-          (eq? #\| (car rest))
-          (eq? #\\ (car rest)))
-      (escape (cdr rest) (cons (car rest) (cons #\\ result))))
-     (else
-      (escape (cdr rest) (cons (car rest) result))))))
+  (let ((special-chars (string->list "&|$\"'\\()[]{}<>#~=;,*")))
+    (let escape ((rest (string->list str))
+                 (result '()))
+      (cond
+       ((null? rest)
+        (list->string (reverse result)))
+       ((member (car rest) special-chars)
+        (escape (cdr rest) (cons (car rest) (cons #\\ result))))
+       (else
+        (escape (cdr rest) (cons (car rest) result)))))))
 
 ;;; s/needle/replacement/g
 (define (string-replace-every needle replacement string)
