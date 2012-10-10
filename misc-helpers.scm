@@ -31,10 +31,10 @@
               (< (car keys) (length obj)))
          (apply quick-ref (cons (list-ref obj (car keys)) (cdr keys))))
         ((symbol? (car keys))
-         (apply quick-ref (cons (cdr (assq (car keys) (filter pair? obj)))
+         (apply quick-ref (cons (cdip (assq (car keys) (filter pair? obj)))
                                 (cdr keys))))
         ((string? (car keys))
-         (apply quick-ref (cons (cdr (assoc (car keys) (filter pair? obj)))
+         (apply quick-ref (cons (cdip (assoc (car keys) (filter pair? obj)))
                                 (cdr keys))))
         (else #f)))
 
