@@ -48,9 +48,9 @@
                               streams))))))
 
 (define (hls-master->streams playlist-url)
-  (let ((playlist (with-input-from-request (make-emo-request playlist-url)
-                                           #f
-                                           read-string)))
+  (let ((playlist (handle-exceptions exn #f
+                    (with-input-from-request
+                     (make-emo-request playlist-url) #f read-string))))
     (if (not (and (string? playlist)
                   (string-contains playlist (string #\newline))))
         #f
