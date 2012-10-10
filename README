@@ -32,7 +32,7 @@ After installing Chicken, you'll also need to install a few eggs:
 Or if you'd like to see what you're installing:
 
     # make print-eggs
-    utf8 intarweb srfi-37 json http-client vector-lib packrat ...
+    intarweb srfi-37 json http-client vector-lib packrat ...
     # chicken-install $(make print-eggs)
 
 

@@ -9,7 +9,7 @@ TEST_RUNNER=run-tests.scm
 EXTRA_FILES=Makefile README
 DISTFILES=$(SOURCE_FILES) $(EXTRA_FILES)
 
-EGGS=utf8 intarweb srfi-37 json http-client vector-lib \
+EGGS=intarweb srfi-37 json http-client vector-lib \
 	packrat openssl base64 defstruct uri-common matchable uri-generic \
 	message-digest ssax
 

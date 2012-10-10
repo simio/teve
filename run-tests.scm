@@ -1,4 +1,4 @@
-(use utf8 srfi-13 srfi-78 posix)
+(use srfi-13 srfi-78 posix)
 
 (define-syntax check/expect-error
   (syntax-rules ()

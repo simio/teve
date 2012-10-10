@@ -1,4 +1,4 @@
-(use utf8 srfi-78)
+(use srfi-78)
 
 (include "misc-helpers.scm")
 

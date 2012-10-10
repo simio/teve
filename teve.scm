@@ -13,8 +13,6 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(use utf8)
-
 (define program-name "teve")
 (define program-filename program-name)
 (define program-version "0.1")
