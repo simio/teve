@@ -90,10 +90,10 @@
 ;;; Return values:
 ;;;   An alist          (if input is valid)
 ;;;   #f                (otherwise)
-(define (varlist->alist str)
+(define (varlist->alist str splitter)
   (handle-exceptions
    exn #f
-   (let make-pairs ((raw-pairs (string-split str ","))
+   (let make-pairs ((raw-pairs (string-split str splitter))
                     (result '()))
      (if (null? raw-pairs)
          result
@@ -106,6 +106,16 @@
                                            (cadr pair))))
                     result)
               result))))))
+
+;;; Finds the first occurence of a substring 'to-this in a string and
+;;; drops all chars up to and including this char, returning the
+;;; remainder of the string. If the string does not contain the
+;;; substring, the whole string is returned.
+(define (string-drop-to str to-this)
+  (let ((pos (string-contains str to-this)))
+    (if pos
+        (string-drop str (+ pos (string-length to-this)))
+        str)))
 
 ;;; Make a pair out of strings like "1x2" or "1024X768"
 (define (x-sep-resolution->pair str)

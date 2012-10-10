@@ -25,7 +25,7 @@
 
 (define (hls:parse-playlist str)
   (define (read-stream mesh slat)
-    (and-let* ((pairs (varlist->alist mesh))
+    (and-let* ((pairs (varlist->alist (string-drop-to mesh ":") ","))
                (res-str (assoc "RESOLUTION" pairs))
                (resolution (or (x-sep-resolution->pair (cdr res-str))
                                (cdr res-str)))
