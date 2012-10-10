@@ -95,6 +95,7 @@
   (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
          (references (json-ref json-data "video" "videoReferences"))
          (popout-url (json-ref json-data "context" "popoutUrl"))
+         (is-live (json-ref json-data "video" "live"))
          (play-url (if popout-url
                        (conc "http://www.svtplay.se" popout-url)
                        #f))
@@ -104,6 +105,7 @@
                               stream
                               (make-stream-value 'subtitles subtitles)
                               (make-stream-value 'view-at play-url)
+                              (make-stream-value 'live is-live)
                               (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                   (make-stream-value 'swf-player
                                                      (force swf-player)))))))
