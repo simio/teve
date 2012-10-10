@@ -48,9 +48,7 @@
                               streams))))))
 
 (define (hls-master->streams playlist-url)
-  (let ((playlist (handle-exceptions exn #f
-                    (with-input-from-request
-                     (make-emo-request playlist-url) #f read-string))))
+  (let ((playlist (force (delay-download (make-emo-request playlist-url)))))
     (if (not (and (string? playlist)
                   (string-contains playlist (string #\newline))))
         #f
@@ -62,4 +60,4 @@
                               (make-stream-value 'stream-type 'hls)
                               (make-stream-value 'master-playlist
                                                  playlist-url))))
-        (hls:parse-playlist playlist)))))
+         (hls:parse-playlist playlist)))))

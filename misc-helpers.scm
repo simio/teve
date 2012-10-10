@@ -50,11 +50,25 @@
         ((vector? obj) (sanitise-json-input (vector->list obj)))
         (else obj)))
 
+;;; Return a delayed download. If a second parameter is supplied,
+;;; it is used as a reader. The default is read-string.
+(define (delay-download url . tail)
+  (let ((reader (if (null? tail) read-string (car tail))))
+    (delay
+      (handle-exceptions exn #f
+        (with-input-from-request url #f reader)))))
+
+;;; Download an XML document object from url
+(define (download-xml url)
+  (delay-download url xml-read))
+
+;;; Read with json-read and sanitise with sanitise-json-input
+(define (json-read-and-sanitise)
+  (sanitise-json-input (json-read)))
+
 ;;; Download and sanitise a json object from url
 (define (download-json url)
-  (handle-exceptions
-      exn #f
-    (sanitise-json-input (with-input-from-request url #f json-read))))
+  (delay-download url json-read-and-sanitise))
 
 (define-syntax not-if
   (syntax-rules ()
@@ -209,12 +223,6 @@
 ;;; The ssax does not have a thunk reader (like json-read of the json egg).
 (define (xml-read)
   (ssax:xml->sxml (current-input-port) '()))
-
-;;; Download an XML document object from url
-(define (download-xml url)
-  (handle-exceptions
-      exn #f
-    (with-input-from-request url #f xml-read)))
 
 ;;; While the json egg creates trees we sanitise into alists, the ssax
 ;;; egg creates trees where even key/value pairs are stored as proper

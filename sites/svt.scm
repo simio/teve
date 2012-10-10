@@ -37,7 +37,7 @@
                         (read-char)))))))
 
 (define (svt:swf-player-in url)
-  (and-let* ((swf (with-input-from-request url #f find-first-quoted-swf)))
+  (and-let* ((swf (force (delay-download url find-first-quoted-swf))))
     (conc "http://www.svtplay.se" swf)))
 
 (define (svt:stream-type-of url bitrate player-type)
@@ -83,7 +83,6 @@
                           (if (< 0 bitrate)
                               (make-stream-value 'bitrate bitrate))))))))
 
-
 (define (svt:json-data->video json-data)
   (and-let* ((references (json-ref json-data "video" "videoReferences")))
     (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
@@ -118,8 +117,8 @@
 ;;; Return a JSON url extracted from an embedded svtplay video, or
 ;;; return #f.
 (define (svt:embedded-player->json-url url)
-  (and-let* ((source (with-input-from-request url #f read-string))
-             (value (first-html-attribute "data-json-href" source)))
+  (and-let* ((source (delay-download url))
+             (value (first-html-attribute "data-json-href" (force source))))
     (string-replace-every "&amp;" "&" (uri-decode-string value))))
 
 (define (svt:url->videos url)
