@@ -19,13 +19,6 @@
 (include "misc-helpers.scm")
 (include "apple-hls.scm")
 
-;;; Get JSON-data from SVT Play
-;;; Return values:
-;;;   A list/alist tree         (if valid JSON data is available for url)
-;;;   #f                        (otherwise)
-(define (svt:download-json-data url)
-  (download-json (add-http-get-query-var url "output" "json")))
-
 (define (find-first-quoted-swf)
   (let ((ending (string-reverse ".swf")))
     (let find-first-swf ((stack "")
@@ -92,35 +85,35 @@
 
 
 (define (svt:json-data->video json-data)
-  (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
-         (references (json-ref json-data "video" "videoReferences"))
-         (popout-url (json-ref json-data "context" "popoutUrl"))
-         (is-live (json-ref json-data "video" "live"))
-         (play-url (if popout-url
-                       (conc "http://www.svtplay.se" popout-url)
-                       #f))
-         (swf-player (delay (svt:swf-player-in play-url)))
-         (add-video-values (lambda (stream)
-                             (update-stream
-                              stream
-                              (make-stream-value 'subtitles subtitles)
-                              (make-stream-value 'view-at play-url)
-                              (make-stream-value 'live is-live)
-                              (if (eq? 'rtmp (stream-ref 'stream-type stream))
-                                  (make-stream-value 'swf-player
-                                                     (force swf-player)))))))
-    (streams->video
-     (fold (lambda (objs streams)
-             (append (filter-map add-video-values objs)
-                     streams))
-           '()
-           (filter-map svt:json-stream->streams references)))))
+  (and-let* ((references (json-ref json-data "video" "videoReferences")))
+    (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
+           (popout-url (json-ref json-data "context" "popoutUrl"))
+           (is-live (json-ref json-data "video" "live"))
+           (play-url (if popout-url
+                         (conc "http://www.svtplay.se" popout-url)
+                         #f))
+           (swf-player (delay (svt:swf-player-in play-url)))
+           (add-video-values (lambda (stream)
+                               (update-stream
+                                stream
+                                (make-stream-value 'subtitles subtitles)
+                                (make-stream-value 'view-at play-url)
+                                (make-stream-value 'live is-live)
+                                (if (eq? 'rtmp (stream-ref 'stream-type stream))
+                                    (make-stream-value 'swf-player
+                                                       (force swf-player)))))))
+      (streams->video
+       (fold (lambda (objs streams)
+               (append (filter-map add-video-values objs)
+                       streams))
+             '()
+             (filter-map svt:json-stream->streams references))))))
 
 ;;; Return a list of videos constructed from the json object
 ;;; downloaded from the supplied url, or return #f.
 (define (svt:json-url->videos url)
   (and-let* ((data (download-json url)))
-    (list (svt:json-data->video data))))
+    (list (svt:json-data->video (force data)))))
 
 ;;; Return a JSON url extracted from an embedded svtplay video, or
 ;;; return #f.
