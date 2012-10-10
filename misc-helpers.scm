@@ -22,7 +22,7 @@
 ;;; (json-ref tree "vids" 5 "url") is "url" in item 5 in "vids" in tree.
 ;;;
 ;;; Return values:
-;;;   A list or cdr of a pair   (if the specified key exists and its value isn't #f)
+;;;   A list or cdr of a pair   (if the key exists and its value isn't #f)
 ;;;   #f                        (otherwise)
 (define (quick-ref obj . keys)
   (cond ((null? keys) obj)
