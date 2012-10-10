@@ -1,5 +1,6 @@
 (use srfi-78 srfi-12)
 
+(include "tests/global.scm")
 (include "video.scm")
 
 ;; Stream values

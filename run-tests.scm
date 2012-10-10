@@ -1,12 +1,4 @@
-(use srfi-13 srfi-78 posix)
-
-(define-syntax check/expect-error
-  (syntax-rules ()
-    ((check/expect-errors args ...)
-     (check (handle-exceptions exn
-                               'i-am-sorry-dave
-                               args ...)
-            => 'i-am-sorry-dave))))
+(use posix)
 
 (check-reset!)
 

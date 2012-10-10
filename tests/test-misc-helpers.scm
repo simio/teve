@@ -1,5 +1,6 @@
 (use srfi-13 srfi-14 srfi-78)
 
+(include "tests/global.scm")
 (include "misc-helpers.scm")
 
 ;;; I have no idea why, but if these long strings are not broken up
