@@ -2,16 +2,6 @@
 
 (include "misc-helpers.scm")
 
-(define-syntax check/expect-error
-  (syntax-rules ()
-    ((check/except args ...)
-     (check (handle-exceptions exn
-                               'i-am-sorry-dave
-                               args ...)
-            => 'i-am-sorry-dave))))
-
-(check-reset!)
-
 ;;; I have no idea why, but if these long strings are not broken up
 ;;; into pieces like this, csi as an inferior scheme in Emacs will
 ;;; print a lot of ^G instead of whatever.
@@ -135,5 +125,3 @@
 (check (add-http-get-query-var "a" 'symbol '(list)) => "a?symbol=(list)")
 
 ;; varlist->alist
-
-(check-report)

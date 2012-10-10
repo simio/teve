@@ -2,16 +2,6 @@
 
 (include "video.scm")
 
-(check-reset!)
-
-(define-syntax check/expect-error
-  (syntax-rules ()
-    ((check/except args ...)
-     (check (handle-exceptions exn
-                               'i-am-sorry-dave
-                               args ...)
-            => 'i-am-sorry-dave))))
-
 ;; Stream values
 (check (make-stream-value 'key 5) => '(key . 5))
 (check (make-stream-value 5 'value) => #f)
@@ -131,8 +121,3 @@
 (check/expect-error (video-length 'not-a-list))
 (check/expect-error (video-length))
 (check/expect-error (video-length test-video test-video-2))
-
-
-
-
-(check-report)
