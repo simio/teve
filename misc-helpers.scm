@@ -187,10 +187,15 @@
 (define (string-replace-every needle replacement string)
   (let loop ((rest string)
              (chunks '()))
-    (if* (string-contains rest needle)
-         (loop (string-drop rest (+ it (string-length needle)))
-               (cons replacement (cons (string-take rest it) chunks)))
-         (apply conc (reverse (cons rest chunks))))))
+    (let ((index (string-contains rest needle)))
+      (cond
+       ((= 0 (string-length needle))
+        string)
+       (index
+        (loop (string-drop rest (+ index (string-length needle)))
+              (cons replacement (cons (string-take rest index) chunks))))
+       (else
+        (apply conc (reverse (cons rest chunks))))))))
         
 ;;; Get (un)quoted value of first html attribute style key-value pair.
 (define (first-html-attribute attribute source)

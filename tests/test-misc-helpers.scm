@@ -203,3 +203,14 @@
 (check (shell-escape shell-normal-chars) => shell-normal-chars)
 (check/expect-error (shell-escape 'symbol))
 (check/expect-error (shell-escape (list)))
+
+;; string-replace-every
+(check (string-replace-every "needle" "bear" "there's a needle in my box")
+       => "there's a bear in my box")
+(check (string-replace-every "x" "/" "123x123") => "123/123")
+(check (string-replace-every "" "" "") => "")
+(check (string-replace-every "" "/" "xxx") => "xxx")
+(check (string-replace-every "x" (list) "x") => "()")
+(check/expect-error (string-replace-every 1 "" 3))
+(check/expect-error (string-replace-every "" "" 1))
+(check/expect-error (string-replace-every 1 "" ""))
