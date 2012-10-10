@@ -195,8 +195,14 @@
       exn #f
     (with-input-from-request url #f xml-read)))
 
+;;; While the json egg creates trees we sanitise into alists, the ssax
+;;; egg creates trees where even key/value pairs are stored as proper
+;;; lists (with a length of 2). If this sxml-ref procedure is used to
+;;; refer to the cdr of such a pair, it returns the cadr instead of
+;;; the cdr, which means it pretends it is accessing an alist. This
+;;; way, the usage of it comes closer to that of json-ref.
 (define (sxml-ref data . keys)
   (let ((val (apply quick-ref (cons data keys))))
-    (if (and (list val) (= 1 (length val)))
+    (if (and (list? val) (= 1 (length val)))
         (car val)
         val)))
