@@ -105,31 +105,33 @@
 ;;; Return values:
 ;;;   An alist          (if input is valid)
 ;;;   #f                (otherwise)
-(define (varlist->alist str splitter)
-  (handle-exceptions
-   exn #f
-   (let make-pairs ((raw-pairs (string-split str splitter))
-                    (result '()))
-     (if (null? raw-pairs)
-         result
-         (make-pairs
-          (cdr raw-pairs)
-          (if (string-contains (car raw-pairs) "=")
-              (cons (let ((pair (string-split (car raw-pairs) "=")))
-                      (cons (car pair) (cond
-                                        ((string->number (cadr pair))
-                                         (string->number (cadr pair)))
-                                        ((string=? "#f" (cadr pair))
-                                         #f)
-                                        ((string=? "#t" (cadr pair))
-                                         #t)
-                                        ((and (< 0 (string-length (cadr pair)))
-                                              (eq? #\' (string-ref (cadr pair) 0)))
-                                         (string->symbol (string-drop (cadr pair) 1)))
-                                        (else
-                                         (cadr pair)))))
-                    result)
-              result))))))
+(define (varlist->alist str . tail)
+  (let ((splitter (if (null? tail) "," (car tail)))
+        (setter (if (or (null? tail) (null? (cdr tail))) "=" (cadr tail))))
+    (handle-exceptions
+        exn #f
+      (let make-pairs ((raw-pairs (string-split str splitter))
+                       (result '()))
+        (if (null? raw-pairs)
+            result
+            (make-pairs
+             (cdr raw-pairs)
+             (if (string-contains (car raw-pairs) setter)
+                 (cons (let ((pair (string-split (car raw-pairs) setter)))
+                         (cons (car pair) (cond
+                                           ((string->number (cadr pair))
+                                            (string->number (cadr pair)))
+                                           ((string=? "#f" (cadr pair))
+                                            #f)
+                                           ((string=? "#t" (cadr pair))
+                                            #t)
+                                           ((and (< 0 (string-length (cadr pair)))
+                                                 (eq? #\' (string-ref (cadr pair) 0)))
+                                            (string->symbol (string-drop (cadr pair) 1)))
+                                           (else
+                                            (cadr pair)))))
+                       result)
+                 result)))))))
 
 ;;; Finds the first occurence of a substring 'to-this in a string and
 ;;; drops all chars up to and including this char, returning the
@@ -213,11 +215,12 @@
         (apply conc (reverse (cons rest chunks))))))))
         
 ;;; Get (un)quoted value of first html attribute style key-value pair.
-(define (first-html-attribute attribute source)
-  (and-let* ((attr-index (string-contains-ci source attribute))
-             (begin-index (+ 1 (string-index source #\" attr-index)))
-             (end-index (string-index source #\" begin-index) begin-index))
-    (substring/shared source begin-index end-index)))
+(define (first-html-attribute attribute source . tail)
+  (let ((quote-char (if (null? tail) #\" (car tail))))
+    (and-let* ((attr-index (string-contains-ci source attribute))
+               (begin-index (+ 1 (string-index source quote-char attr-index)))
+               (end-index (string-index source quote-char begin-index) begin-index))
+      (substring/shared source begin-index end-index))))
 
 ;;; Thunk which reads XML from current-input-port and returns sxml.
 ;;; The ssax does not have a thunk reader (like json-read of the json egg).
