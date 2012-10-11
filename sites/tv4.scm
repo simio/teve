@@ -18,8 +18,8 @@
 (include "misc-helpers.scm")
 
 (define (tv4:download-xml-data xml-base-url)
-  (and-let* ((xml-base (download-xml xml-base-url))
-             (xml-play (download-xml (conc xml-base-url "/play"))))
+  (and-let* ((xml-base (force (download-xml xml-base-url)))
+             (xml-play (force (download-xml (conc xml-base-url "/play")))))
     (list (caddr xml-base)
           (caddr xml-play))))
 
@@ -59,18 +59,32 @@
                              (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                  (make-stream-value 'swf-player swf-player))))
             (filter-map tv4:xml-items->stream xml-items))))))
-         
+
 (define (tv4:xml-url->video xml-url)
   (and-let* ((data (tv4:download-xml-data xml-url)))
     (tv4:xml-data->video data)))
+
+(define (tv4:video-id->xml-url id)
+  (conc "http://prima.tv4play.se/api/web/asset/" id))
 
 (define (tv4:tv4play-url->xml-url url)
   (and-let* ((url-obj (uri-reference url))
              (query (uri-query url-obj))
              (video-id (cdip (assq 'videoid query)))
-             (xml-base-url (conc "http://prima.tv4play.se/api/web/asset/"
-                                 video-id)))
+             (xml-base-url (tv4:video-id->xml-url video-id)))
     xml-base-url))
+
+(define (tv4:embedded-video->xml-url url)
+  (and-let* ((source (force (delay-download url)))
+             (raw-flash-vars (first-html-attribute "data-flash-vars"
+                                                   source
+                                                   #\'))
+             (flash-vars (with-input-from-string
+                             raw-flash-vars
+                           json-read-and-sanitise))
+             (raw-video-id (cdip (assoc "vid" flash-vars)))
+             (video-id (string->number raw-video-id)))
+    (tv4:video-id->xml-url video-id)))
 
 (define (tv4:url->videos url)
   (cond
@@ -79,7 +93,7 @@
     (list (tv4:xml-url->video (tv4:tv4play-url->xml-url url))))
    ((or (string-contains url "://www.tv4.se/")
         (string-contains url "://tv4.se/"))
-    #f) ;XXX not yet implemented
+    (list (tv4:xml-url->video (tv4:embedded-video->xml-url url))))
    (else
     #f)))
 
