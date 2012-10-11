@@ -95,13 +95,43 @@
                                ".aktuellt.hela-program.30-9-21-00"))
      ("title" . "30-9-21-00")
      ("folderStructure" . "aktuellt.hela-program"))
-    ("context" ("title" . "30/9 21:00")
+    ("context"
+     ("title" . "30/9 21:00")
      ("popoutUrl" . "/video/324252/30-9-21-00?type=embed"))))
 
-;; json-read (from json egg) and sanitise-json-input
+;; json-read (from json egg), sanitise-json-input and json-read-and-sanitise
 (check (with-input-from-string raw-json json-read) => unsanitised-json)
 (check (sanitise-json-input unsanitised-json) => sanitised-json)
 (check (sanitise-json-input #f) => #f)
+(check (with-input-from-string raw-json json-read-and-sanitise) => sanitised-json)
+(check (with-input-from-string "blabla" json-read-and-sanitise) => #f)
+
+;; json-ref (and quick-ref, since they're the same lambda)
+(check (json-ref sanitised-json "context" "title") => "30/9 21:00")
+(check (json-ref sanitised-json "finns inte") => #f)
+(check (json-ref 5 0) => #f)
+(check (json-ref (list) (list)) => #f)
+(check (json-ref sanitised-json "video" "videoReferences" "url") => #f)
+(check (json-ref sanitised-json "video" "videoReferences" 0 "playerType") => "flash")
+(check (json-ref sanitised-json "video" "videoReferences" 0 'playerType) => #f)
+(check (json-ref sanitised-json "video" "videoReferences" 1 "bitrate") => 0)
+(check (json-ref sanitised-json "video" "videoReferences" 0 "playerType" "flash") => #f)
+(check (json-ref sanitised-json) => sanitised-json)
+
+(define test-sxml-sublist '((three items here) ("two" items) (1)))
+(define test-sxml `(5 symbol ,test-sxml-sublist))
+
+;; sxml-ref (test mostly differences from json-ref)
+(check (sxml-ref test-sxml) => test-sxml)
+(check (sxml-ref test-sxml 'symbol) => #f)
+(check (sxml-ref test-sxml 1) => 'symbol)
+(check (sxml-ref test-sxml "two") => #f)
+(check (sxml-ref test-sxml 2) => test-sxml-sublist)
+(check (sxml-ref test-sxml 2 "two") => 'items)
+(check (sxml-ref test-sxml 2 1) => '("two" items))
+(check (sxml-ref test-sxml 2 'three) => '(items here))
+(check (sxml-ref test-sxml 2 'three 1) => 'here)
+(check (sxml-ref test-sxml 2 'three 2) => #f)
 
 ;; url->protocol
 (check (url->protocol "http://www.example.com/") => "http")
@@ -214,3 +244,5 @@
 (check/expect-error (string-replace-every 1 "" 3))
 (check/expect-error (string-replace-every "" "" 1))
 (check/expect-error (string-replace-every 1 "" ""))
+
+;; first-html-attribute
