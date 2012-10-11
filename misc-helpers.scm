@@ -219,7 +219,7 @@
   (let ((quote-char (if (null? tail) #\" (car tail))))
     (and-let* ((attr-index (string-contains-ci source attribute))
                (begin-index (+ 1 (string-index source quote-char attr-index)))
-               (end-index (string-index source quote-char begin-index) begin-index))
+               (end-index (string-index source quote-char begin-index)))
       (substring/shared source begin-index end-index))))
 
 ;;; Thunk which reads XML from current-input-port and returns sxml.
