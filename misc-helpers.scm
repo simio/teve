@@ -64,7 +64,7 @@
 
 ;;; Read with json-read and sanitise with sanitise-json-input
 (define (json-read-and-sanitise)
-  (sanitise-json-input (json-read)))
+  (sanitise-json-input (handle-exceptions exn #f (json-read))))
 
 ;;; Download and sanitise a json object from url
 (define (download-json url)
