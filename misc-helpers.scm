@@ -16,6 +16,25 @@
 (require-extension srfi-1 srfi-13)
 (require-extension miscmacros http-client json ssax)
 
+;;; Get cdr of PAIR, or eval to #f if it's not a pair (CDr If Pair)
+(define-syntax cdip
+  (syntax-rules ()
+    ((cdip expr)
+     (let ((val expr))
+       (if (pair? val)
+           (cdr val)
+           #f)))))
+
+;;; Get car of PAIR, or eval to #f if it's not a pair (CAr If Pair)
+(define-syntax caip
+  (syntax-rules ()
+    ((caip expr)
+     (let ((val expr))
+       (if (pair? val)
+           (car val)
+           #f)))))
+
+
 ;;; Accessor for values in a tree, as those returned by parse-json.
 ;;; Keys are strings (for use with alists) or numbers (for use with list-ref).
 ;;; Use multiple keys to go deeper into the tree. For example,
@@ -162,24 +181,6 @@
           (else
            (find-split (cdr chars) (cons (car chars) x-res))))))
 
-;;; Get cdr of PAIR, or eval to #f if it's not a pair (CDr If Pair)
-(define-syntax cdip
-  (syntax-rules ()
-    ((cdip expr)
-     (let ((val expr))
-       (if (pair? val)
-           (cdr val)
-           #f)))))
-
-;;; Get car of PAIR, or eval to #f if it's not a pair (CAr If Pair)
-(define-syntax caip
-  (syntax-rules ()
-    ((caip expr)
-     (let ((val expr))
-       (if (pair? val)
-           (car val)
-           #f)))))
-  
 (define (make-rnd-string len . tail)
   (let* ((str "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
          (char (string-ref str (random (string-length str))))
