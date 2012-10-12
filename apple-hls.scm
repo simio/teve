@@ -30,12 +30,11 @@
                (resolution (or (x-sep-resolution->pair (cdr res-str))
                                (cdr res-str)))
                (bandwidth (assoc "BANDWIDTH" pairs)))
-              (make-stream
-               (cons 'video-width (car resolution))
-               (cons 'video-height (cdr resolution))
-               (cons 'bitrate (/ (cdr bandwidth) 1000))
-               (cons 'url (uri-decode-string (car slat))))))
-  
+      (make-stream
+       (cons 'video-width (car resolution))
+       (cons 'video-height (cdr resolution))
+       (cons 'bitrate (/ (cdr bandwidth) 1000))
+       (cons 'url (uri-decode-string (car slat))))))
   (let read-entries ((playlist (cdr (string-split str (string #\newline))))
                      (streams '()))
     (cond ((or (null? playlist)
