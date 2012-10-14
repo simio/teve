@@ -27,7 +27,7 @@
      (conc "ffmpeg \\" #\newline
            "    -i " (shell-escape (stream-ref 'url stream)) " \\" #\newline
            "    -acodec copy -vcodec copy -absf aac_adtstoasc \\" #\newline
-           "    " (shell-escape outfile) ".avi"))
+           "    " (shell-escape outfile) ".mp4"))
     ((rtmp)
      (conc "rtmpdump \\" #\newline
            "    -r " (shell-escape (stream-ref 'url stream)) " \\" #\newline
