@@ -70,7 +70,7 @@
 (define (tv4:tv4play-url->xml-url url)
   (and-let* ((url-obj (uri-reference url))
              (query (uri-query url-obj))
-             (video-id (cdip (assq 'videoid query)))
+             (video-id (cdip (assq 'video_id query)))
              (xml-base-url (tv4:video-id->xml-url video-id)))
     xml-base-url))
 
