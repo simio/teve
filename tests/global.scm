@@ -13,6 +13,8 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
+(use srfi-78)
+
 (define-syntax check/expect-error
   (syntax-rules ()
     ((check/expect-errors args ...)

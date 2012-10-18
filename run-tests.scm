@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(use posix)
+(use posix srfi-78)
 
 (check-reset!)
 
