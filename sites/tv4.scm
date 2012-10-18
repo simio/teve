@@ -42,7 +42,6 @@
     (sxml-ref (car data) 'url))
    (else
     (tv4:xml-items->subtitles-url (cdr data)))))
-   
 
 (define (tv4:xml-data->video data)
   (and-let* ((xml-items (sxml-ref data 'playback 'items)))
