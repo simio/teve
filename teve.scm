@@ -44,6 +44,19 @@
                  (if (number? stream-id)
                      (stderr* (stream-printer (video-ref stream-id video)))
                      (stderr* (video-printer video))))
+                ((play)
+                 (if (and (number? stream-id)
+                          (<= 0 stream-id (length video)))
+                     (let ((play-command
+                            (stream->play-command (list-ref video stream-id))))
+                       (if play-command
+                           (stdout play-command)
+                           (stderr "I don't know how to play #" stream-id)))
+                     (stderr "Error: Could not find stream #" stream-id
+                             "." #\newline
+                             "Please verify that this stream-id exists for the "
+                             "specified url, by checking the" #\newline
+                             "output of '" program-filename " -l " url "'")))
                 ((download)
                  (if (and (number? stream-id)
                           (<= 0 stream-id (length video)))

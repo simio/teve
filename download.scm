@@ -13,6 +13,9 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
+(use srfi-13)
+(require-extension miscmacros uri-generic)
+
 (include "video.scm")
 
 (define (stream->curl/make-command stream outfile)
@@ -24,11 +27,13 @@
 (define (stream->rtmpdump/make-command stream outfile)
   (conc "rtmpdump \\" #\newline
         "    -r " (shell-escape (stream-ref 'url stream)) " \\" #\newline
+        (if* (stream-ref 'swf-path stream)
+             (conc "    -y " it " \\" #\newline)
+             "")
         "    -o " (shell-escape outfile) " \\" #\newline
-        (if (stream-ref 'swf-player stream)
-            (conc "    -W " (shell-escape (stream-ref 'swf-player stream))
-                  " \\" #\newline)
-            "")
+        (if* (stream-ref 'swf-player stream)
+             (conc "    -W " " \\" #\newline)
+             "")
         (if (stream-ref 'live stream)
             (conc "    -v \\" #\newline)
             "")))
@@ -37,42 +42,98 @@
   (conc "ffmpeg \\" #\newline
         "    -i " (shell-escape (stream-ref 'url stream)) " \\" #\newline
         "    -acodec copy -vcodec copy \\" #\newline
-        (if (stream-ref 'ffmpeg-parameters stream)
-            (conc "    " (stream-ref 'ffmpeg-parameters stream)
-                  " \\" #\newline)
-            "")
+        (if* (stream-ref 'ffmpeg-parameters stream)
+             (conc "    " it " \\" #\newline)
+             "")
         (shell-escape outfile)))
 
 (define (stream->adobehds.php/make-command stream outfile)
   (conc "php AdobeHDS.php \\" #\newline
         "    --manifest " (shell-escape (stream-ref 'url stream))
         " \\" #\newline
-        (if (stream-ref 'adobe.hds-parameters stream)
-            (conc "    " (stream-ref 'adobe.hds-parameters stream)
-                  " \\" #\newline)
-            "")
+        (if* (stream-ref 'adobe.hds-parameters stream)
+             (conc "    " it " \\" #\newline)
+             "")
         "    --outfile " (shell-escape outfile)))
 
 (define (stream->mplayer/make-command stream outfile)
   (conc "mplayer \\" #\newline
         "    -dumpstream -dumpfile " (shell-escape outfile)
         " \\" #\newline
-        (if (stream-ref 'mplayer-parameters stream)
-            (conc "    " (stream-ref 'mplayer-parameters stream)
-                  " \\" #\newline)
-            "")
+        (if* (stream-ref 'mplayer-parameters stream)
+             (conc "    " it " \\" #\newline)
+             "")
         (shell-escape (stream-ref 'url stream))))
 
+(define (extract-uri-path str)
+  (let ((uri (uri-reference str)))
+    (if (not uri)
+        str
+        (apply conc (uri-path uri)))))
+
+(define (stream->default-extension stream)
+  (let ((swf-path-ext (and (eq? 'rtmp (stream-ref 'stream-type stream))
+                           (pathname-extension
+                            (extract-uri-path (stream-ref 'swf-path stream)))))
+        (url-path-ext (pathname-extension
+                       (extract-uri-path (stream-ref 'url stream)))))
+    (cond
+     ((stream-ref 'filename-extension stream))
+     (swf-path-ext)
+     ((case (stream-ref 'stream-type stream)
+        ((hls hds) "mp4")
+        ((wmv mms) "wmv")
+        (else #f)))
+     (url-path-ext)
+     (else "flv"))))
+
+(define (enforce-extension extension filename)
+  (if (string-suffix? extension filename)
+      filename
+      (conc filename "." extension)))
+
+(define (stream->default-basename stream)
+  (cond
+   ((stream-ref 'default-filename stream))
+   ((stream-ref 'swf-path stream)
+    (pathname-file (stream-ref 'swf-path stream)))
+   ((stream-ref 'url stream)
+    (pathname-file (stream-ref 'url stream)))
+   (else "downloaded-video")))
+
+(define (stream->default-filename stream)
+  (enforce-extension (stream->default-extension stream)
+                     (stream->default-basename stream)))
+
 (define (stream->download-command stream outfile)
-  (case (stream-ref 'stream-type stream)
-    ((hds)
-     (stream->adobehds.php/make-command stream outfile))
-    ((hls)
-     (stream->ffmpeg/make-command stream outfile))
-    ((rtmp)
-     (stream->rtmpdump/make-command stream outfile))
-    ((http wmv)
-     (stream->curl/make-command stream outfile))
-    ((mms rtsp)
-     (stream->mplayer/make-command stream outfile))
-    (else #f)))
+  (let ((filename (if outfile outfile (stream->default-filename stream))))
+    (case (stream-ref 'stream-type stream)
+      ((hds)
+       (stream->adobehds.php/make-command stream outfile))
+      ((hls)
+       (stream->ffmpeg/make-command stream outfile))
+      ((rtmp)
+       (stream->rtmpdump/make-command stream outfile))
+      ((http wmv)
+       (stream->curl/make-command stream outfile))
+      ((mms rtsp)
+       (stream->mplayer/make-command stream outfile))
+      (else #f))))
+
+;;; Create a temporary fifo and return it's absolute name
+(define (create-fifo extension)
+  (create-temporary-file extension))
+
+(define (player-command infile)
+  (conc "mplayer " infile))
+
+(define (stream->play-command stream)
+  (and-let* ((fifo (create-fifo (stream->default-extension stream))))
+    (conc (stream->download-command stream fifo)
+          "& \\" #\newline
+          (player-command fifo))))
+
+(define (stream->tee-play-command stream outfile)
+  (conc (stream->download-command stream outfile)
+        "& \\" #\newline
+        (player-command outfile)))

@@ -27,8 +27,9 @@
        (stderr "  -d <id>   Download stream #<id>")
        (stderr "  -h        Show this message.")
        (stderr "  -l        List available streams.")
-       (stderr "  -l<id>    List stream #<x>.")
+       (stderr "  -l <id>   List stream #<x>.")
        (stderr "  -o <file> Download to <file>. (Default is 'movie'.)")
+       (stderr "  -p <id>   Play stream #<id>")
        (stderr "  -v        Be verbose.")
        (exit))))
   (define flag-download-id
@@ -53,6 +54,14 @@
        (set! outfile arg)
        (debug (conc "Outfile set to '" outfile "'."))
        seeds)))
+  (define flag-play-id
+    (option
+     '(#\p) #t #f
+     (lambda (option name arg seeds)
+       (set! action 'play)
+       (set! stream-id (string->number arg))
+       (debug (conc "Heading for stream id " stream-id))
+       seeds)))
   (define flag-list-streams
     (option
      '(#\l) #f #t
@@ -65,7 +74,7 @@
    (args-fold
     (command-line-arguments)
     (list flag-usage flag-list-streams flag-download-id
-          flag-outfile flag-verbose)
+          flag-outfile flag-play-id flag-verbose)
     (lambda (option name arg seeds)
       (stdout (conc "Unrecognized option " name)))
     cons
