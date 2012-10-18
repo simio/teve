@@ -54,8 +54,7 @@
               (update-stream stream
                              (if subtitles
                                  (make-stream-value 'subtitles subtitles))
-                             (if is-live
-                                 (make-stream-value 'live #t))
+                             (make-stream-value 'live is-live)
                              (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                  (make-stream-value 'swf-player swf-player))))
             (filter-map tv4:xml-items->stream xml-items))))))
