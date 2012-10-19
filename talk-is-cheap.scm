@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension srfi-1)
+(use srfi-1)
 
 (define talk-prints-debug-messages #f)
 (define current-debug-port (current-error-port))
