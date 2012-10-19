@@ -30,7 +30,6 @@
 (include "download.scm")
 
 ;;; Do something
-;(let ((command-line-args (parse-flags)))
 (receive (options operands)
   (args:parse (command-line-arguments) opts)
   (if (not (null? operands))
