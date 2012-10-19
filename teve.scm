@@ -30,9 +30,11 @@
 (include "download.scm")
 
 ;;; Do something
-(let ((command-line-args (parse-flags)))
-  (if (not (null? command-line-args))
-      (let* ((url (car command-line-args))
+;(let ((command-line-args (parse-flags)))
+(receive (options operands)
+  (args:parse (command-line-arguments) opts)
+  (if (not (null? operands))
+      (let* ((url (car operands))
              (videos (url->videos url)))
         (if (null? videos)
             (stderr "No videos found.")

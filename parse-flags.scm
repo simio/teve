@@ -13,69 +13,35 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension srfi-37)
+(require-extension args)
 
-(define (parse-flags)
-  (define flag-usage
-    (option
-     '(#\h) #f #f
-     (lambda _
-       (stderr (conc program-name " " program-version))
-       (stderr (conc "Usage: " program-filename
-                     " [options] <url>"))
-       (stderr #\newline " Options:")
-       (stderr "  -d <id>   Download stream #<id>")
-       (stderr "  -h        Show this message.")
-       (stderr "  -l        List available streams.")
-       (stderr "  -l <id>   List stream #<x>.")
-       (stderr "  -o <file> Download to <file>. (Default is 'movie'.)")
-       (stderr "  -p <id>   Play stream #<id>")
-       (stderr "  -v        Be verbose.")
-       (exit))))
-  (define flag-download-id
-    (option
-     '(#\d) #t #f
-     (lambda (option name arg seeds)
-       (set! action 'download)
-       (set! stream-id (string->number arg))
-       (debug (conc "Heading for stream id " stream-id))
-       seeds)))
-  (define flag-verbose
-    (option
-     '(#\v) #f #f
-     (lambda (option name arg seeds)
-       (set! talk-prints-debug-messages #t)
-       (debug "Verbose mode.")
-       seeds)))
-  (define flag-outfile
-    (option
-     '(#\o) #t #f
-     (lambda (option name arg seeds)
-       (set! outfile arg)
-       (debug (conc "Outfile set to '" outfile "'."))
-       seeds)))
-  (define flag-play-id
-    (option
-     '(#\p) #t #f
-     (lambda (option name arg seeds)
-       (set! action 'play)
-       (set! stream-id (string->number arg))
-       (debug (conc "Heading for stream id " stream-id))
-       seeds)))
-  (define flag-list-streams
-    (option
-     '(#\l) #f #t
-     (lambda (option name arg seeds)
-       (set! action 'list)
-       (if arg
-           (set! stream-id (string->number arg)))
-       seeds)))
-  (reverse
-   (args-fold
-    (command-line-arguments)
-    (list flag-usage flag-list-streams flag-download-id
-          flag-outfile flag-play-id flag-verbose)
-    (lambda (option name arg seeds)
-      (stdout (conc "Unrecognized option " name)))
-    cons
-    '())))
+(include "talk-is-cheap.scm")
+
+(define opts
+  (list (args:make-option (d) (required: "id") "Download stream #id"
+                          (set! action 'download)
+                          (set! stream-id (string->number arg))
+                          (debug (conc "Downloading stream id " stream-id)))
+        (args:make-option (v) #:none "Be verbose"
+                          (set! talk-prints-debug-messages #t)
+                          (debug "Verbose mode."))
+        (args:make-option (o) (required: "filename")
+                          "Filename to save to (default: movie)"
+                          (set! outfile arg)
+                          (debug (conc "Saving to \"" outfile "\"")))
+        (args:make-option (p) (required: "id") "Play stream #id"
+                          (set! action 'play)
+                          (set! stream-id (string->number arg)))
+        (args:make-option (h) #:none "Display this text"
+                          (usage))
+        (args:make-option (l) (optional: "id") "List stream(s)"
+                          (set! action 'list)
+                          (if arg (set! stream-id (string->number arg))))))
+
+(define (usage)
+  (with-output-to-port (current-error-port)
+    (lambda ()
+      (print "Usage: " program-filename " [options] <url>" #\newline
+             (args:usage opts)
+             "Report bugs to jesper at huggpunkt.org.")))
+  (exit 1))
