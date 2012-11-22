@@ -28,11 +28,11 @@
   (conc "rtmpdump \\" #\newline
         "    -r " (shell-escape (stream-ref 'url stream)) " \\" #\newline
         (if* (stream-ref 'swf-path stream)
-             (conc "    -y " it " \\" #\newline)
+             (conc "    -y " (shell-escape it) " \\" #\newline)
              "")
         "    -o " (shell-escape outfile) " \\" #\newline
         (if* (stream-ref 'swf-player stream)
-             (conc "    -W " " \\" #\newline)
+             (conc "    -W " (shell-escape it) " \\" #\newline)
              "")
         (if (stream-ref 'live stream)
             (conc "    -v \\" #\newline)
