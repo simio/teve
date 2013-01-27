@@ -15,12 +15,20 @@
 
 (require-extension srfi-1)
 
+(include "misc-helpers.scm")
+
 ;;; The scrape-list is a list of all url->video procedures
 (define *scraper-list* '())
 
 ;;; Allow "plugins" in sites/ to add procedures to the scraper-list
 (define (add-scraper procedure)
   (set! *scraper-list* (cons procedure *scraper-list*)))
+
+(define (prepend-default-protocol url)
+  (if (url->protocol url)
+      url
+      (conc "http://" url)))
+      
 
 (include "sites/svt.scm")
 (include "sites/tv4.scm")
@@ -30,4 +38,6 @@
 ;;; videos are appended into a video-list, which is returned.
 (define (url->videos url)
   (delete-duplicates
-   (apply append (filter-map (lambda (u->v) (u->v url)) *scraper-list*))))
+   (apply append
+     (filter-map (lambda (u->v) (u->v (prepend-default-protocol url)))
+                 *scraper-list*))))
