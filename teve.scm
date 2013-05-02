@@ -27,6 +27,7 @@
 (include "parse-flags.scm")
 (include "video.scm")
 (include "url2vid.scm")
+(include "select-stream.scm")
 (include "download.scm")
 
 ;;; Do something

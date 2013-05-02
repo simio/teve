@@ -92,6 +92,10 @@
     ((streams->video streams)
      (apply make-video streams))))
 
+;;; 
+(define (video->streams video)
+  video)
+
 (define video-length length)
 
 ;;; (pretty)-printers
