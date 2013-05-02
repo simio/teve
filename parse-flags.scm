@@ -18,20 +18,20 @@
 (include "talk-is-cheap.scm")
 
 (define opts
-  (list (args:make-option (d) #:none "Download stream"
+  (list (args:make-option (d) #:none "Download stream (default or specified with -i)"
                           (set! action 'download))
         (args:make-option (v) #:none "Be verbose"
                           (set! talk-prints-debug-messages #t)
                           (debug "Verbose mode."))
         (args:make-option (o) (required: "filename")
-                          "Filename to save to"
+                          "Output filename"
                           (set! outfile arg)
                           (debug (conc "Saving to \"" outfile "\"")))
-        (args:make-option (p) #:none "Play stream"
+        (args:make-option (p) #:none "Play stream (default or specified with -i)"
                           (set! action 'play))
-        (args:make-option (l) #:none "List stream(s)"
+        (args:make-option (l) #:none "List all streams (or specified with -i)"
                           (set! action 'list))
-        (args:make-option (i) (required: "id") "Stream #id to perform action on"
+        (args:make-option (i) (required: "id") "Stream #id to use"
                           (set! stream-id (string->number arg)))
         (args:make-option (h) #:none "Display this text" (usage))))
 
@@ -40,5 +40,5 @@
     (lambda ()
       (print "Usage: " program-filename " [options] <url>" #\newline
              (args:usage opts)
-             "Report bugs to jesper at huggpunkt.org.")))
+             "Please report bugs to jesper at huggpunkt.org or https://github.com/simio/teve")))
   (exit 1))
