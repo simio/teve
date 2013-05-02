@@ -19,51 +19,49 @@
 (include "video.scm")
 
 (define (stream->curl/make-command stream outfile)
-  (conc "curl \\" #\newline
-        "    -L \\" #\newline
-        "    -o " (shell-escape outfile) " \\" #\newline
-        "    " (shell-escape (stream-ref 'url stream))))
+  (conc "curl"
+        " -L"
+        " -o " (shell-escape outfile)
+        " " (shell-escape (stream-ref 'url stream))))
 
 (define (stream->rtmpdump/make-command stream outfile)
-  (conc "rtmpdump \\" #\newline
-        "    -r " (shell-escape (stream-ref 'url stream)) " \\" #\newline
+  (conc "rtmpdump"
+        " -r " (shell-escape (stream-ref 'url stream))
         (if* (stream-ref 'swf-path stream)
-             (conc "    -y " (shell-escape it) " \\" #\newline)
+             (conc " -y" (shell-escape it))
              "")
-        "    -o " (shell-escape outfile) " \\" #\newline
+        " -o " (shell-escape outfile)
         (if* (stream-ref 'swf-player stream)
-             (conc "    -W " (shell-escape it) " \\" #\newline)
+             (conc " -W " (shell-escape it))
              "")
         (if (stream-ref 'live stream)
-            (conc "    -v \\" #\newline)
+            (conc " -v")
             "")))
 
 (define (stream->ffmpeg/make-command stream outfile)
-  (conc "ffmpeg \\" #\newline
-        "    -i " (shell-escape (stream-ref 'url stream)) " \\" #\newline
-        "    -acodec copy -vcodec copy \\" #\newline
+  (conc "ffmpeg"
+        " -i " (shell-escape (stream-ref 'url stream))
+        " -acodec copy -vcodec copy"
         (if* (stream-ref 'ffmpeg-parameters stream)
-             (conc "    " it " \\" #\newline)
+             (conc " " it)
              "")
-        (shell-escape outfile)))
+        " " (shell-escape outfile)))
 
 (define (stream->adobehds.php/make-command stream outfile)
-  (conc "php AdobeHDS.php \\" #\newline
-        "    --manifest " (shell-escape (stream-ref 'url stream))
-        " \\" #\newline
+  (conc "php AdobeHDS.php"
+        " --manifest " (shell-escape (stream-ref 'url stream))
         (if* (stream-ref 'adobe.hds-parameters stream)
-             (conc "    " it " \\" #\newline)
+             (conc " " it)
              "")
-        "    --outfile " (shell-escape outfile)))
+        " --outfile " (shell-escape outfile)))
 
 (define (stream->mplayer/make-command stream outfile)
-  (conc "mplayer \\" #\newline
-        "    -dumpstream -dumpfile " (shell-escape outfile)
-        " \\" #\newline
+  (conc "mplayer"
+        " -dumpstream -dumpfile " (shell-escape outfile)
         (if* (stream-ref 'mplayer-parameters stream)
-             (conc "    " it " \\" #\newline)
+             (conc " " it)
              "")
-        (shell-escape (stream-ref 'url stream))))
+        " " (shell-escape (stream-ref 'url stream))))
 
 (define (extract-uri-path str)
   (let ((uri (uri-reference str)))

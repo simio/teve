@@ -56,7 +56,7 @@
                      (let ((play-command
                             (stream->play-command (video-ref id video))))
                        (if play-command
-                           (stdout play-command)
+                           (system (debug play-command))
                            (stderr "I don't know how to play #" id)))
                      (stderr "Error: Could not find stream #" id
                              "." #\newline
@@ -70,7 +70,7 @@
                             (stream->download-command (video-ref id video)
                                                       outfile)))
                        (if download-command
-                           (stdout download-command)
+                           (system (debug download-command))
                            (stderr "I don't know how to download #" id)))
                      (stderr "Error: Could not find stream #" id
                              "." #\newline
