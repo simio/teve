@@ -18,25 +18,22 @@
 (include "talk-is-cheap.scm")
 
 (define opts
-  (list (args:make-option (d) (optional: "id") "Download stream #id"
-                          (set! action 'download)
-                          (if arg (set! stream-id (string->number arg)))
-                          (debug (conc "Downloading stream id " stream-id)))
+  (list (args:make-option (d) #:none "Download stream"
+                          (set! action 'download))
         (args:make-option (v) #:none "Be verbose"
                           (set! talk-prints-debug-messages #t)
                           (debug "Verbose mode."))
         (args:make-option (o) (required: "filename")
-                          "Filename to save to (default: movie)"
+                          "Filename to save to"
                           (set! outfile arg)
                           (debug (conc "Saving to \"" outfile "\"")))
-        (args:make-option (p) (required: "id") "Play stream #id"
-                          (set! action 'play)
+        (args:make-option (p) #:none "Play stream"
+                          (set! action 'play))
+        (args:make-option (l) #:none "List stream(s)"
+                          (set! action 'list))
+        (args:make-option (i) (required: "id") "Stream #id to perform action on"
                           (set! stream-id (string->number arg)))
-        (args:make-option (h) #:none "Display this text"
-                          (usage))
-        (args:make-option (l) (optional: "id") "List stream(s)"
-                          (set! action 'list)
-                          (if arg (set! stream-id (string->number arg))))))
+        (args:make-option (h) #:none "Display this text" (usage))))
 
 (define (usage)
   (with-output-to-port (current-error-port)
