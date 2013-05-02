@@ -17,7 +17,7 @@
 (define program-filename program-name)
 (define program-version "0.1")
 
-(define action 'nothing)
+(define action 'play)
 (define stream-id #f)
 (define video-id 1)		; No multiple video support just yet
 (define outfile #f)
