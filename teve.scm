@@ -40,35 +40,39 @@
             (stderr "No videos found.")
             ;; Until multiple videos are supported, video-id is always 1,
             ;; so we can just take the car instead of looping.
-            (let ((video (car videos)))
+            (let* ((video (car videos))
+                   (id (if* stream-id it (video->best-stream-id video))))
               (case action
                 ((list)
+                 ;; The list action is supposed to use 'stream-id rather than
+                 ;; 'id, since it is acting directly on CLI parameters, rather
+                 ;; than the automatically preferred or user specified stream.
                  (if (number? stream-id)
                      (stderr* (stream-printer (video-ref stream-id video)))
                      (stderr* (video-printer video))))
                 ((play)
-                 (if (and (number? stream-id)
-                          (<= 0 stream-id (length video)))
+                 (if (and (number? id)
+                          (<= 0 id (length video)))
                      (let ((play-command
-                            (stream->play-command (list-ref video stream-id))))
+                            (stream->play-command (video-ref id video))))
                        (if play-command
                            (stdout play-command)
-                           (stderr "I don't know how to play #" stream-id)))
-                     (stderr "Error: Could not find stream #" stream-id
+                           (stderr "I don't know how to play #" id)))
+                     (stderr "Error: Could not find stream #" id
                              "." #\newline
                              "Please verify that this stream-id exists for the "
                              "specified url, by checking the" #\newline
                              "output of '" program-filename " -l " url "'")))
                 ((download)
-                 (if (and (number? stream-id)
-                          (<= 0 stream-id (length video)))
+                 (if (and (number? id)
+                          (<= 0 id (length video)))
                      (let ((download-command
-                            (stream->download-command (list-ref video stream-id)
+                            (stream->download-command (video-ref id video)
                                                       outfile)))
                        (if download-command
                            (stdout download-command)
-                           (stderr "I don't know how to download #" stream-id)))
-                     (stderr "Error: Could not find stream #" stream-id
+                           (stderr "I don't know how to download #" id)))
+                     (stderr "Error: Could not find stream #" id
                              "." #\newline
                              "Please verify that this stream-id exists for the "
                              "specified url, by checking the" #\newline

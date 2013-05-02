@@ -30,7 +30,6 @@
 
 ;;; The raw distances are multiplied by these weights before added
 ;;; together and used for comparison.
-(define bitrate-distance-weight 1)
 (define width-distance-weight (/ wanted-bitrate wanted-width))
 
 ;;; Calculate and return the distance between the supplied stream and
@@ -43,26 +42,38 @@
                              it
                              0)))
     (/ (+
-        (* bitrate-distance-weight
-           (abs (- reference-bitrate stream-bitrate)))
+        (abs (- reference-bitrate stream-bitrate))
         (* width-distance-weight
            (abs (- reference-width stream-width))))
        2)))
 
-;;; Returns an alist with total distance for keys and streams for values.
+;;; Returns an alist with the following structure:
+;;;
+;;;     (distance . (stream-id . stream))
 (define (video->stream-distance-table video)
   (sort
    (let calculate-distances ((distance-table '())
-                             (rest (video->streams video)))
+                             (rest (video->streams video))
+                             (stream-id 0))
      (cond
       ((null? rest) distance-table)
       ((not (stream? (car rest)))
-       (calculate-distances distance-table (cdr rest)))
+       (calculate-distances distance-table (cdr rest) (+ 1 stream-id)))
       (else
        (calculate-distances
-        (cons (cons (stream-distance (car rest) wanted-bitrate wanted-width)
-                    (car rest))
-              distance-table)
-        (cdr rest)))))
+        (cons
+         (cons (stream-distance (car rest) wanted-bitrate wanted-width)
+               (cons stream-id
+                     (car rest)))
+         distance-table)
+        (cdr rest)
+        (+ 1 stream-id)))))
    (lambda (a b)
      (< (car a) (car b)))))
+
+(define (video->best-stream video)
+  (cddar (video->stream-distance-table video)))
+
+(define (video->best-stream-id video)
+  (cadar (video->stream-distance-table video)))
+

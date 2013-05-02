@@ -18,9 +18,9 @@
 (include "talk-is-cheap.scm")
 
 (define opts
-  (list (args:make-option (d) (required: "id") "Download stream #id"
+  (list (args:make-option (d) (optional: "id") "Download stream #id"
                           (set! action 'download)
-                          (set! stream-id (string->number arg))
+                          (if arg (set! stream-id (string->number arg)))
                           (debug (conc "Downloading stream id " stream-id)))
         (args:make-option (v) #:none "Be verbose"
                           (set! talk-prints-debug-messages #t)
