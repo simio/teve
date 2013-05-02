@@ -1,4 +1,4 @@
-#| Copyright (c) 2012 Jesper Raftegard <jesper@huggpunkt.org>
+#| Copyright (c) 2012, 2013 Jesper Raftegard <jesper@huggpunkt.org>
  | 
  | Permission to use, copy, modify, and distribute this software for any
  | purpose with or without fee is hereby granted, provided that the above
@@ -20,7 +20,7 @@
 (define action 'nothing)
 (define stream-id #f)
 (define video-id 1)		; No multiple video support just yet
-(define outfile "movie")
+(define outfile #f)
 
 (include "talk-is-cheap.scm")
 (include "misc-helpers.scm")

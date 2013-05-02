@@ -1,4 +1,4 @@
-#| Copyright (c) 2012 Jesper Raftegard <jesper@huggpunkt.org>
+#| Copyright (c) 2012, 2013 Jesper Raftegard <jesper@huggpunkt.org>
  | 
  | Permission to use, copy, modify, and distribute this software for any
  | purpose with or without fee is hereby granted, provided that the above
@@ -105,19 +105,27 @@
   (enforce-extension (stream->default-extension stream)
                      (stream->default-basename stream)))
 
+;;; Ensures a valid filename for the supplied stream.
+;;; Returns outfile (and enforces the correct file extension) if set.
+;;; Returns a default filename otherwise.
+(define (stream/filename?->output-filename stream filename?)
+  (if filename?
+      (enforce-extension (stream->default-extension stream) filename?)
+      (stream->default-filename stream)))
+
 (define (stream->download-command stream outfile)
-  (let ((filename (if outfile outfile (stream->default-filename stream))))
+  (let ((filename (stream/filename?->output-filename stream outfile)))
     (case (stream-ref 'stream-type stream)
       ((hds)
-       (stream->adobehds.php/make-command stream outfile))
+       (stream->adobehds.php/make-command stream filename))
       ((hls)
-       (stream->ffmpeg/make-command stream outfile))
+       (stream->ffmpeg/make-command stream filename))
       ((rtmp)
-       (stream->rtmpdump/make-command stream outfile))
+       (stream->rtmpdump/make-command stream filename))
       ((http wmv)
-       (stream->curl/make-command stream outfile))
+       (stream->curl/make-command stream filename))
       ((mms rtsp)
-       (stream->mplayer/make-command stream outfile))
+       (stream->mplayer/make-command stream filename))
       (else #f))))
 
 ;;; Create a temporary fifo and return it's absolute name
@@ -134,6 +142,7 @@
           (player-command fifo))))
 
 (define (stream->tee-play-command stream outfile)
-  (conc (stream->download-command stream outfile)
+  (let ((filename (stream/filename?->output-filename stream outfile)))
+    (conc (stream->download-command stream filename)
         "& \\" #\newline
-        (player-command outfile)))
+        (player-command filename))))
