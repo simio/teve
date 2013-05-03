@@ -30,13 +30,13 @@
 
 ;;; This function is MODIFIED from intarweb.scm
 (define (write-request-line/decode-commas request)
-  (fprintf (request-port request)
-           "~A ~A HTTP/~A.~A\r\n"
-           (http-method->string (request-method request))
-           (hacks:url-decode-commas			;; Only mod here.
-            (uri->string (request-uri request)))
-           (request-major request)
-           (request-minor request)))
+  (display (sprintf "~A ~A HTTP/~A.~A\r\n"
+                    (http-method->string (request-method request))
+                    (hacks:url-decode-commas		;; Only mod here.
+                     (uri->string (request-uri request)))
+                    (request-major request)
+                    (request-minor request))
+           (request-port request)))
 
 ;;; This function is MODIFIED from intarweb.scm
 (define (http-1.0-request-unparser/decode-commas request)
@@ -50,8 +50,7 @@
 
 ;;; Ordering matters, sez teh intarweb.
 (request-unparsers (list (car (request-unparsers))
-                         http-1.0-request-unparser/decode-commas
-                         (caddr (request-unparsers))))
+                         http-1.0-request-unparser/decode-commas))
 
 ;;; Finally, a request maker which guarantees niceness to fragile Akamai.
 (define (make-emo-request url)
