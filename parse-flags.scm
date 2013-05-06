@@ -31,8 +31,7 @@
                                   "Saving to \""
                                   (*cfg* 'operators 'output-filename "\""))))
         (args:make-option (p) #:none
-                          (conc "Play stream (default or specified with -i)"
-                                "[default action]")
+                          (conc "Play stream (default or specified with -i)")
                           (*cfg* set: #t 'operators 'play?))
         (args:make-option (l) #:none "List all streams (or specified with -i)"
                           (*cfg* set: #t 'operators 'list?))
