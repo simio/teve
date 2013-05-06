@@ -132,6 +132,7 @@
 (check (json-ref sanitised-json "video" "videoReferences" 1 "bitrate") => 0)
 (check (json-ref sanitised-json "video" "videoReferences" 0 "playerType" "flash") => #f)
 (check (json-ref sanitised-json) => sanitised-json)
+(check/expect-error (json-ref sanitised-json "video" -1))
 
 (define test-sxml-sublist '((three items here) ("two" items) (1)))
 (define test-sxml `(5 symbol ,test-sxml-sublist))
