@@ -44,5 +44,5 @@
       (print "Usage: " program-filename " [options] <url>" #\newline
              (args:usage opts)
              (conc "Please report bugs to jesper at huggpunkt.org or"
-                   "https://github.com/simio/teve"))))
+                   " https://github.com/simio/teve"))))
   (exit 1))
