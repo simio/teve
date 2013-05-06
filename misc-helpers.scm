@@ -37,7 +37,7 @@
 ;;; Accessor for values in a tree, as those returned by parse-json.
 ;;; Keys are strings (for use with alists) or numbers (for use with list-ref).
 ;;; Use multiple keys to go deeper into the tree. For example,
-;;; (json-ref tree "vids" 5 "url") is "url" in item 5 in "vids" in tree.
+;;; (quick-ref tree "vids" 5 "url") is "url" in item 5 in "vids" in tree.
 ;;;
 ;;; Return values:
 ;;;   A list or cdr of a pair   (if the key exists and its value isn't #f)
