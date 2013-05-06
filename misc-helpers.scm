@@ -42,6 +42,8 @@
 ;;; Return values:
 ;;;   A list or cdr of a pair   (if the key exists and its value isn't #f)
 ;;;   #f                        (otherwise)
+;;;
+;;; Should produce an error if a negative list index is supplied.
 (define (quick-ref obj . keys)
   (cond ((null? keys) obj)
         ((not (list? obj)) #f)
@@ -56,6 +58,35 @@
         (else #f)))
 
 (define json-ref quick-ref)
+
+;;; UNTESTED Accessor for values in an alist tree.
+;;;
+;;; Return values:
+;;;   Any non-false value	(for any non-false existant value)
+;;;   #f			(otherwise)
+(define (atree-ref tree . branches)
+  (cond ((null? branches) tree)		; Requested branch/leaf.
+        ((not (pair? tree)) #f)		; Leaf found, but expected branch.
+        (else
+         (apply atree-ref (cons (alist-ref (car branches) tree equal? #f)
+                                (cdr branches))))))
+
+;;; UNTESTED Updater for values in an alist tree.
+;;;
+;;; Return values:
+;;;   An updated tree		(if the update was sucessful)
+;;;   #f			(if the update failed)
+(define (atree-update tree value . branches)
+  (cond ((null? branches) #f)
+        ((null? (cdr branches))
+         (alist-update (car branches) value tree equal?))
+        (else
+         (alist-update (car branches)
+                       (apply atree-update
+                         (cons (atree-ref tree (car branches))
+                               (cons value (cdr branches))))
+                       tree
+                       equal?))))
 
 ;; Recurse through the vector/alist mess returned by json-read,
 ;; converting vectors to alists.
