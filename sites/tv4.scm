@@ -16,6 +16,7 @@
 (require-extension miscmacros uri-common)
 
 (include "misc-helpers.scm")
+(include "video.scm")
 
 (define (tv4:download-xml-data xml-base-url)
   (and-let* ((xml-base (force (download-xml xml-base-url)))
