@@ -20,7 +20,7 @@
 ;;; Default pre-configuration values
 (define (make-configuration)
   (let ((values '((operators
-                   (default . play)
+                   (default . download)
                    (play? . #f)
                    (download? . #f)
                    (list? . #f)
