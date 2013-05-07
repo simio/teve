@@ -63,8 +63,7 @@
        (calculate-distances
         (cons
          (cons (stream-distance (car rest) wanted-bitrate wanted-width)
-               (cons stream-id
-                     (car rest)))
+               (cons stream-id (car rest)))
          distance-table)
         (cdr rest)
         (+ 1 stream-id)))))
@@ -76,4 +75,3 @@
 
 (define (video->best-stream-id video)
   (cadar (video->stream-distance-table video)))
-
