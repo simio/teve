@@ -89,10 +89,12 @@
   (cond
    ((or (string-contains url "://www.tv4play.se/")
         (string-contains url "://tv4play.se/"))
-    (filter video? (list (tv4:xml-url->video (tv4:tv4play-url->xml-url url)))))
+    (filter video?
+            (list (tv4:xml-url->video (tv4:tv4play-url->xml-url url)))))
    ((or (string-contains url "://www.tv4.se/")
         (string-contains url "://tv4.se/"))
-    (filter video? (list (tv4:xml-url->video (tv4:embedded-video->xml-url url)))))
+    (filter video?
+            (list (tv4:xml-url->video (tv4:embedded-video->xml-url url)))))
    (else
     #f)))
 
