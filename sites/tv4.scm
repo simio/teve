@@ -24,17 +24,27 @@
     (list (caddr xml-base)
           (caddr xml-play))))
 
-(define (tv4:xml-items->stream data)
-  (and-let* ((url (sxml-ref data 'base))
-             (swf-path (sxml-ref data 'url))
-             (scheme (sxml-ref data 'scheme))
+(define (tv4:xml-item->stream data)
+  (and-let* ((url-form (sxml-ref data 'base))
+             (url (sxml-ref data 'url))
+             (scheme (or (sxml-ref data 'scheme)
+                         (url->protocol (sxml-ref data 'url))))
              (mediaformat (sxml-ref data 'mediaFormat))
              (is-media-stream? (not (string=? "smi" mediaformat)))
              (bitrate (string->number (sxml-ref data 'bitrate))))
-    (make-stream (make-stream-value 'stream-type 'rtmp)
-                 (make-stream-value 'url url)
-                 (make-stream-value 'swf-path swf-path)
-                 (make-stream-value 'bitrate bitrate))))
+    (cond
+     ((string=? mediaformat "flv")
+      ;; Was/is this the correct value? Are there even any rtmp streams
+      ;; left at TV4 Play?
+      (make-stream (make-stream-value 'stream-type 'rtmp)
+                   (make-stream-value 'url url-form)
+                   (make-stream-value 'swf-path url)
+                   (make-stream-value 'bitrate bitrate)))
+     ((string=? mediaformat "mp4")
+      (make-stream (make-stream-value 'stream-type 'hds)
+                   (make-stream-value 'url url)
+                   (make-stream-value 'bitrate bitrate)))
+     (else #f))))
 
 (define (tv4:xml-items->subtitles-url data)
   (cond
@@ -57,7 +67,7 @@
                              (make-stream-value 'live is-live)
                              (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                  (make-stream-value 'swf-player swf-player))))
-            (filter-map tv4:xml-items->stream xml-items))))))
+            (filter-map tv4:xml-item->stream xml-items))))))
 
 (define (tv4:xml-url->video xml-url)
   (and-let* ((data (tv4:download-xml-data xml-url)))
