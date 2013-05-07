@@ -43,7 +43,8 @@
       #f))
 
 (define (stream? obj)
-  (and (list? obj)
+  (and (not (null? obj))
+       (list? obj)
        (every stream-value? obj)))
 
 (define (update-stream stream . values)
@@ -73,7 +74,8 @@
     ret))
 
 (define (video? obj)
-  (and (list? obj)
+  (and (not (null? obj))
+       (list? obj)
        (every stream? obj)))
 
 (define (update-video video . streams)
