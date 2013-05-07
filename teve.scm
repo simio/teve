@@ -29,6 +29,17 @@
 (include "select-stream.scm")
 (include "download.scm")
 
+(define (select-action default play? download? list?)
+  (debug* "Performing ")
+  (debug
+   (cond
+    ((and play? download? (not list?)) 'tee)
+    ((and play? (not list?) (not download?)) 'play)
+    ((and download? (not list?) (not play?)) 'download)
+    ((and list? (not play?) (not download?)) 'list)
+    ((not (or list? play? download?)) default)
+    (else #f))))
+
 ;;; Do something
 (receive (options operands)
   (args:parse (command-line-arguments) opts)
@@ -40,22 +51,18 @@
             ;; Until multiple videos are supported, video-id is always #f,
             ;; so we can just take the car instead of looping.
             (let* ((video (car videos))
-                   (play? (*cfg* 'operators 'play?))
-                   (download? (*cfg* 'operators 'download?))
-                   (list? (*cfg* 'operators 'list?))
-                   (fallback (if (or play? download? list?)
-                                 (*cfg* 'operators 'default)
-                                 #f))
+                   (action (select-action
+                            (*cfg* 'operators 'default)
+                            (*cfg* 'operators 'play?)
+                            (*cfg* 'operators 'download?)
+                            (*cfg* 'operators 'list)))
                    (id (if* (*cfg* 'operators 'stream-id)
                             it
                             (video->best-stream-id video))))
               (cond
-               ((or (and (*cfg* 'operators 'play?)
-                         (*cfg* 'operators 'download?))
-                    (equal? fallback 'tee))
+               ((equal? action 'tee)
                 (stderr "Error: Teeing is not yet implemented."))
-               ((or list?
-                    (equal? fallback 'list))
+               ((equal? action 'list)
                 ;; The list action is supposed to use 'stream-id rather than
                 ;; 'id, since it is acting directly on CLI parameters, rather
                 ;; than the automatically preferred or user specified stream.
@@ -64,8 +71,7 @@
                                               (*cfg* 'operators 'stream-id)
                                               video)))
                     (stderr* (video-printer video))))
-               ((or play?
-                    (equal? fallback 'play))
+               ((equal? action 'play)
                 (if (and (number? id)
                          (<= 0 id (length video)))
                     (let ((play-command
@@ -79,8 +85,7 @@
                             "specified url, by checking the" #\newline
                             "output of '" (*platform* program-filename)
                             " -l " url "'")))
-               ((or download?
-                    (equal? fallback 'download))
+               ((equal? action 'download)
                 (if (and (number? id)
                          (<= 0 id (length video)))
                     (let ((download-command
