@@ -48,7 +48,7 @@
        (every stream-value? obj)))
 
 (define (update-stream stream . values)
-  (if (stream? stream)
+  (if (or (stream? stream) (null? stream))
       (delete-duplicates
        (append (filter stream-value? values) stream)
        (lambda (o1 o2) (equal? (car o1) (car o2))))
@@ -79,7 +79,7 @@
        (every stream? obj)))
 
 (define (update-video video . streams)
-  (if (video? video)
+  (if (or (video? video) (null? video))
       (delete-duplicates
        (append (filter stream? streams) video))
       #f))
