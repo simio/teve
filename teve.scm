@@ -55,7 +55,7 @@
                             (*cfg* 'operators 'default)
                             (*cfg* 'operators 'play?)
                             (*cfg* 'operators 'download?)
-                            (*cfg* 'operators 'list)))
+                            (*cfg* 'operators 'list?)))
                    (id (if* (*cfg* 'operators 'stream-id)
                             it
                             (video->best-stream-id video))))
