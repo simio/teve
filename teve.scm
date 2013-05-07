@@ -13,13 +13,8 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-
 (define program-display-name "teve")
 (define program-version "0.1")
-
-;(define action 'play)
-;(define stream-id #f)
-                                        ;(define outfile #f)
 
 (include "platform.scm")
 
