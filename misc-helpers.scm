@@ -77,7 +77,10 @@
 ;;;   An updated tree		(if the update was sucessful)
 ;;;   #f			(if the update failed)
 (define (atree-update tree value . branches)
-  (cond ((null? branches) #f)
+  (cond ((or (null? branches)
+             (atom? tree)
+             (not (every atom? branches)))
+         #f)
         ((null? (cdr branches))
          (alist-update (car branches) value tree equal?))
         ((and (not (null? (cdr branches)))	 ; Leaf of new branch requested
@@ -92,6 +95,31 @@
                                (cons value (cdr branches))))
                        tree
                        equal?))))
+
+;;; UNTESTED Deep merge of atrees. Overlays one atree on top of another.
+;;; The overlay tree will replace any values present in the base.
+(define (atree-merge base overlay)
+  (cond ((null? overlay) base)
+        ((not (pair? (car overlay))) #f)
+        ((or (atom? (cdar overlay))
+             (atom? (atree-ref base (caar overlay))))	; #f if not found
+         (atree-merge
+          (atree-update base (cdar overlay) (caar overlay))
+          (cdr overlay)))
+        (else
+         (atree-merge
+          (atree-update base
+                        (atree-merge (atree-ref base (caar overlay))
+                                     (cdar overlay))
+                        (caar overlay))
+          (cdr overlay)))))
+
+;;; UNTESTED Fold many atrees into one.
+;;; Values present in the first supplied tree will replace those present
+;;; in the second supplied tree, and so forth from left to right.
+(define atree-fold
+  (lambda trees
+    (fold atree-merge '() trees)))
 
 ;; Recurse through the vector/alist mess returned by json-read,
 ;; converting vectors to alists.
