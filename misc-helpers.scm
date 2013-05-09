@@ -80,6 +80,11 @@
   (cond ((null? branches) #f)
         ((null? (cdr branches))
          (alist-update (car branches) value tree equal?))
+        ((and (not (null? (cdr branches)))	 ; Leaf of new branch requested
+              (not (assoc (car branches) tree)))
+         (apply atree-update (cons
+                              (cons (cons (car branches) '()) tree)
+                              (cons value branches))))
         (else
          (alist-update (car branches)
                        (apply atree-update
