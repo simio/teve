@@ -41,6 +41,7 @@ teve currently uses other programs to download streams.
 These tools must be in your $PATH, or teve won't find them (or see
 CONFIGURATION below).
 
+
 2. BUILDING
 
 Just 'make' to get a binary, and then run it:
