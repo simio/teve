@@ -57,7 +57,7 @@
           (apply atree-ref values args)))))))
 
 (define (env->conf env)
-  (let* ((env-to-conf-map `(("TEVE_DEFAULT_OP"
+  (let* ((env-to-conf-map `(("TEVE_DEFAULT_OPERATION"
                              ,string->symbol operators default)
                             ("TEVE_BITRATE"
                              ,string->number preferences ideal-bitrate)
