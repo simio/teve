@@ -11,12 +11,12 @@ is achieved. The script is freely available from this GitHub repo:
 
     https://github.com/simio/media-scripts
 
-Please be aware that it will only talk you in Swedish.
+Please be aware that it will only talk to you in Swedish.
 
 
 1. REQUIREMENTS
 
-Chicken Scheme is required to run and compile, preferably 4.7 or later.
+Chicken Scheme is required to run and compile, preferably 4.8 or later.
 If your package manager does not contain Chicken, or contains only an
 outdated version, building it from source is mind-numbingly simple on
 most platforms.
@@ -40,14 +40,15 @@ Or if you'd like to see what you're installing:
 
 Just 'make' to get a binary, and then run it:
 
-    $ ./teve -h
-    teve prototype-1
-    Usage: teve [-hlv] [-d id] [-o outfile] url
-      -d <id>   Download stream #<id>
-      -h        Show this message.
-      -l        List available streams.
-      -o <file> Download to <file>. (Default is 'movie'.)
-      -v        Be verbose.
+  $ ./teve -h
+  Usage: teve [options] <url>
+   -d                       Download stream (default or specified with -i)
+   -v                       Be verbose
+   -o filename              Output filename
+   -l                       List all streams (or specified with -i)
+   -i id                    Stream #id to use
+   -h                       Display this text
+  Please report bugs to jesper at huggpunkt.org or https://github.com/simio/teve
 
 You may optionally install it somewhere:
 
