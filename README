@@ -35,6 +35,19 @@ Or if you'd like to see what you're installing:
     intarweb srfi-37 json http-client vector-lib packrat ...
     # chicken-install $(make print-eggs)
 
+teve currently uses other programs to download streams.
+
+  ffmpeg        For Apple HLS streams (SVT Play, Öppet arkiv)
+  rtmpdump      For rtmp/rtmpe streams (old streams at SVT & TV4 Play)
+  AdobeHDS.php  For HDS streams (SVT & TV4 Play, Öppet arkiv)
+                This requires a working php installation. The script
+                itself is available here:
+                https://raw.github.com/K-S-V/Scripts/master/AdobeHDS.php
+  curl          For ordinary HTTP downloads (SVT Play)
+  mplayer       For mms and rtsp downloads (old streams at SVT Play)
+
+These tools must be in your $PATH, or teve won't find them (or see
+CONFIGURATION below).
 
 2. BUILDING
 
@@ -69,3 +82,75 @@ will need to install that before running the tests:
     # chicken-install srfi-78
 
 To run all tests in a batch, just 'make check'.
+
+
+4. USAGE
+
+The simplest use case is downloading a video:
+
+  1. In a web browser, go to the page where the video you want to
+     download is played.
+  2. Copy the url (for example http://www.svtplay.se/aktuellt).
+  3. Run in a shell:
+
+       $ teve http://www.svtplay.se/aktuellt
+
+If the video at that url is properly identified, teve will
+automatically pick a filename and start the appropriate downloader.
+
+If there are several streams available for the same video, teve will
+also try to pick the best stream to download. Please note that this
+does NOT mean it will select the LARGEST stream. Instead, all streams
+are compared to an ideal (defined by bitrate and video pixel width),
+and the closest match is selected. The ideal values can be changed in
+configuration files or by setting environment variables. See
+CONFIGURATION below for more information.
+
+If you do not want teve to pick a stream automatically, you can
+specify a specific stream id with the -i command line parameter.
+To list all available streams, run teve with the -l parameter:
+
+    $ teve -l http://www.svtplay.se/aktuellt
+
+And if you then decide to download stream #4:
+
+    $ teve -d -i 4 http://www.svtplay.se/aktuellt
+
+To specify an output filename, use the -o parameter:
+
+    $ teve -d -o aktuellt -i 4 http://www.svtplay.se/aktuellt
+
+An appropriate video file extension will be added automatically.
+
+If the configuration value "default-action" is set to "download",
+which is the default, the -d parameter above may be omitted.
+
+5. CONFIGURATION
+
+The builtin default configuration values may be overridden in
+configuration files. The configuration under which teve is run is
+decided in the following order:
+
+  1. The builtin defaults are loaded.
+  2. If /etc/teve.conf is present, any values present in this file are
+     loaded. New values are added to the configuration, while already
+     present are replaced from this file.
+  3. If $HOME/.teverc is present, it is parsed and used as
+     /etc/teve.conf above. You can specify an alternate location to
+     look for this file by setting the TEVE_RC environment variable.
+  4. Any environment variables set are parsed, replacing or adding to
+     the configuration.
+  5. The command line parameters are parsed, overriding any previously
+     set configuration variables.
+
+The configuration files are parsed as standard ini files.
+See teve.conf.dist for a list of all configurable values,
+and their corresponding environment variables.
+
+6. SUPPORTED SITES
+
+As of version 0.2, the following sites are supported:
+
+  svtplay.se
+  oppetarkiv.se
+  tv4play.se

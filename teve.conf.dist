@@ -1,0 +1,34 @@
+; teve.conf.dist
+; The values below are the hardcoded defaults
+
+[external-programs]
+; These are the paths executed by teve to run external programs.
+; The default values are just filenames, meaning you will have to
+; set up your $PATH to point to these files.
+; Paths can also be specified in the environment variables. Paths
+; specified in environment variables has priority over any paths supplied
+; in configuration files.
+rtmpdump="rtmpdump"     ; $RTMPDUMP
+ffmpeg="ffmpeg"         ; $FFMPEG
+mplayer="mplayer"       ; $MPLAYER
+curl="curl"             ; $CURL
+php="php"               ; $PHP
+
+; If any of the above enironment variables, prefixed with TEVE_, are found,
+; they will be used instead of the above. ($TEVE_RTMPDUMP takes precedence
+; above $RTMPDUMP and so forth.)
+
+; Setting $PATH to point to this file will not work, so it should
+; be modified to point to a copy of it.
+adobehds.php="AdobeHDS.php"
+
+[preferences]
+; The default operation to perform when no operation
+; was specified on the command line.
+; Possible values are 'download' and 'list'.
+default-action=download
+
+; These values are used for automatic selection of a stream to download.
+; See the USAGE section in the README file for more information.
+ideal-bitrate=2500
+ideal-pixel-width=1280
