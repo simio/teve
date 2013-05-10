@@ -121,6 +121,10 @@
   (lambda trees
     (fold atree-merge '() trees)))
 
+(define atree-fold-right
+  (lambda trees
+    (fold-right atree-merge '() trees)))
+
 ;; Recurse through the vector/alist mess returned by json-read,
 ;; converting vectors to alists.
 (define (sanitise-json-input obj)
