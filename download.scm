@@ -127,14 +127,14 @@
       (else #f))))
 
 ;;; Create a temporary fifo and return it's absolute name
-(define (create-fifo extension)
+(define (make-fifo extension)
   (create-temporary-file extension))
 
 (define (player-command infile)
   (conc "mplayer " infile))
 
 (define (stream->play-command stream)
-  (and-let* ((fifo (create-fifo (stream->default-extension stream))))
+  (and-let* ((fifo (make-fifo (stream->default-extension stream))))
     (conc (stream->download-command stream fifo)
           "& \\" #\newline
           (player-command fifo))))
