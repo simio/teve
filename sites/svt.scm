@@ -88,9 +88,11 @@
     (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
            (popout-url (json-ref json-data "context" "popoutUrl"))
            (is-live (json-ref json-data "video" "live"))
-           (play-url (if popout-url
-                         (conc "http://www.svtplay.se" popout-url)
-                         #f))
+           (play-url (cond
+                      ((not popout-url) #f)
+                      ((string-prefix? "http" popout-url) popout-url)
+                      (else
+                       (conc "http://www.svtplay.se" popout-url))))
            (swf-player (delay (svt:swf-player-in play-url)))
            (add-video-values (lambda (stream)
                                (update-stream
