@@ -14,7 +14,7 @@
  |#
 
 (require-extension srfi-1 srfi-2 srfi-12 srfi-13)
-(require-extension miscmacros http-client uri-common uri-generic)
+(require-extension miscmacros http-client)
 
 (include "misc-helpers.scm")
 (include "apple-hls.scm")

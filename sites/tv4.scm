@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension miscmacros uri-common)
+(require-extension miscmacros)
 
 (include "misc-helpers.scm")
 (include "video.scm")

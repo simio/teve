@@ -19,7 +19,7 @@
 (require-extension srfi-2)
 (require-extension miscmacros http-client)
 
-(include "intarweb-hack.scm")
+;(include "intarweb-hack.scm")
 (include "misc-helpers.scm")
 (include "video.scm")
 

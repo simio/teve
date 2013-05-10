@@ -13,8 +13,8 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(use srfi-2)
-(require-extension intarweb srfi-13 uri-common)
+(use srfi-2 srfi-13)
+(require-extension intarweb uri-common)
 
 ;;; Akamai is emotionally unstable and needs special treatment.
 ;;; The http servers might choke on url:s in GET requests containing
