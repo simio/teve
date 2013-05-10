@@ -17,21 +17,6 @@
 
 (include "video.scm")
 
-;;; Wanted bitrate/pixel width. A distance from these values is
-;;; calculated for each stream, and the nearest stream is selected by
-;;; the algorithm. (A wanted-height would be pointless, since the
-;;; width is a good enough indicator of the video resolution.)
-;;;
-;;; These should later be specified in a dotfile and overridable from
-;;; the CLI.
-
-(define wanted-bitrate 2500)
-(define wanted-width 1280)
-
-;;; The raw distances are multiplied by these weights before added
-;;; together and used for comparison.
-(define width-distance-weight (/ wanted-bitrate wanted-width))
-
 ;;; Calculate and return the distance between the supplied stream and
 ;;; the ideal size/bitrate.
 (define (stream-distance stream reference-bitrate reference-width)
@@ -43,7 +28,10 @@
                              0)))
     (/ (+
         (abs (- reference-bitrate stream-bitrate))
-        (* width-distance-weight
+        ;; The raw distances are multiplied by these weights before added
+        ;; together and used for comparison.
+        (* (/ (*cfg* 'preferences 'ideal-bitrate)
+              (*cfg* 'preferences 'ideal-pixel-width))
            (abs (- reference-width stream-width))))
        2)))
 
@@ -62,7 +50,9 @@
       (else
        (calculate-distances
         (cons
-         (cons (stream-distance (car rest) wanted-bitrate wanted-width)
+         (cons (stream-distance (car rest)
+                                (*cfg* 'preferences 'ideal-bitrate)
+                                (*cfg* 'preferences 'ideal-pixel-width))
                (cons stream-id (car rest)))
          distance-table)
         (cdr rest)
