@@ -42,6 +42,13 @@
                                      (stream-id . #f)
                                      (video-id . #f)
                                      (output-filename . #f))
+                                    (external-programs
+                                     (rtmpdump . "rtmpdump")
+                                     (ffmpeg . "ffmpeg")
+                                     (mplayer . "mplayer")
+                                     (curl . "curl")
+                                     (php . "php")
+                                     (adobehds.php . "AdobeHDS.php"))
                                     (preferences
                                      (ideal-bitrate . 2500)
                                      (ideal-pixel-width . 1280))))
@@ -59,6 +66,28 @@
 (define (env->conf env)
   (let* ((env-to-conf-map `(("TEVE_DEFAULT_OPERATION"
                              ,string->symbol operators default)
+                            ("RTMPDUMP"
+                             ,identity external-programs rtmpdump)
+                            ("TEVE_RTMPDUMP"
+                             ,identity external-programs rtmpdump)
+                            ("FFMPEG"
+                             ,identity external-programs ffmpeg)
+                            ("TEVE_FFMPEG"
+                             ,identity external-programs ffmpeg)
+                            ("MPLAYER"
+                             ,identity external-programs mplayer)
+                            ("TEVE_MPLAYER"
+                             ,identity external-programs mplayer)
+                            ("CURL"
+                             ,identity external-programs curl)
+                            ("TEVE_CURL"
+                             ,identity external-programs curl)
+                            ("PHP"
+                             ,identity external-programs php)
+                            ("TEVE_PHP"
+                             ,identity external-programs php)
+                            ("TEVE_ADOBEHDS_PHP"
+                             ,identity external-programs adobehds.php)
                             ("TEVE_BITRATE"
                              ,string->number preferences ideal-bitrate)
                             ("TEVE_WIDTH"

@@ -19,13 +19,13 @@
 (include "video.scm")
 
 (define (stream->curl/make-command stream outfile)
-  (conc "curl"
+  (conc (*cfg* 'external-programs 'curl)
         " -L"
         " -o " (shell-escape outfile)
         " " (shell-escape (stream-ref 'url stream))))
 
 (define (stream->rtmpdump/make-command stream outfile)
-  (conc "rtmpdump"
+  (conc (*cfg* 'external-programs 'rtmpdump)
         " -r " (shell-escape (stream-ref 'url stream))
         (if* (stream-ref 'swf-path stream)
              (conc " -y" (shell-escape it))
@@ -39,7 +39,7 @@
             "")))
 
 (define (stream->ffmpeg/make-command stream outfile)
-  (conc "ffmpeg"
+  (conc (*cfg* 'external-programs 'ffmpeg)
         " -i " (shell-escape (stream-ref 'url stream))
         " -acodec copy -vcodec copy"
         (if* (stream-ref 'ffmpeg-parameters stream)
@@ -48,7 +48,9 @@
         " " (shell-escape outfile)))
 
 (define (stream->adobehds.php/make-command stream outfile)
-  (conc "php AdobeHDS.php"
+  (conc (*cfg* 'external-programs 'php)
+        " "
+        (*cfg* 'external-programs 'adobehds.php)
         " --manifest " (shell-escape (stream-ref 'url stream))
         (if* (stream-ref 'adobe.hds-parameters stream)
              (conc " " it)
@@ -56,7 +58,7 @@
         " --outfile " (shell-escape outfile)))
 
 (define (stream->mplayer/make-command stream outfile)
-  (conc "mplayer"
+  (conc (*cfg* 'external-programs 'mplayer)
         " -dumpstream -dumpfile " (shell-escape outfile)
         (if* (stream-ref 'mplayer-parameters stream)
              (conc " " it)
@@ -131,7 +133,7 @@
   (create-temporary-file extension))
 
 (define (player-command infile)
-  (conc "mplayer " infile))
+  (conc (*cfg* 'external-programs 'mplayer) " " infile))
 
 (define (stream->play-command stream)
   (and-let* ((fifo (make-fifo (stream->default-extension stream))))
