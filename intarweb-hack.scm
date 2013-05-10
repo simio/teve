@@ -1,4 +1,4 @@
-#| Copyright (c) 2012 Jesper Raftegard <jesper@huggpunkt.org>
+#| Copyright (c) 2012, 2013 Jesper Raftegard <jesper@huggpunkt.org>
  | 
  | Permission to use, copy, modify, and distribute this software for any
  | purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension srfi-2)
+(use srfi-2)
 (require-extension intarweb srfi-13 uri-common)
 
 ;;; Akamai is emotionally unstable and needs special treatment.
