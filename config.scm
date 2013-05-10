@@ -35,7 +35,6 @@
 (define make-configuration
   (lambda sources
     (let* ((default-configuration '((operators
-                                     (default . download)
                                      (play? . #f)
                                      (download? . #f)
                                      (list? . #f)
@@ -50,6 +49,7 @@
                                      (php . "php")
                                      (adobehds.php . "AdobeHDS.php"))
                                     (preferences
+                                     (default-action . download)
                                      (ideal-bitrate . 2500)
                                      (ideal-pixel-width . 1280))))
            (values (apply atree-fold-right

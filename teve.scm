@@ -55,7 +55,7 @@
             ;; so we can just take the car instead of looping.
             (let* ((video (car videos))
                    (action (select-action
-                            (*cfg* 'operators 'default)
+                            (*cfg* 'preferences 'default-action)
                             (*cfg* 'operators 'play?)
                             (*cfg* 'operators 'download?)
                             (*cfg* 'operators 'list?)))
