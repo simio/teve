@@ -136,7 +136,8 @@
         (string-contains url "://www.öppetarkiv.se/")
         (string-contains url "://xn--ppetarkiv-z7a.se/")
         (string-contains url "://www.xn--ppetarkiv-z7a.se/"))
-    (filter video? (svt:json-url->videos (add-http-get-query-var url "output" "json"))))
+    (filter video? (svt:json-url->videos
+                    (add-http-get-query-var url "output" "json"))))
    ((or (string-contains url "://www.svt.se/")
         (string-contains url "://svt.se/"))
     (and-let* ((json-url (svt:embedded-player->json-url url)))
