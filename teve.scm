@@ -14,7 +14,7 @@
  |#
 
 (define program-display-name "teve")
-(define program-version "0.1")
+(define program-version "0.2")
 
 ;; Keep this here to avoid reimporting uri-common stuff
 (include "intarweb-hack.scm")	; includes uri-common
