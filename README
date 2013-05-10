@@ -117,6 +117,7 @@ An appropriate video file extension will be added automatically.
 If the configuration value "default-action" is set to "download",
 which is the default, the -d parameter above may be omitted.
 
+
 5. CONFIGURATION
 
 The builtin default configuration values may be overridden in
@@ -138,6 +139,7 @@ decided in the following order:
 The configuration files are parsed as standard ini files.
 See teve.conf.dist for a list of all configurable values,
 and their corresponding environment variables.
+
 
 6. SUPPORTED SITES
 
