@@ -34,7 +34,7 @@ install: $(TARGET)
 	install -m 755 $(TARGET) $(PREFIX)/bin
 
 install-eggs:
-	chicken-install $(EGGS)
+	chicken-install -s $(EGGS)
 
 # wip, won't work
 deploy: $(SOURCE_FILES) deploy-eggs deploy-others
@@ -45,13 +45,13 @@ deploy: $(SOURCE_FILES) deploy-eggs deploy-others
 deploy-eggs:
 	mkdir -p $(DEPLOY_PATH)/$(TARGET)
 	for egg in $(EGGS); do \
-		env CSC_OPTIONS=$(DEPLOY_CSC_OPTIONS) chicken-install \
+		env CSC_OPTIONS=$(DEPLOY_CSC_OPTIONS) chicken-install -s \
 			-prefix $(DEPLOY_PATH)/$(TARGET) -deploy $$egg; \
 	done
 
 deploy-others:
 	mkdir -p $(DEPLOY_PATH)/$(TARGET)
-	CR_PATH=$$(chicken-install -repository) && \
+	CR_PATH=$$(chicken-install -s -repository) && \
 	for file in $(OTHER_DEPLOY_FILES); do \
 		cp $$CR_PATH/$$file$(SO) $(DEPLOY_PATH)/$(TARGET) && \
 		strip $(DEPLOY_PATH)/$(TARGET)/$$file$(SO); \
