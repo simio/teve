@@ -2,16 +2,8 @@ teve [te:ve:] is a work-in-progress CLI streamer and downloader for
 online TV sites. The name is derived from "tee video", which is one of
 the main points of the program.
 
-The current implementation (written in Scheme) is a prototype. Which
-programming language the final implementation will use has yet to be
-decided.
-
-teve will replace SVTPlay.sh as soon as feature-by-feature compatiblity
-is achieved. The script is freely available from this GitHub repo:
-
-    https://github.com/simio/media-scripts
-
-Please be aware that it will only talk to you in Swedish.
+teve replaces SVTPlay.sh, which is outdated, unsupported and essentially
+useless due to changes to svtplay.se.
 
 
 1. REQUIREMENTS
