@@ -48,7 +48,9 @@
 
 (define (tv4:xml-items->subtitles-url data)
   (cond
-   ((null? data) #f)
+   ((or (null? data)
+        (not (string? (sxml-ref (car data) 'mediaFormat))))
+    #f)
    ((string=? "smi" (sxml-ref (car data) 'mediaFormat))
     (sxml-ref (car data) 'url))
    (else
