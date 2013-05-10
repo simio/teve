@@ -14,7 +14,7 @@
  |#
 
 (use srfi-13)
-(require-extension miscmacros uri-generic)
+(require-extension miscmacros)
 
 (include "video.scm")
 
