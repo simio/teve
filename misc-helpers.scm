@@ -304,3 +304,8 @@
     (if (and (list? val) (= 1 (length val)))
         (car val)
         val)))
+
+;;; Don't pretend to be json-ref
+(define sxml-ref/proper
+  (lambda args
+    (apply quick-ref args)))
