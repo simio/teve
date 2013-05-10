@@ -60,6 +60,11 @@
   (and-let* ((xml-items (sxml-ref/proper data 'playback 'items)))
     (let* ((subtitles (tv4:xml-items->subtitles-url xml-items))
            (is-live (string=? "true" (sxml-ref data 'playback 'live)))
+           (video-id (sxml-ref data 'playback '@ 'assetId))
+           (suggest-filename (lambda ()
+                               (if* (sxml-ref data 'playback 'title)
+                                    it
+                                    (conc "tv4-video-" video-id))))
            (swf-player "http://www.tv4play.se/flash/tv4playflashlets.swf"))
       (streams->video
        (map (lambda (stream)
@@ -67,6 +72,8 @@
                              (if subtitles
                                  (make-stream-value 'subtitles subtitles))
                              (make-stream-value 'live is-live)
+                             (make-stream-value 'default-filename
+                                                (suggest-filename))
                              (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                  (make-stream-value 'swf-player swf-player))))
             (filter-map tv4:xml-item->stream xml-items))))))

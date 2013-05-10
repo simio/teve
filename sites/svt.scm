@@ -86,6 +86,7 @@
 (define (svt:json-data->video json-data)
   (and-let* ((references (json-ref json-data "video" "videoReferences")))
     (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
+           (video-id (json-ref json-data "videoId"))
            (popout-url (json-ref json-data "context" "popoutUrl"))
            (is-live (json-ref json-data "video" "live"))
            (play-url (cond
@@ -97,6 +98,8 @@
            (add-video-values (lambda (stream)
                                (update-stream
                                 stream
+                                (make-stream-value 'default-filename
+                                                   (conc "svt-video-" video-id))
                                 (make-stream-value 'subtitles subtitles)
                                 (make-stream-value 'view-at play-url)
                                 (make-stream-value 'live is-live)
