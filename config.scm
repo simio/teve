@@ -13,31 +13,76 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension miscmacros)
+(use posix)
+
+(require-extension miscmacros ini-file)
 
 (include "misc-helpers.scm")
 
-;;; Default pre-configuration values
-(define (make-configuration)
-  (let ((values '((operators
-                   (default . download)
-                   (play? . #f)
-                   (download? . #f)
-                   (list? . #f)
-                   (stream-id . #f)
-                   (video-id . #f)
-                   (output-filename . #f))
-                  (preferences
-                   (ideal-bitrate . 2500)
-                   (ideal-pixel-width . 1280)))))
-    (lambda args
-      (cond
-       ((null? args) values)
-       ((equal? set: (car args))
-        (set! values (apply atree-update (cons values (cdr args))))
-        values)
-       (else
-        (apply atree-ref values args))))))
+;;; Create a configuration variable
+;;;
+;;; Accepts zero or more configuration atrees and evaluates to a
+;;; configuration lambda. New values are added and overridden from
+;;; left to right, starting with the default configuration specified
+;;; within this procedure.
+;;;
+;;; #f and unset values are considered equal.
+;;;
+;;; The resulting lambda may be used thus:
+;;;   (cfg 'branch 'leaf)		=> #f	; value not yet set
+;;;   (cfg set: 5 'branch 'leaf)	=> 5    ; set 'leaf to 5
+;;;   (cfg 'branch 'leaf)		=> 5	; it's now set
+(define make-configuration
+  (lambda sources
+    (let* ((default-configuration '((operators
+                                     (default . download)
+                                     (play? . #f)
+                                     (download? . #f)
+                                     (list? . #f)
+                                     (stream-id . #f)
+                                     (video-id . #f)
+                                     (output-filename . #f))
+                                    (preferences
+                                     (ideal-bitrate . 2500)
+                                     (ideal-pixel-width . 1280))))
+           (values (apply atree-fold-right
+                     (cons default-configuration sources))))
+      (lambda args
+        (cond
+         ((null? args) values)
+         ((equal? set: (car args))
+          (set! values (apply atree-update (cons values (cdr args))))
+          (cadr args))
+         (else
+          (apply atree-ref values args)))))))
 
-(define *cfg* (make-configuration))
+(define (env->conf env)
+  (let* ((env-to-conf-map `(("TEVE_DEFAULT_OP"
+                             ,string->symbol operators default)
+                            ("TEVE_BITRATE"
+                             ,string->number preferences ideal-bitrate)
+                            ("TEVE_WIDTH"
+                             ,string->number preferences ideal-pixel-width)))
+         (getenv (lambda (m)
+                   (and-let* ((v (get-environment-variable (car m))))
+                     ((cadr m) (get-environment-variable (car m))))))
+         (conf-path cddr))
+    (let loop ((mappings env-to-conf-map)
+               (result '()))
+      (cond
+       ((null? mappings) result)
+       ((getenv (car mappings))
+        (loop (cdr mappings)
+              (apply atree-update
+                (cons result (cons (getenv (car mappings))
+                                   (conf-path (car mappings)))))))
+       (else
+        (loop (cdr mappings) result))))))
+    
+
+(define *cfg*
+  (let* ((sys-conf (if* (system-config-filename) (read-ini it) '()))
+         (user-conf (if* (user-config-filename) (read-ini it) '()))
+         (env-conf (env->conf (get-environment-variables))))
+  (make-configuration sys-conf user-conf env-conf)))
 

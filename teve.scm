@@ -22,7 +22,7 @@
 (include "misc-helpers.scm")
 
 (include "config.scm")
-(include "parse-flags.scm")
+(include "parse-flags.scm")	; Should load after config.scm
 
 (include "video.scm")
 (include "url2vid.scm")
