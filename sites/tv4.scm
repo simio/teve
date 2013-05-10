@@ -57,7 +57,7 @@
     (tv4:xml-items->subtitles-url (cdr data)))))
 
 (define (tv4:xml-data->video data)
-  (and-let* ((xml-items (sxml-ref data 'playback 'items)))
+  (and-let* ((xml-items (sxml-ref/proper data 'playback 'items)))
     (let* ((subtitles (tv4:xml-items->subtitles-url xml-items))
            (is-live (string=? "true" (sxml-ref data 'playback 'live)))
            (swf-player "http://www.tv4play.se/flash/tv4playflashlets.swf"))
