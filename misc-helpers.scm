@@ -78,7 +78,7 @@
 ;;;   #f			(if the update failed)
 (define (atree-update tree value . branches)
   (cond ((or (null? branches)
-             (atom? tree)
+             (not (list? tree))
              (not (every atom? branches)))
          #f)
         ((null? (cdr branches))
