@@ -108,7 +108,7 @@
         (apply conc (reverse output))
         (print-values (cdr rest)
                       (fold cons output
-                            (list (string-pad-right (conc (caar rest) ":") 20)
+                            (list (string-pad-right (conc (caar rest) ":") 22)
                                   (cdar rest) #\newline))))))
 
 (define (video-printer video)
@@ -120,6 +120,6 @@
         (print-streams (cdr rest)
                        (fold cons output
                              (list
-                              (string-pad-right "stream id:" 20) id #\newline
+                              (string-pad-right "stream id:" 22) id #\newline
                               (stream-printer (car rest)) #\newline))
                        (+ 1 id)))))
