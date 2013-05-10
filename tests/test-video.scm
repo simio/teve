@@ -100,10 +100,10 @@
 (check (make-video 'a 'b (list 'c) (list (cons 'a 5)) (list #f))
        => '(((a . 5))))
 
-(check (video? (make-video)) => #t)
+(check (video? (make-video)) => #f)
 (check (video? 5) => #f)
-(check (video? '()) => #t)
-(check (video? '(())) => #t)
+(check (video? '()) => #f)
+(check (video? '(())) => #f)
 (check (video? '((()))) => #f)
 (check (video? '(((a . 5)))) => #t)
 (check (video? '(((5 . a)))) => #f)
