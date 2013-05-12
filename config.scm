@@ -107,7 +107,6 @@
                                    (conf-path (car mappings)))))))
        (else
         (loop (cdr mappings) result))))))
-    
 
 (define *cfg*
   (let* ((sys-conf (if* (*platform* 'system-config-file) (read-ini it) '()))
