@@ -51,6 +51,7 @@
   (conc (*cfg* 'external-programs 'php)
         " "
         (*cfg* 'external-programs 'adobehds.php)
+        " --delete " ;; Script will clean up if not interrupted
         " --manifest " (shell-escape (stream-ref 'url stream))
         (if* (stream-ref 'adobe.hds-parameters stream)
              (conc " " it)
