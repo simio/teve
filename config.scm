@@ -110,8 +110,8 @@
     
 
 (define *cfg*
-  (let* ((sys-conf (if* (system-config-filename) (read-ini it) '()))
-         (user-conf (if* (user-config-filename) (read-ini it) '()))
+  (let* ((sys-conf (if* (*platform* 'system-config-file) (read-ini it) '()))
+         (user-conf (if* (*platform* 'user-config-file) (read-ini it) '()))
          (env-conf (env->conf (get-environment-variables))))
-  (make-configuration sys-conf user-conf env-conf)))
+    (make-configuration sys-conf user-conf env-conf)))
 

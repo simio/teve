@@ -13,31 +13,30 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(use data-structures files posix)
+(use srfi-1 data-structures files posix)
 
 (require-extension miscmacros)
 
 (define (make-platform)
-  (let ((values `((program-filename . ,(pathname-file (program-name)))
-                  (home-dir . ,(cadddr
-                                (cddr (user-information (current-user-id)))))
-                  (etc-dir . "/etc")
-                  (userconf-file-extension . "rc")
-                  (systemconf-file-extension . ".conf"))))
+  (let* ((program-filename (pathname-file (program-name)))
+         (home-dir (cadddr (cddr (user-information (current-user-id)))))
+         (user-data-dir (conc home-dir "/." program-filename))
+         (system-config-file (if* (file-exists?
+                                   (conc "/etc/" program-filename ".conf"))
+                                  it
+                                  #f))
+         (user-config-file (find
+                            (lambda (x) (and (string? x) (file-exists? x)))
+                            (list (get-environment-variable "TEVE_RC")
+                                  (conc user-data-dir "/config")
+                                  (conc home-dir "/." program-filename "rc")))))
+         (values `((program-filename . ,program-filename)
+                   (home-dir . ,home-dir)
+                   (etc-dir . "/etc")
+                   (user-data-dir . ,user-data-dir)
+                   (user-config-file . ,user-config-file)
+                   (system-config-file . ,system-config-file)))
     (lambda (key)
       (alist-ref key values))))
 
 (define *platform* (make-platform))
-
-(define (system-config-filename)
-  (let ((filename (conc (*platform* 'etc-dir)
-                        "/" program-display-name
-                        (*platform* 'systemconf-file-extension))))
-    (and (file-exists? filename) filename)))
-
-(define (user-config-filename)
-  (let ((filename (or (get-environment-variable "TEVE_RC")
-                      (conc (*platform* 'home-dir)
-                            "/." program-display-name
-                            (*platform* 'userconf-file-extension)))))
-    (and (file-exists? filename) filename)))
