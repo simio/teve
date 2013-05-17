@@ -18,7 +18,8 @@
 (require-extension miscmacros)
 
 (define (make-platform)
-  (let* ((program-filename (pathname-file (program-name)))
+  (let* ((program-filename (let ((actual (pathname-file (program-name))))
+                             (if (equal? "csi" actual) "teve" actual)))
          (home-dir (cadddr (cddr (user-information (current-user-id)))))
          (user-data-dir (conc home-dir "/." program-filename))
          (system-config-file (if* (file-exists?
