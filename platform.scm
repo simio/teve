@@ -31,7 +31,7 @@
                             (list (get-environment-variable "TEVE_RC")
                                   (conc user-data-dir "/config")
                                   (conc home-dir "/." program-filename "rc"))))
-         (cache-dir (if (file-exists? (conc user-data-dir "/cache")) it #f))
+         (cache-dir (if* (file-exists? (conc user-data-dir "/cache")) it #f))
          (values `((program-filename . ,program-filename)
                    (home-dir . ,home-dir)
                    (etc-dir . "/etc")
