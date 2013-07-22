@@ -19,6 +19,39 @@
 (include "misc-helpers")
 (include "dot-locking")
 
+;;; Return a delayed download. If a second parameter is supplied,
+;;; it is used as a reader. The default is read-string.
+(define (delay-download url . tail)
+  (let ((reader (if (null? tail) read-string (car tail))))
+    (delay
+      (handle-exceptions exn #f
+        (with-input-from-request url #f reader)))))
+
+;; Recurse through the vector/alist mess returned by json-read,
+;; converting vectors to alists.
+(define (sanitise-json-input obj)
+  (cond ((null? obj) obj)
+        ((pair? obj) (cons (sanitise-json-input (car obj))
+                           (sanitise-json-input (cdr obj))))
+        ((vector? obj) (sanitise-json-input (vector->list obj)))
+        (else obj)))
+
+;;; Download an XML document object from url
+(define (download-xml url)
+  (delay-download url xml-read))
+
+;;; Read with json-read and sanitise with sanitise-json-input
+(define (json-read-and-sanitise)
+  (sanitise-json-input (handle-exceptions exn #f (json-read))))
+
+;;; Download and sanitise a json object from url
+(define (download-json url)
+  (delay-download url json-read-and-sanitise))
+
+;;;
+;;; Cache code begins here
+;;;
+
 (define (cache:uri->key uri)
   (message-digest-string (sha256-primitive) uri))
 
@@ -70,8 +103,19 @@
 ;;; Any second parameter supplied must be a number and specifies the
 ;;; ttl to use for checking if the cache is up to date. If no number
 ;;; is specified, the ttl value used to store the data in cache is used.
+;;;
+;;; Valid values for the uri parameter are uri:s and http-client requests.
+;;; (The value will be passed directly to with-input-from-request from
+;;; the http-client egg.)
 (define (via-cache uri . rest)
-  (let* ((data (delay-download uri))
+  (let* ((uri (cond
+               ((request? uri) (uri->string (request-uri uri)))
+               ((uri? uri) (uri->string uri))
+               ((string? uri) uri)
+               (else
+                (stderr "HELP! What kind of uri is this?\\n" uri)
+                uri)))
+         (data (delay-download uri))
          (key (cache:uri->key uri))
          (ttl (or (and (not (null? rest))
                        (number? (car rest))

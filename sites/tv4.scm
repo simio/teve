@@ -93,7 +93,7 @@
     xml-base-url))
 
 (define (tv4:embedded-video->xml-url url)
-  (and-let* ((source (force (delay-download url)))
+  (and-let* ((source (via-cache url))
              (raw-flash-vars (first-html-attribute "data-flash-vars"
                                                    source
                                                    #\'))

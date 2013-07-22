@@ -125,35 +125,6 @@
   (lambda trees
     (fold-right atree-merge '() trees)))
 
-;; Recurse through the vector/alist mess returned by json-read,
-;; converting vectors to alists.
-(define (sanitise-json-input obj)
-  (cond ((null? obj) obj)
-        ((pair? obj) (cons (sanitise-json-input (car obj))
-                           (sanitise-json-input (cdr obj))))
-        ((vector? obj) (sanitise-json-input (vector->list obj)))
-        (else obj)))
-
-;;; Return a delayed download. If a second parameter is supplied,
-;;; it is used as a reader. The default is read-string.
-(define (delay-download url . tail)
-  (let ((reader (if (null? tail) read-string (car tail))))
-    (delay
-      (handle-exceptions exn #f
-        (with-input-from-request url #f reader)))))
-
-;;; Download an XML document object from url
-(define (download-xml url)
-  (delay-download url xml-read))
-
-;;; Read with json-read and sanitise with sanitise-json-input
-(define (json-read-and-sanitise)
-  (sanitise-json-input (handle-exceptions exn #f (json-read))))
-
-;;; Download and sanitise a json object from url
-(define (download-json url)
-  (delay-download url json-read-and-sanitise))
-
 (define-syntax not-if
   (syntax-rules ()
     ((not-if test value)
@@ -185,7 +156,8 @@
       #f))
 
 ;;; Converts a string of the form "VAR=VAL,VAR2=VAL2,..." to an alist.
-;;; Numerical values are converted to numbers, while everything else is strings.
+;;; Numerical values are converted to numbers, while everything else
+;;; is strings.
 ;;; Return values:
 ;;;   An alist          (if input is valid)
 ;;;   #f                (otherwise)
