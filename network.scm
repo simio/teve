@@ -108,15 +108,15 @@
 ;;; (The value will be passed directly to with-input-from-request from
 ;;; the http-client egg.)
 (define (via-cache uri . rest)
-  (let* ((uri (cond
-               ((request? uri) (uri->string (request-uri uri)))
-               ((uri? uri) (uri->string uri))
-               ((string? uri) uri)
-               (else
-                (stderr "HELP! What kind of uri is this?\\n" uri)
-                uri)))
+  (let* ((cleartext-uri (cond
+                         ((request? uri) (uri->string (request-uri uri)))
+                         ((uri? uri) (uri->string uri))
+                         ((string? uri) uri)
+                         (else
+                          (stderr "HELP! What kind of uri is this?\\n" uri)
+                          uri)))
          (data (delay-download uri))
-         (key (cache:uri->key uri))
+         (key (cache:uri->key cleartext-uri))
          (ttl (or (and (not (null? rest))
                        (number? (car rest))
                        (car rest))
