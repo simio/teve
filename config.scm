@@ -17,7 +17,8 @@
 
 (require-extension miscmacros ini-file)
 
-(include "misc-helpers.scm")
+(include "platform")
+(include "misc-helpers")
 
 ;;; Create a configuration variable
 ;;;
@@ -51,7 +52,10 @@
                                     (preferences
                                      (default-action . download)
                                      (ideal-bitrate . 2500)
-                                     (ideal-pixel-width . 1280))))
+                                     (ideal-pixel-width . 1280)
+                                     (use-cache . #t)
+                                     (cache-default-ttl . 300)
+                                     (cache-override-ttl . #f))))
            (values (apply atree-fold-right
                      (cons default-configuration sources))))
       (lambda args

@@ -26,6 +26,8 @@
 
 (include "config.scm")
 (include "parse-flags.scm")	; Should load after config.scm
+(include "dot-locking.scm")
+(include "cache.scm")
 
 (include "video.scm")
 (include "url2vid.scm")

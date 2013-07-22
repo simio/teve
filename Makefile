@@ -11,7 +11,7 @@ DISTFILES=$(SOURCE_FILES) $(EXTRA_FILES)
 
 EGGS=intarweb args json http-client vector-lib packrat openssl base64 \
 	defstruct uri-common matchable uri-generic message-digest ssax \
-	ini-file
+	ini-file message-digest sha2
 
 OTHER_DEPLOY_FILES=type-checks type-errors regex blob-hexadecimal to-hex \
 	string-hexadecimal variable-item blob-set-int md5 string-utils \
