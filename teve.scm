@@ -24,10 +24,11 @@
 (include "talk-is-cheap.scm")
 (include "misc-helpers.scm")
 
-(include "config.scm")
-(include "parse-flags.scm")	; Should load after config.scm
 (include "dot-locking.scm")
-(include "cache.scm")
+(include "config.scm")
+(include "network.scm")
+
+(include "parse-flags.scm")	; Should load after config.scm
 
 (include "video.scm")
 (include "url2vid.scm")
