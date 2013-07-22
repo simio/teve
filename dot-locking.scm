@@ -4,11 +4,12 @@
 ;;;
 ;;; http://wiki.call-cc.org/eggref/4/dot-locking
 ;;;
-;;; The dot-locking egg tries to create a hard link between a file in /tmp
-;;; (or wherever create-temporary-directory puts its files) and the directory
+;;; Since the dot-locking egg tries to create a hard link between a file in
+;;; /tmp (created with create-temporary-directory) and the directory
 ;;; of the file being locked, it is only capable of locking files on the same
-;;; hard disk partition as /tmp. On my system, /tmp is on a partition of its
-;;; own, rendering this egg useless.
+;;; hard disk partition as /tmp. Hard links cannot span partitions, though,
+;;; so this will fail whenever someone wisely chooses to mount /tmp as a
+;;; partition of its own.
 ;;;
 ;;; This alternative implementation instead creates any temporary files in the
 ;;; directory of the file being locked.
