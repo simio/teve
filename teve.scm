@@ -17,7 +17,7 @@
 (define program-version "0.2.1")
 
 ;; Keep this here to avoid reimporting uri-common stuff
-(include "intarweb-hack.scm")	; includes uri-common
+(include "intarweb-hack.scm")	; loads uri-common; don't load it elsewhere
 
 (include "platform.scm")
 
