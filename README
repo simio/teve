@@ -94,7 +94,7 @@ automatically pick a filename and start the appropriate downloader.
 If there are several streams available for the same video, teve will
 also try to pick the best stream to download. Please note that this
 does NOT mean it will select the LARGEST stream. Instead, all streams
-are compared to an ideal (defined by bitrate and video pixel width),
+are compared to an ideal (defined by bitrate and video width in pixels),
 and the closest match is selected. The ideal values can be changed in
 configuration files or by setting environment variables. See
 CONFIGURATION below for more information.
