@@ -20,20 +20,24 @@
 ;;; Calculate and return the distance between the supplied stream and
 ;;; the ideal size/bitrate.
 (define (stream-distance stream reference-bitrate reference-width)
-  (let ((stream-width (if* (stream-ref 'video-width stream)
-                           it
-                           0))
-        (stream-bitrate (if* (stream-ref 'bitrate stream)
-                             it
-                             0)))
-    (/ (+
-        (abs (- reference-bitrate stream-bitrate))
-        ;; The raw distances are multiplied by these weights before added
-        ;; together and used for comparison.
-        (* (/ (*cfg* 'preferences 'ideal-bitrate)
-              (*cfg* 'preferences 'ideal-pixel-width))
-           (abs (- reference-width stream-width))))
-       2)))
+  (let* ((stream-width (if* (stream-ref 'video-width stream) it 0))
+         (stream-bitrate (if* (stream-ref 'bitrate stream) it 0))
+         (transport-weight-symbol (string->symbol
+                                (conc "transport-weight-"
+                                      (symbol->string
+                                       (stream-ref 'stream-type stream)))))
+         (transport-weight (if* (*cfg* 'preferences transport-weight-symbol)
+                                it
+                                1)))
+    (* 0.5
+       transport-weight
+       ;; Here is the actual weight calculation
+       (+ (abs (- reference-bitrate stream-bitrate))
+          ;; The raw distances are multiplied by these weights
+          ;; before added together and used for comparison.
+          (* (/ (*cfg* 'preferences 'ideal-bitrate)
+                (*cfg* 'preferences 'ideal-pixel-width))
+             (abs (- reference-width stream-width)))))))
 
 ;;; Returns an alist with the following structure:
 ;;;
