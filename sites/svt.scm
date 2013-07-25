@@ -84,25 +84,30 @@
                           (if (< 0 bitrate)
                               (make-stream-value 'bitrate bitrate))))))))
 
-(define (svt:json-data->video json-data)
-  (and-let* ((references (json-ref json-data "video" "videoReferences")))
-    (let* ((subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
+;;; Return a list of videos constructed from the json object
+;;; downloaded from the supplied url, or return #f.
+(define (svt:json-url->videos path)
+  (and-let* ((uri (uri-reference path))
+             (json-data (force (download-json path)))
+             (references (json-ref json-data "video" "videoReferences")))
+    (let* ((base-path (uri->base-path path))
+           (subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
            (video-id (json-ref json-data "videoId"))
-           (popout-url (json-ref json-data "context" "popoutUrl"))
+           (popout-path (json-ref json-data "context" "popoutUrl"))
            (is-live (json-ref json-data "video" "live"))
-           (play-url (cond
-                      ((not popout-url) #f)
-                      ((string-prefix? "http" popout-url) popout-url)
+           (play-path (cond
+                      ((not popout-path) #f)
+                      ((string-prefix? "http" popout-path) popout-path)
                       (else
-                       (conc "http://www.svtplay.se" popout-url))))
-           (swf-player (delay (svt:swf-player-in play-url)))
+                       (conc base-path popout-path))))
+           (swf-player (delay (svt:swf-player-in play-path)))
            (add-video-values (lambda (stream)
                                (update-stream
                                 stream
                                 (make-stream-value 'default-filename
                                                    (conc "svt-video-" video-id))
                                 (make-stream-value 'subtitles subtitles)
-                                (make-stream-value 'view-at play-url)
+                                (make-stream-value 'view-at play-path)
                                 (make-stream-value 'live is-live)
                                 (if (eq? 'hls (stream-ref 'stream-type stream))
                                     (make-stream-value 'ffmpeg-parameters
@@ -110,18 +115,13 @@
                                 (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                     (make-stream-value 'swf-player
                                                        (force swf-player)))))))
-      (streams->video
-       (fold (lambda (objs streams)
-               (append (filter-map add-video-values objs)
-                       streams))
-             '()
-             (filter-map svt:json-stream->streams references))))))
-
-;;; Return a list of videos constructed from the json object
-;;; downloaded from the supplied url, or return #f.
-(define (svt:json-url->videos url)
-  (and-let* ((data (download-json url)))
-    (list (svt:json-data->video (force data)))))
+      (list
+       (streams->video
+        (fold (lambda (objs streams)
+                (append (filter-map add-video-values objs)
+                        streams))
+              '()
+              (filter-map svt:json-stream->streams references)))))))
 
 ;;; Return a JSON url extracted from an embedded svtplay video, or
 ;;; return #f.
@@ -148,7 +148,8 @@
       (filter video?
               (svt:json-url->videos (if (string-prefix? "http" json-url)
                                         json-url
-                                        (conc "http://www.svt.se" json-url))))))
+                                        (conc (uri->base-path url)
+                                              json-url))))))
    (else
     #f)))
 
