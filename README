@@ -132,7 +132,7 @@ decided in the following order:
   3. If $HOME/.teverc is present, it is parsed and used as
      /etc/teve.conf above. You can specify an alternate location to
      look for this file by setting the TEVE_RC environment variable.
-  4. Any environment variables set are parsed, replacing or adding to
+  4. Any environment variables set are parsed, replacing or added to
      the configuration.
   5. The command line parameters are parsed, overriding any previously
      set configuration variables.
