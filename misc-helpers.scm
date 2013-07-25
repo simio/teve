@@ -287,3 +287,16 @@
 (define sxml-ref/proper
   (lambda args
     (apply quick-ref args)))
+
+
+;;; Fed with a string containing a url, it will return
+;;; "scheme://hostname[:non-default-port]"
+
+(define (uri->base-path str)
+  (and-let* ((uri (uri-reference str)))
+    (conc (uri-scheme uri) "://" (uri-host uri)
+          (if* (uri-port uri)
+               (if (nor (equal? it 80)
+                        (string=? (uri-scheme uri) "http"))
+                   (conc ":" it)
+                   "")))))
