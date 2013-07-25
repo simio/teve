@@ -92,7 +92,7 @@
     (if filename
         (with-dot-lock filename
           (with-output-to-file filename (lambda () (write object)))))
-    object))
+    (quick-ref object 'data)))
 
 ;;; Wrap it all up. Possible actions:
 ;;;  1. If caching is disabled, download.
@@ -109,9 +109,12 @@
 ;;; the http-client egg.)
 (define (via-cache uri . rest)
   (let* ((cleartext-uri (cond
-                         ((request? uri) (uri->string (request-uri uri)))
-                         ((uri? uri) (uri->string uri))
-                         ((string? uri) uri)
+                         ((request? uri)
+                          (uri->string (request-uri uri)))
+                         ((uri? uri)
+                          (uri->string uri))
+                         ((string? uri)
+                          uri)
                          (else
                           (stderr "HELP! What kind of uri is this?\\n" uri)
                           uri)))
