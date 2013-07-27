@@ -21,7 +21,7 @@
 
 ;;; Return a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
-(define (delay-download url . tail)
+(define (network:delay-download url . tail)
   (let ((reader (if (null? tail) read-string (car tail))))
     (delay
       (handle-exceptions exn #f
@@ -38,7 +38,7 @@
 
 ;;; Download an XML document object from url
 (define (download-xml url)
-  (delay-download url xml-read))
+  (network:delay-download url xml-read))
 
 ;;; Read with json-read and sanitise with sanitise-json-input
 (define (json-read-and-sanitise)
@@ -46,16 +46,16 @@
 
 ;;; Download and sanitise a json object from url
 (define (download-json url)
-  (delay-download url json-read-and-sanitise))
+  (network:delay-download url json-read-and-sanitise))
 
 ;;;
 ;;; Cache code begins here
 ;;;
 
-(define (cache:uri->key uri)
+(define (network:uri->key uri)
   (message-digest-string (sha256-primitive) uri))
 
-(define (cache:key->filename key)
+(define (network:key->filename key)
   (and-let* ((base-dir (*platform* 'cache-dir))
              (exists (directory-exists? base-dir)))
     (conc base-dir "/" key)))
@@ -68,8 +68,8 @@
 ;;; number. This number will be used instead of the cached
 ;;; ttl value, to determine whether the cached data is considered
 ;;; up to date or not.
-(define (cache:get-entry key . rest)
-  (and-let* ((filename (cache:key->filename key))
+(define (network:get-entry key . rest)
+  (and-let* ((filename (network:key->filename key))
              (in-cache (file-exists? filename))
              (cache-object (with-input-from-file filename read))
              (ttl (or (and (not (null? rest))
@@ -84,11 +84,11 @@
     data))
 
 ;;; Store data in cache and return data.
-(define (cache:store key ttl data)
+(define (network:store key ttl data)
   (let ((object `((timestamp . ,(current-seconds))
                   (ttl . ,(if* ttl it (*cfg* 'preferences 'default-cache-ttl)))
                   (data . ,data)))
-        (filename (cache:key->filename key)))
+        (filename (network:key->filename key)))
     (if filename
         (with-dot-lock filename
           (with-output-to-file filename (lambda () (write object)))))
@@ -118,8 +118,8 @@
                          (else
                           (stderr "HELP! What kind of uri is this?\\n" uri)
                           uri)))
-         (data (delay-download uri))
-         (key (cache:uri->key cleartext-uri))
+         (data (network:delay-download uri))
+         (key (network:uri->key cleartext-uri))
          (ttl (or (and (not (null? rest))
                        (number? (car rest))
                        (car rest))
@@ -127,8 +127,8 @@
     (cond
      ((not (*cfg* 'preferences 'use-cache))
       (force data))
-     ((cache:get-entry key ttl))
+     ((network:get-entry key ttl))
      (else
       ;;; XXX: TTL should actually be derived from the relevant HTTP headers,
       ;;; if they exist...
-      (cache:store key ttl (force data))))))
+      (network:store key ttl (force data))))))
