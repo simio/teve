@@ -95,27 +95,25 @@
 ;;; (The value will be passed directly to with-input-from-request from
 ;;; the http-client egg.)
 (define (via-cache uri . rest)
-  (let* ((cleartext-uri (cond
-                         ((request? uri)
-                          (uri->string (request-uri uri)))
-                         ((uri? uri)
-                          (uri->string uri))
-                         ((string? uri)
-                          uri)
-                         (else
-                          (stderr "HELP! What kind of uri is this?\\n" uri)
-                          uri)))
-         (data (network:delay-download uri))
-         (key (network:uri->key cleartext-uri))
-         (ttl (or (and (not (null? rest))
-                       (number? (car rest))
-                       (car rest))
-                  #f)))
-    (cond
-     ((not (*cfg* 'preferences 'use-cache))
-      (force data))
-     ((network:get-entry key ttl))
-     (else
-      ;;; XXX: TTL should actually be derived from the relevant HTTP headers,
-      ;;; if they exist...
-      (network:store key ttl (force data))))))
+  (let-optionals rest ((ttl #f))
+    (let* ((cleartext-uri (cond
+                           ((request? uri)
+                            (uri->string (request-uri uri)))
+                           ((uri? uri)
+                            (uri->string uri))
+                           ((string? uri)
+                            uri)
+                           (else
+                            (stderr "HELP! What kind of uri is this?\\n" uri)
+                            uri)))
+           (data (network:delay-download uri))
+           (key (network:uri->key cleartext-uri))
+           (ttl (if (number? ttl) ttl #f)))
+      (cond
+       ((not (*cfg* 'preferences 'use-cache))
+        (force data))
+       ((network:get-entry key ttl))
+       (else
+        ;; XXX: TTL should actually be derived from the relevant HTTP headers,
+        ;; if they exist...
+        (network:store key ttl (force data)))))))
