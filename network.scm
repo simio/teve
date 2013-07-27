@@ -27,22 +27,9 @@
       (handle-exceptions exn #f
         (with-input-from-request url #f reader)))))
 
-;; Recurse through the vector/alist mess returned by json-read,
-;; converting vectors to alists.
-(define (sanitise-json-input obj)
-  (cond ((null? obj) obj)
-        ((pair? obj) (cons (sanitise-json-input (car obj))
-                           (sanitise-json-input (cdr obj))))
-        ((vector? obj) (sanitise-json-input (vector->list obj)))
-        (else obj)))
-
 ;;; Download an XML document object from url
 (define (download-xml url)
   (network:delay-download url xml-read))
-
-;;; Read with json-read and sanitise with sanitise-json-input
-(define (json-read-and-sanitise)
-  (sanitise-json-input (handle-exceptions exn #f (json-read))))
 
 ;;; Download and sanitise a json object from url
 (define (download-json url)

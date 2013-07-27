@@ -14,7 +14,7 @@
  |#
 
 (require-extension srfi-1 srfi-13)
-(require-extension miscmacros http-client json ssax)
+(require-extension miscmacros http-client ssax)
 
 ;;; Get cdr of PAIR, or eval to #f if it's not a pair (CDr If Pair)
 (define-syntax cdip
@@ -62,8 +62,6 @@
          (apply quick-ref (cons (cdip (assoc (car keys) (filter pair? obj)))
                                 (cdr keys))))
         (else #f)))
-
-(define json-ref quick-ref)
 
 ;;; UNTESTED Accessor for values in an alist tree.
 ;;;

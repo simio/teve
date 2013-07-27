@@ -18,6 +18,7 @@
 
 (include "misc-helpers.scm")
 (include "parsers/apple-hls.scm")
+(include "parsers/json.scm")
 
 (define (find-first-quoted-swf)
   (let ((ending (string-reverse ".swf")))
