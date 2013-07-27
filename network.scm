@@ -96,16 +96,7 @@
 ;;; the http-client egg.)
 (define (via-cache uri . rest)
   (let-optionals rest ((ttl #f))
-    (let* ((cleartext-uri (cond
-                           ((request? uri)
-                            (uri->string (request-uri uri)))
-                           ((uri? uri)
-                            (uri->string uri))
-                           ((string? uri)
-                            uri)
-                           (else
-                            (stderr "HELP! What kind of uri is this?\\n" uri)
-                            uri)))
+    (let* ((cleartext-uri (->string/uri uri))
            (data (network:delay-download uri))
            (key (network:uri->key cleartext-uri))
            (ttl (if (number? ttl) ttl #f)))

@@ -290,7 +290,6 @@
 
 ;;; Fed with a string containing a url, it will return
 ;;; "scheme://hostname[:non-default-port]"
-
 (define (uri->base-path str)
   (and-let* ((uri (uri-reference str)))
     (conc (uri-scheme uri) "://" (uri-host uri)
@@ -299,3 +298,12 @@
                         (string=? (uri-scheme uri) "http"))
                    (conc ":" it)
                    "")))))
+
+;;; Try to produce a uri in a string, no matter what is supplied.
+;;; Failure evaluates to #f.
+(define (->string/uri obj)
+  (cond
+   ((request? obj) (uri->string (request-uri obj)))
+   ((uri? obj) (uri->string obj))
+   ((string? obj) obj)
+   (else #f)))
