@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension miscmacros srfi-1 srfi-13)
+(require-extension srfi-1 srfi-13)
 
 (include "misc-helpers.scm")
 
