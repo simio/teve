@@ -178,18 +178,19 @@
              (cdr raw-pairs)
              (if (string-contains (car raw-pairs) setter)
                  (cons (let ((pair (string-split (car raw-pairs) setter)))
-                         (cons (car pair) (cond
-                                           ((string->number (cadr pair))
-                                            (string->number (cadr pair)))
-                                           ((string=? "#f" (cadr pair))
-                                            #f)
-                                           ((string=? "#t" (cadr pair))
-                                            #t)
-                                           ((and (< 0 (string-length (cadr pair)))
-                                                 (eq? #\' (string-ref (cadr pair) 0)))
-                                            (string->symbol (string-drop (cadr pair) 1)))
-                                           (else
-                                            (cadr pair)))))
+                         (cons (car pair)
+                               (cond
+                                ((string->number (cadr pair))
+                                 (string->number (cadr pair)))
+                                ((string=? "#f" (cadr pair))
+                                 #f)
+                                ((string=? "#t" (cadr pair))
+                                 #t)
+                                ((and (< 0 (string-length (cadr pair)))
+                                      (eq? #\' (string-ref (cadr pair) 0)))
+                                 (string->symbol (string-drop (cadr pair) 1)))
+                                (else
+                                 (cadr pair)))))
                        result)
                  result)))))))
 
