@@ -17,7 +17,7 @@
 (require-extension miscmacros http-client)
 
 (include "misc-helpers.scm")
-(include "apple-hls.scm")
+(include "parsers/apple-hls.scm")
 
 (define (find-first-quoted-swf)
   (let ((ending (string-reverse ".swf")))
