@@ -16,4 +16,4 @@
 (use srfi-13 srfi-14 srfi-78)
 
 (include "tests/global.scm")
-(include "apple-hls.scm")
+(include "parsers/apple-hls.scm")
