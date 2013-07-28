@@ -27,6 +27,8 @@ Or if you'd like to see what you're installing:
     intarweb srfi-37 json http-client vector-lib packrat ...
     # chicken-install $(make print-eggs)
 
+If chicken-install fails to build some egg, see 7. TROUBLESHOOTING below.
+
 teve currently uses other programs to download streams.
 
   ffmpeg        For Apple HLS streams (SVT Play, Öppet arkiv)
@@ -151,7 +153,18 @@ As of version 0.2, the following sites are supported:
   tv4play.se
 
 
-7. CONTACT
+7. TROUBLESHOOTING
+
+ P: chicken-install fails to build the openssl egg.
+ S: Make sure you have the OpenSSL libs and header files installed.
+    If they have been stashed away in some obscure places, you may
+    need to pass their locations to the compiler and linker:
+
+      # env CSC_OPTIONS='-I /foo/include/openssl -L /foo/lib' \
+                make install-eggs
+
+
+8. CONTACT
 
 Direct any questions to either the (Swedish) bb at planka.huggpunkt.org
 or directly to jesper at huggpunkt.org.
