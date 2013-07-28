@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(require-extension json)
+(require-extension json miscmacros)
 
 (include "misc-helpers.scm")
 
@@ -27,8 +27,8 @@
         (else obj)))
 
 ;;; Read with json-read and sanitise with sanitise-json-input
-(define (json-read-and-sanitise)
-  (sanitise-json-input (handle-exceptions exn #f (json-read))))
+(define (json-read->alist-tree)
+  (sanitise-json-input (ignore-errors (json-read))))
 
 (define json-ref quick-ref)
 

@@ -62,8 +62,7 @@ transport-weight-hds=2          ; AdobeHDS.php only when necessary
 ; Settings for the disk cache (used with remote objects). The default
 ; ttl is used for data without an inherent time-to-live (through for
 ; example HTTP headers). If cache-override-ttl is #t, the default ttl
-; will be used when deciding whether a cached object needs an update,
-; regardless of the ttl value stored in the object itself.
+; will be used when deciding whether cached objects are up to date.
 use-cache=#t                    ; #t of #f
 cache-default-ttl=300           ; In seconds
 cache-override-ttl=#f           ; Always use default value

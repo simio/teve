@@ -19,8 +19,8 @@
 (include "video.scm")
 
 (define (tv4:download-xml-data xml-base-url)
-  (and-let* ((xml-base (force (download-xml xml-base-url)))
-             (xml-play (force (download-xml (conc xml-base-url "/play")))))
+  (and-let* ((xml-base (download xml-base-url #:reader xml-read))
+             (xml-play (download (conc xml-base-url "/play") #:reader xml-read)))
     (list (caddr xml-base)
           (caddr xml-play))))
 
@@ -93,7 +93,7 @@
     xml-base-url))
 
 (define (tv4:embedded-video->xml-url url)
-  (and-let* ((source (via-cache url))
+  (and-let* ((source (download url))
              (raw-flash-vars (first-html-attribute "data-flash-vars"
                                                    source
                                                    #\'))

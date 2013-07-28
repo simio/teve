@@ -21,23 +21,37 @@
 
 ;;; Return a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
-(define (network:delay-download url . tail)
-  (let ((reader (if (null? tail) read-string (car tail))))
+(define (network:delay-download url . rest)
+  (let-optionals rest ((reader read-string))
     (delay
-      (handle-exceptions exn #f
-        (with-input-from-request url #f reader)))))
+      (ignore-errors
+       (with-input-from-request url #f reader)))))
 
-;;; Download an XML document object from url
-(define (download-xml url)
-  (network:delay-download url xml-read))
-
-;;; Download and sanitise a json object from url
-(define (download-json url)
-  (network:delay-download url json-read-and-sanitise))
-
+;;; Tell whether a cache object is alive.
 ;;;
-;;; Cache code begins here
+;;; Takes two arguments:
+;;;     cached-object   A cache object.
+;;;     ttl             The ttl the caller is asking for.
+;;;                     (Optional. Default: #t)
 ;;;
+;;; Evaluation:
+;;;  1. If the cache-override-ttl config value is set, the config value
+;;;     'cache-default-ttl is used.
+;;;  2. Otherwise, if ttl is #f, the cache is always considered too old.
+;;;  3. Otherwise, if ttl is a number, the cache will be considered too old
+;;;     if it is older than that number of seconds.
+;;;  4. Otherwise (for #t), the ttl stored in the cache is used.
+;;;
+;;; Returns #t iff the cached object is alive, otherwise #f.
+(define (network:cache-object-alive? obj . rest)
+  (let-optionals rest ((ttl #t))
+    (let ((ttl (cond
+                ((and (*cfg* 'preferences 'cache-override-ttl)
+                      (*cfg* 'preferences 'cache-default-ttl)))
+                ((not ttl) -1)
+                ((number? ttl) ttl)
+                (else (or (quick-ref obj 'ttl) -1)))))
+      (< (current-seconds) (+ ttl (quick-ref obj 'timestamp))))))
 
 (define (network:uri->key uri)
   (message-digest-string (sha256-primitive) uri))
@@ -55,19 +69,11 @@
 ;;; number. This number will be used instead of the cached
 ;;; ttl value, to determine whether the cached data is considered
 ;;; up to date or not.
-(define (network:get-entry key . rest)
+(define (network:get-entry key)
   (and-let* ((filename (network:key->filename key))
              (in-cache (file-exists? filename))
              (cache-object (with-input-from-file filename read))
-             (ttl (cond
-                   ((and (not (null? rest))
-                         (number? (car rest))
-                         (car rest)))
-                   ((and (*cfg* 'preferences 'cache-override-ttl)
-                         (*cfg* 'preferences 'cache-default-ttl)))
-                   (else (quick-ref cache-object 'ttl))))
-             (timestamp (quick-ref cache-object 'timestamp))
-             (up-to-date (< (current-seconds) (+ timestamp ttl)))
+             (up-to-date (network:cache-object-alive? cache-object))
              (data (quick-ref cache-object 'data)))
     data))
 
@@ -82,30 +88,40 @@
           (with-output-to-file filename (lambda () (write object)))))
     (quick-ref object 'data)))
 
-;;; Wrap it all up. Possible actions:
+;;; Translate requests to data from cache or network.
 ;;;  1. If caching is disabled, download.
-;;;  2. Otherwise, if the uri isn't cached, download and update cache.
-;;;  3. Otherwise, if the cache is outdated, download and update cache.
-;;;  4. Otherwise, just use the cached data.
+;;;  2. Otherwise, if the uri is cached and up-to-date, use cached data.
+;;;  3. Otherwise, download, cache and return data.
 ;;;
-;;; Any second parameter supplied must be a number and specifies the
-;;; ttl to use for checking if the cache is up to date. If no number
-;;; is specified, the ttl value used to store the data in cache is used.
+;;; Valid values for the uri parameter are uri objects, http-client
+;;; requests or a simple uri in a string. (The value will be passed
+;;; directly to with-input-from-request from the http-client egg.)
 ;;;
-;;; Valid values for the uri parameter are uri:s and http-client requests.
-;;; (The value will be passed directly to with-input-from-request from
-;;; the http-client egg.)
-(define (via-cache uri . rest)
-  (let-optionals rest ((ttl #f))
-    (let* ((cleartext-uri (->string/uri uri))
-           (data (network:delay-download uri))
-           (key (network:uri->key cleartext-uri))
-           (ttl (if (number? ttl) ttl #f)))
-      (cond
-       ((not (*cfg* 'preferences 'use-cache))
-        (force data))
-       ((network:get-entry key ttl))
-       (else
-        ;; XXX: TTL should actually be derived from the relevant HTTP headers,
-        ;; if they exist...
-        (network:store key ttl (force data)))))))
+;;; ttl is the number of seconds a cached object is considered up to data
+;;; to use when storing it, which is later used for subsequent checks if
+;;; the object is up-to-date.
+(define (network:cache-controller uri reader ttl)
+  (let* ((download (network:delay-download uri))
+         (key (network:uri->key (->string/uri uri)))
+         (ttl (cond
+               ((not ttl) -1)
+               ((number? ttl) ttl)
+               (else (*cfg* 'preferences 'cache-default-ttl))))
+         (data (cond
+                ((not (*cfg* 'preferences 'use-cache))
+                 (force download))
+                ((network:get-entry key))
+                (else
+                 ;; XXX: TTL should actually be derived from the
+                 ;; relevant HTTP headers, if they exist...
+                 (network:store key ttl (force download))))))
+    (and (string? data)
+         (with-input-from-string data reader))))
+
+(define (download uri #!key (ttl #t) (reader read-string))
+  (let ((value (network:cache-controller uri reader ttl)))
+    (if value
+        value
+        (begin
+          (stderr "The cache controller somehow failed.")
+          #f))))
