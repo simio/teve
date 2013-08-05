@@ -25,7 +25,7 @@
                           (set! talk-prints-debug-messages #t)
                           (debug "Verbose mode."))
         (args:make-option (o) (required: "filename")
-                          "Output filename"
+                          "Set output filename"
                           (*cfg* set: arg 'operators 'output-filename)
                           (debug (conc
                                   "Saving to \""
