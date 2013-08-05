@@ -38,7 +38,7 @@
                         (read-char)))))))
 
 (define (svt:swf-player-in url)
-  (and-let* ((swf (with-input-from-string (download url)
+  (and-let* ((swf (with-input-from-string (fetch url)
                     find-first-quoted-swf)))
     (conc "http://www.svtplay.se" swf)))
 
@@ -89,7 +89,7 @@
 ;;; downloaded from the supplied url, or return #f.
 (define (svt:json-url->videos path)
   (and-let* ((uri (uri-reference path))
-             (json-data (download path #:reader json-read->alist-tree))
+             (json-data (fetch path #:reader json-read->alist-tree))
              (references (json-ref json-data "video" "videoReferences")))
     (let* ((base-path (uri->base-path path))
            (subtitles (json-ref json-data "video" "subtitleReferences" 0 "url"))
@@ -127,7 +127,7 @@
 ;;; Return a JSON url extracted from an embedded svtplay video, or
 ;;; return #f.
 (define (svt:embedded-player->json-url url)
-  (and-let* ((source (download url))
+  (and-let* ((source (fetch url))
              (value (first-html-attribute "data-json-href" source)))
     (string-replace-every "&amp;" "&" (uri-decode-string value))))
 

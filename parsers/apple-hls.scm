@@ -47,7 +47,7 @@
                               streams))))))
 
 (define (hls-master->streams playlist-url)
-  (let ((playlist (download (make-emo-request playlist-url))))
+  (let ((playlist (fetch (make-emo-request playlist-url))))
     (if (not (and (string? playlist)
                   (string-contains playlist (string #\newline))))
         #f

@@ -118,7 +118,7 @@
     (and (string? data)
          (with-input-from-string data reader))))
 
-(define (download uri #!key (ttl #t) (reader read-string))
+(define (fetch uri #!key (ttl #t) (reader read-string))
   (let ((value (network:cache-controller uri reader ttl)))
     (if value
         value
