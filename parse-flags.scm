@@ -20,7 +20,7 @@
                           "Download stream (default or specified with -i)"
                           (*cfg* set: #t 'operators 'download?))
         (args:make-option (v) #:none "Be verbose"
-                          (set! talk-prints-debug-messages #t)
+                          (print-debug-messages? #t)
                           (debug "Verbose mode."))
         (args:make-option (o) (required: "filename")
                           "Set output filename"

@@ -16,12 +16,14 @@
 (define program-display-name "teve")
 (define program-version "0.2.2")
 
+
 ;; Keep this here to avoid reimporting uri-common stuff
 (include "intarweb-hack.scm")	; loads uri-common; don't load it elsewhere
 
 (include "platform.scm")
 
-(include "talk-is-cheap.scm")
+(include "hello.scm")
+(import hello)
 (include "misc-helpers.scm")
 
 (include "dot-locking.scm")

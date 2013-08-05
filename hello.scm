@@ -1,4 +1,4 @@
-#| Copyright (c) 2012 Jesper Raftegard <jesper@huggpunkt.org>
+#| Copyright (c) 2012, 2013 Jesper Raftegard <jesper@huggpunkt.org>
  | 
  | Permission to use, copy, modify, and distribute this software for any
  | purpose with or without fee is hereby granted, provided that the above
@@ -13,9 +13,16 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(use srfi-1)
+(module hello *
+(import scheme chicken data-structures srfi-1 extras)
 
-(define talk-prints-debug-messages #f)
+(define print-debug-messages?
+  (let ((print-them #f))
+    (lambda args
+      (if (< 0 (length args))
+          (set! print-them (car args)))
+      print-them)))
+
 (define current-debug-port (current-error-port))
 
 ;;; Print stuff. If stuff consists entirely of strings, numbers and chars,
@@ -51,7 +58,7 @@
 (define-syntax debug-is-cheap
   (syntax-rules (nl: prepend: mapper:)
     ((debug-is-cheap nl: newline prepend: prepend mapper: mapper stuff ...)
-     (if talk-prints-debug-messages
+     (if print-debug-messages?
          (talk-is-cheap current-debug-port
                         (conc prepend ": ")
                         (if newline #\newline "")	; append
@@ -98,3 +105,4 @@
     ((debug* stuff ...)
      (debug-is-cheap nl: #f stuff ...))))
 
+)
