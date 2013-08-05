@@ -123,5 +123,5 @@
     (if value
         value
         (begin
-          (stderr "The cache controller somehow failed.")
+          (stderr "The cache controller somehow failed for " uri)
           #f))))
