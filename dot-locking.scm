@@ -31,8 +31,6 @@
 
 (use posix extras srfi-18 files)
 
-(include "talk-is-cheap.scm")
-
 (define (dotlock:file->lock file)
   (let ((path (conc file ".lock")))
     (normalize-pathname

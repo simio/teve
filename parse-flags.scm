@@ -15,8 +15,6 @@
 
 (require-extension args)
 
-(include "talk-is-cheap.scm")
-
 (define opts
   (list (args:make-option (d) #:none
                           "Download stream (default or specified with -i)"
