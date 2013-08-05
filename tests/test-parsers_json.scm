@@ -114,12 +114,12 @@
      ("title" . "30/9 21:00")
      ("popoutUrl" . "/video/324252/30-9-21-00?type=embed"))))
 
-;; json-read (from json egg), sanitise-json-input and json-read-and-sanitise
+;; json-read (from json egg), sanitise-json-input and json-read->alist-tree
 (check (with-input-from-string raw-json json-read) => unsanitised-json)
 (check (sanitise-json-input unsanitised-json) => sanitised-json)
 (check (sanitise-json-input #f) => #f)
-(check (with-input-from-string raw-json json-read-and-sanitise) => sanitised-json)
-(check (with-input-from-string "blabla" json-read-and-sanitise) => #f)
+(check (with-input-from-string raw-json json-read->alist-tree) => sanitised-json)
+(check (with-input-from-string "blabla" json-read->alist-tree) => #f)
 
 ;; json-ref (and quick-ref, since they're the same lambda)
 (check (json-ref sanitised-json "context" "title") => "30/9 21:00")

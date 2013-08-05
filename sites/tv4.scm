@@ -99,7 +99,7 @@
                                                    #\'))
              (flash-vars (with-input-from-string
                              raw-flash-vars
-                           json-read-and-sanitise))
+                           json-read->alist-tree))
              (raw-video-id (cdip (assoc "vid" flash-vars)))
              (video-id (string->number raw-video-id)))
     (tv4:video-id->xml-url video-id)))
