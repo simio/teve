@@ -58,7 +58,7 @@
 (define-syntax debug-is-cheap
   (syntax-rules (nl: prepend: mapper:)
     ((debug-is-cheap nl: newline prepend: prepend mapper: mapper stuff ...)
-     (if print-debug-messages?
+     (if (print-debug-messages?)
          (talk-is-cheap current-debug-port
                         (conc prepend ": ")
                         (if newline #\newline "")	; append
