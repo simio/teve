@@ -15,12 +15,37 @@
 
 (require-extension args)
 
+(args:width 20)
+
 (define opts
   (list (args:make-option (d) #:none
                           "Download stream (default or specified with -i)"
                           (*cfg* set: #t 'operators 'download?))
         (args:make-option (v) #:none "Be verbose"
                           (print-debug-messages? #t))
+        (args:make-option (c) (optional: "type")
+                          (conc "Machine-readable output. "
+                                "Different formats are available:" #\newline
+                                (make-string 21 #\space)
+                                " -c, -cs         Scheme data" #\newline
+                                (make-string 21 #\space)
+                                " -cj             JSON")
+                          ;; Set default to s
+                          (let ((format (if (string? arg)
+                                            (string->symbol arg)
+                                            's)))
+                            (case format
+                              ((s)
+                               (*cfg* set: 'scheme 'operators 'machine-output))
+                              ((j)
+                               (*cfg* set: 'json 'operators 'machine-output))
+                              ((t)
+                               (*cfg* set: 'grep 'operators 'machine-output))
+                              (else
+                               (stderr "Unknown stdout output format: " arg)
+                               (exit 1)))
+                            (debug "stdout set to "
+                                   (*cfg* 'operators 'machine-output) format)))
         (args:make-option (o) (required: "filename")
                           "Set output filename"
                           (*cfg* set: arg 'operators 'output-filename)

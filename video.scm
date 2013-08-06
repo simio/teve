@@ -17,6 +17,9 @@
 
 (include "misc-helpers.scm")
 
+(include "printers/scheme.scm")
+(include "printers/json.scm")
+
 ;;; Stream/video makers, accessors and updaters
 ;;; An object is a valid video iff it is a list where every item is a stream.
 ;;; An object is a valid stream iff it is an alist and the car of every
@@ -114,14 +117,18 @@
                                   (cdar rest) #\newline))))))
 
 (define (video-printer video)
-  (let print-streams ((rest video)
-                      (output '())
-                      (id 0))
-    (if (null? rest)
-        (apply conc (reverse output))
-        (print-streams (cdr rest)
-                       (fold cons output
-                             (list
-                              (string-pad-right "stream id:" 22) id #\newline
-                              (stream-printer (car rest)) #\newline))
-                       (+ 1 id)))))
+  (case (*cfg* 'operators 'machine-output)
+    ((scheme) (scheme-printer video))
+    ((json) (json-printer video))
+    (else
+     (let print-streams ((rest video)
+                         (output '())
+                         (id 0))
+       (if (null? rest)
+           (apply conc (reverse output))
+           (print-streams (cdr rest)
+                          (fold cons output
+                                (list
+                                 (string-pad-right "stream id:" 22) id #\newline
+                                 (stream-printer (car rest)) #\newline))
+                          (+ 1 id)))))))
