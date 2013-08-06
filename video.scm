@@ -100,6 +100,8 @@
 
 (define video-length length)
 
+(define video-join join)
+
 ;;; (pretty)-printers
 (define (stream-printer stream)
   (let print-values ((rest stream)
