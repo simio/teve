@@ -26,7 +26,8 @@
                           (*cfg* set: arg 'operators 'output-filename)
                           (debug (conc
                                   "Saving to \""
-                                  (*cfg* 'operators 'output-filename "\""))))
+                                  (*cfg* 'operators 'output-filename)
+                                  "\"")))
 ;;        (args:make-option (p) #:none
 ;;                          (conc "Play stream (default or specified with -i)")
 ;;                          (*cfg* set: #t 'operators 'play?))
