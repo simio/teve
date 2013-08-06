@@ -13,6 +13,8 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
+(use srfi-69)
+
 (require-extension json miscmacros)
 
 (include "misc-helpers.scm")
@@ -25,6 +27,33 @@
                            (sanitise-json-input (cdr obj))))
         ((vector? obj) (sanitise-json-input (vector->list obj)))
         (else obj)))
+
+;; Reverse the above
+(define (unsanitise-json-input obj #!optional (first-car #t))
+  (let ((unsanitise-pair (lambda (x)
+                           (cons (if (symbol? (car x))
+                                     (symbol->string (car x))
+                                     (car x))
+                                 (unsanitise-json-input (cdr x))))))
+    (cond ((null? obj) obj)
+          ((symbol? obj) (symbol->string obj))
+          ;; Convert alists to hash-tables
+          ((and (list? obj)
+                (not (null? obj))
+                (every (lambda (x) (and (pair? x) (not (list? (cdr x)))))
+                       obj))
+           (let ((lis (cons (unsanitise-json-input (car obj) #t)
+                            (unsanitise-json-input (cdr obj) #f))))
+             (if first-car
+                 (alist->hash-table lis)
+                 lis)))
+          ;; Walk down any lists that are not alists
+          ((pair? obj)
+           (cons (unsanitise-json-input (car obj))
+                 (unsanitise-json-input (cdr obj))))
+          (else obj))))
+          
+          
 
 ;;; Read with json-read and sanitise with sanitise-json-input
 (define (json-read->alist-tree)

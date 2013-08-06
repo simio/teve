@@ -73,11 +73,14 @@
                 ;; The list action is supposed to use 'stream-id rather than
                 ;; 'id, since it is acting directly on CLI parameters, rather
                 ;; than the automatically preferred or user specified stream.
-                (if (number? (*cfg* 'operators 'stream-id))
-                    (stderr* (stream-printer (video-ref
-                                              (*cfg* 'operators 'stream-id)
-                                              video)))
-                    (stderr* (video-printer video))))
+                (let ((data (if (number? (*cfg* 'operators 'stream-id))
+                                (stream-printer
+                                 (video-ref (*cfg* 'operators 'stream-id)
+                                            video))
+                                (video-printer video))))
+                  (if (*cfg* 'operators 'machine-output)
+                      (stdout* data)
+                      (stderr* data))))
                ((equal? action 'play)
                 (if (and (number? id)
                          (<= 0 id (length video)))

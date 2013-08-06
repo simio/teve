@@ -15,7 +15,9 @@
 
 (require-extension json)
 
+(include "parsers/json.scm")
+
 (define (json-printer data)
   (with-output-to-string
     (lambda ()
-      (json-write data))))
+      (json-write (unsanitise-json-input data)))))
