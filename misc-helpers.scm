@@ -232,7 +232,7 @@
         (make-rnd-string (- len 1) (conc char appendix)))))
 
 (define (shell-escape str)
-  (let ((special-chars (string->list "&|$\"'\\()[]{}<>#~=;,*")))
+  (let ((special-chars (string->list " &|$\"'\\()[]{}<>#~=;,*")))
     (let escape ((rest (string->list str))
                  (result '()))
       (cond
