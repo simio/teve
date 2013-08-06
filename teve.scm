@@ -107,7 +107,7 @@
                             "." #\newline
                             "Please verify that this stream-id exists for the "
                             "specified url, by checking the" #\newline
-                            "output of '" (*platform* program-filename)
+                            "output of '" (*platform* 'program-filename)
                             " -l " url "'")))
                ((equal? action 'download)
                 (if (and (number? id)
@@ -123,7 +123,7 @@
                             "." #\newline
                             "Please verify that this stream-id exists for the "
                             "specified url, by checking the" #\newline
-                            "output of '" (*platform* program-filename)
+                            "output of '" (*platform* 'program-filename)
                             " -l " url "'")))
                (else
                 (stderr "Pardon?"))))))))
