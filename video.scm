@@ -17,9 +17,6 @@
 
 (include "misc-helpers.scm")
 
-(include "printers/scheme.scm")
-(include "printers/json.scm")
-
 ;;; Stream/video makers, accessors and updaters
 ;;; An object is a valid video iff it is a list where every item is a stream.
 ;;; An object is a valid stream iff it is an alist and the car of every
@@ -118,7 +115,8 @@
 
 (define (video-printer video)
   (case (*cfg* 'operators 'machine-output)
-    ((scheme) (scheme-printer video))
+    ((scheme) (with-output-to-string
+                (lambda () (write video))))
     ((json) (json-printer video))
     (else
      (let print-streams ((rest video)

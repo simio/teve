@@ -61,3 +61,7 @@
 
 (define json-ref quick-ref)
 
+(define (json-printer data)
+  (with-output-to-string
+    (lambda ()
+      (json-write (unsanitise-json-input data)))))
