@@ -16,34 +16,52 @@
 (require-extension miscmacros)
 
 (include "misc-helpers.scm")
+(include "parsers/apple-hls.scm")
 (include "video.scm")
 
 (define (tv4:download-xml-data xml-base-url)
   (and-let* ((xml-base (fetch xml-base-url #:reader xml-read))
-             (xml-play (fetch (conc xml-base-url "/play") #:reader xml-read)))
+             (xml-play-hds (fetch (conc xml-base-url "/play")
+                             #:reader xml-read))
+             (xml-play-hls (fetch (conc xml-base-url "/play?protocol=hls")
+                                   #:reader xml-read)))
     (list (caddr xml-base)
-          (caddr xml-play))))
+          (caddr xml-play-hds)
+          (caddr xml-play-hls))))
 
-(define (tv4:xml-item->stream data)
+(define (tv4:xml-item->streams data)
   (and-let* ((url-form (sxml-ref data 'base))
              (url (sxml-ref data 'url))
              (scheme (or (sxml-ref data 'scheme)
                          (url->protocol (sxml-ref data 'url))))
              (mediaformat (sxml-ref data 'mediaFormat))
              (is-media-stream? (not (string=? "smi" mediaformat)))
-             (bitrate (string->number (sxml-ref data 'bitrate))))
+             (bitrate (string->number (sxml-ref data 'bitrate)))
+             (add-hls-values (lambda (stream)
+                               (update-stream
+                                stream
+                                (make-stream-value 'stream-type 'hls)
+                                (make-stream-value 'ffmpeg-parameters
+                                                   "-absf aac_adtstoasc")
+                                (make-stream-value 'url url)))))
     (cond
      ((string=? mediaformat "flv")
       ;; Was/is this the correct value? Are there even any rtmp streams
       ;; left at TV4 Play?
-      (make-stream (make-stream-value 'stream-type 'rtmp)
-                   (make-stream-value 'url url-form)
-                   (make-stream-value 'swf-path url)
-                   (make-stream-value 'bitrate bitrate)))
-     ((string=? mediaformat "mp4")
-      (make-stream (make-stream-value 'stream-type 'hds)
-                   (make-stream-value 'url url)
-                   (make-stream-value 'bitrate bitrate)))
+      (list
+       (make-stream (make-stream-value 'stream-type 'rtmp)
+                    (make-stream-value 'url url-form)
+                    (make-stream-value 'swf-path url)
+                    (make-stream-value 'bitrate bitrate))))
+     ((and (string=? mediaformat "mp4")
+           (string-suffix? ".m3u8" url-form))
+      (map add-hls-values (hls-master->streams url)))
+     ((and (string=? mediaformat "mp4")
+           (string-suffix? ".f4m" url-form))
+      (list
+       (make-stream (make-stream-value 'stream-type 'hds)
+                    (make-stream-value 'url url)
+                    (make-stream-value 'bitrate bitrate))))
      (else #f))))
 
 (define (tv4:xml-items->subtitles-url data)
@@ -57,26 +75,36 @@
     (tv4:xml-items->subtitles-url (cdr data)))))
 
 (define (tv4:xml-data->video data)
-  (and-let* ((xml-items (sxml-ref/proper data 'playback 'items)))
-    (let* ((subtitles (tv4:xml-items->subtitles-url xml-items))
-           (is-live (string=? "true" (sxml-ref data 'playback 'live)))
-           (video-id (sxml-ref data 'playback '@ 'assetId))
-           (suggest-filename (lambda ()
-                               (if* (sxml-ref data 'playback 'title)
-                                    it
-                                    (conc "tv4-video-" video-id))))
-           (swf-player "http://www.tv4play.se/flash/tv4playflashlets.swf"))
-      (streams->video
-       (map (lambda (stream)
-              (update-stream stream
-                             (if subtitles
-                                 (make-stream-value 'subtitles subtitles))
-                             (make-stream-value 'live is-live)
-                             (make-stream-value 'default-filename
-                                                (suggest-filename))
-                             (if (eq? 'rtmp (stream-ref 'stream-type stream))
-                                 (make-stream-value 'swf-player swf-player))))
-            (filter-map tv4:xml-item->stream xml-items))))))
+  (and-let* ((playback-items (filter-map (lambda (x)
+                                           (if (equal? (caip x) 'playback)
+                                               x
+                                               #f))
+                                         data)))
+    (video-join (filter-map
+     (lambda (playback-item)
+       (and-let* ((xml-items (sxml-ref/proper playback-item 'items)))
+         (let* ((subtitles (tv4:xml-items->subtitles-url xml-items))
+                (is-live (string=? "true" (sxml-ref data 'playback 'live)))
+                (video-id (sxml-ref data 'playback '@ 'assetId))
+                (suggest-filename (lambda ()
+                                    (if* (sxml-ref data 'playback 'title)
+                                         it
+                                         (conc "tv4-video-" video-id))))
+                (swf-player "http://www.tv4play.se/flash/tv4playflashlets.swf"))
+           (streams->video
+            (map (lambda (stream)
+                   (update-stream stream
+                                  (if subtitles
+                                      (make-stream-value 'subtitles subtitles))
+                                  (make-stream-value 'live is-live)
+                                  (make-stream-value 'default-filename
+                                                     (suggest-filename))
+                                  (if (eq? 'rtmp
+                                           (stream-ref 'stream-type stream))
+                                      (make-stream-value 'swf-player
+                                                         swf-player))))
+                 (join (filter-map tv4:xml-item->streams xml-items)))))))
+     playback-items))))
 
 (define (tv4:xml-url->video xml-url)
   (and-let* ((data (tv4:download-xml-data xml-url)))
