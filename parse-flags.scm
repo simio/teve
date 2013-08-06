@@ -45,6 +45,10 @@
    (args:make-option (d) #:none
                      "Download stream (default or specified with -i)"
                      (*cfg* set: #t 'operators 'download?))
+   (args:make-option (e) #:none
+                     "Enter REPL for each video."
+                     (*cfg* set: #t 'operators 'repl?)
+                     (debug "Going for the REPL."))
    (args:make-option (h) #:none "Display this text" (usage))
    (args:make-option (i) (required: "id") "Stream #id to use"
                      (*cfg* set: (string->number arg)

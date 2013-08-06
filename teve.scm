@@ -36,10 +36,11 @@
 (include "select-stream.scm")
 (include "download.scm")
 
-(define (select-action default play? download? list?)
+(define (select-action default play? download? list? repl?)
   (debug* "Performing ")
   (debug
    (cond
+    (repl? 'repl)
     ((and play? download? (not list?)) 'tee)
     ((and play? (not list?) (not download?)) 'play)
     ((and download? (not list?) (not play?)) 'download)
@@ -62,11 +63,24 @@
                             (*cfg* 'preferences 'default-action)
                             (*cfg* 'operators 'play?)
                             (*cfg* 'operators 'download?)
-                            (*cfg* 'operators 'list?)))
+                            (*cfg* 'operators 'list?)
+                            (*cfg* 'operators 'repl?)))
                    (id (if* (*cfg* 'operators 'stream-id)
                             it
                             (video->best-stream-id video))))
               (cond
+               ((equal? action 'repl)
+                (stderr program-display-name " " program-version)
+                (set! *preferred-id* id)
+                (set! *video* video)
+                (set! *videos* videos)
+                (set! *uri* url)
+                (stderr " *uri*           " *uri*)
+                (stderr " *videos*        " (length *videos*))
+                (stderr " *video*         " (length *video*))
+                (stderr " *preferred-id*  " *preferred-id*)
+                (stderr "REPL READY.")
+                (repl))
                ((equal? action 'tee)
                 (stderr "Error: Teeing is not yet implemented."))
                ((equal? action 'list)
