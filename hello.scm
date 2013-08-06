@@ -20,7 +20,13 @@
   (let ((print-them #f))
     (lambda args
       (if (< 0 (length args))
-          (set! print-them (car args)))
+          (begin
+            (set! print-them (car args))
+            (if (car args)
+                (display (conc "Verbose mode enabled." #\newline)
+                         (current-error-port))
+                (display (conc "Verbose mode disabled." #\newline)
+                         (current-error-port)))))
       print-them)))
 
 (define current-debug-port (current-error-port))
