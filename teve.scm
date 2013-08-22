@@ -21,8 +21,8 @@
 
 (include "platform.scm")
 
-(include "hello.scm")
-(import hello)
+(include "stdinerr.scm")
+(import stdinerr)
 
 (include "misc-helpers.scm")
 

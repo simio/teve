@@ -13,7 +13,7 @@
  | OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  |#
 
-(module hello *
+(module stdinerr *
 (import scheme chicken data-structures srfi-1 extras)
 
 (define print-debug-messages?
