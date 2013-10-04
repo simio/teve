@@ -1,6 +1,8 @@
 teve
 *.swp
 *.core
+*.so
+*.import.scm
 deploy
 
 # Licensing?
