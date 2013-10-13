@@ -21,7 +21,7 @@
 
 (include "platform.scm")
 
-(load "stdinerr")
+(include "stdinerr")
 (import stdinerr)
 
 (include "misc-helpers.scm")
