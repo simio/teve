@@ -230,18 +230,6 @@
         appendix
         (make-rnd-string (- len 1) (conc char appendix)))))
 
-(define (shell-escape str)
-  (let ((special-chars (string->list " &|$\"'\\()[]{}<>#~=;,*")))
-    (let escape ((rest (string->list str))
-                 (result '()))
-      (cond
-       ((null? rest)
-        (list->string (reverse result)))
-       ((member (car rest) special-chars)
-        (escape (cdr rest) (cons (car rest) (cons #\\ result))))
-       (else
-        (escape (cdr rest) (cons (car rest) result)))))))
-
 ;;; s/needle/replacement/g
 (define (string-replace-every needle replacement string)
   (let loop ((rest string)
