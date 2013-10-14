@@ -40,7 +40,7 @@
 (define (stream->ffmpeg/make-command stream outfile)
   (conc (*cfg* 'external-programs 'ffmpeg)
         " -i " (shell-escape (stream-ref 'url stream))
-        " -acodec copy -vcodec copy"
+        " -codec copy"
         (if* (stream-ref 'ffmpeg-parameters stream)
              (conc " " it)
              "")

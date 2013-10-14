@@ -111,7 +111,7 @@
                                 (make-stream-value 'live is-live)
                                 (if (eq? 'hls (stream-ref 'stream-type stream))
                                     (make-stream-value 'ffmpeg-parameters
-                                                       "-absf aac_adtstoasc"))
+                                                       "-bsf:a aac_adtstoasc"))
                                 (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                     (make-stream-value 'swf-player
                                                        (force swf-player)))))))
