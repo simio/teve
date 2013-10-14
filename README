@@ -28,7 +28,8 @@ Or if you prefer to see what you're installing:
     intarweb srfi-37 json http-client vector-lib packrat ...
     # chicken-install $(make print-eggs)
 
-If chicken-install fails to build some egg, see 7. TROUBLESHOOTING below.
+If chicken-install fails to build some egg, and there is no solution
+listed in section 7. TROUBLESHOOTING below, please send a bug report.
 
 teve currently invokes other programs to download streams.
 
@@ -42,11 +43,12 @@ teve currently invokes other programs to download streams.
   mplayer       For mms and rtsp downloads (old streams at SVT Play)
 
 These tools must be present in your $PATH, or teve won't find them (or
-see CONFIGURATION below).
+see section 6. CONFIGURATION below).
 
 2. WINDOWS
 
-Windows support is considered experimental. Please refer to the wiki:
+Windows support is considered experimental. Please refer to the GitHub
+wiki for more information:
 
     https://github.com/simio/teve/wiki/Windows-support
 
@@ -74,6 +76,7 @@ The default PREFIX is /usr/opt, which puts the binary in /usr/opt/bin.
 If you don't like binaries, you may run teve as a script:
 
     $ csi -s teve.scm -h
+
 
 4. TESTING
 
