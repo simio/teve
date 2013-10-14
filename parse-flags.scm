@@ -14,17 +14,15 @@
 
 (require-extension args)
 
-(args:width 20)
+(args:width 14)
 
 (define opts
   (list
    (args:make-option (c) (optional: "type")
-                     (conc "Machine-readable output. "
-                           "Different types are available:" #\newline
-                           (make-string 21 #\space)
-                           " s  Scheme data [default]" #\newline
-                           (make-string 21 #\space)
-                           " j  JSON")
+                     (conc "Machine-readable output." #\newline
+                           (make-string 15 #\space) "Different types are available:" #\newline
+                           (make-string 17 #\space) "s  Scheme data [default]" #\newline
+                           (make-string 17 #\space) "j  JSON")
                      ;; Set default to s
                      (let ((format (if (string? arg)
                                        (string->symbol arg)
