@@ -44,8 +44,14 @@ teve currently invokes other programs to download streams.
 These tools must be present in your $PATH, or teve won't find them (or
 see CONFIGURATION below).
 
+2. WINDOWS
 
-2. BUILDING
+Windows support is considered experimental. Please refer to the wiki:
+
+    https://github.com/simio/teve/wiki/Windows-support
+
+
+3. BUILDING
 
 Just 'make' to get a binary, and then run it:
 
@@ -69,8 +75,7 @@ If you don't like binaries, you may run teve as a script:
 
     $ csi -s teve.scm -h
 
-
-3. TESTING
+4. TESTING
 
 The tests are contained in tests/. They use the srfi-78 egg, so you
 will need to install that before running the tests:
@@ -80,7 +85,7 @@ will need to install that before running the tests:
 To run all tests in a batch, just 'make check'.
 
 
-4. USAGE
+5. USAGE
 
 The simplest use case is downloading a video:
 
@@ -122,7 +127,7 @@ If the configuration value "default-action" is set to "download",
 which is the default, the -d parameter above may be omitted.
 
 
-5. CONFIGURATION
+6. CONFIGURATION
 
 The built-in default configuration values may be overridden in
 configuration files. The configuration with which teve is run is
@@ -145,7 +150,7 @@ teve.conf.dist for a list of all configurable values, and their
 corresponding environment variables.
 
 
-6. SUPPORTED SITES
+7. SUPPORTED SITES
 
 As of version 0.2, the following sites are supported:
 
@@ -154,7 +159,7 @@ As of version 0.2, the following sites are supported:
   tv4play.se
 
 
-7. TROUBLESHOOTING
+8. TROUBLESHOOTING
 
  P: chicken-install fails to build the openssl egg.
  S: Make sure you have the OpenSSL libs and header files installed.
@@ -165,7 +170,7 @@ As of version 0.2, the following sites are supported:
                 make install-eggs
 
 
-8. CONTACT
+9. CONTACT
 
 Direct any questions to either the (Swedish) bb at planka.huggpunkt.org
 or directly to jesper at huggpunkt.org.
