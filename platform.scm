@@ -12,15 +12,15 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-1 data-structures files posix)
+(use srfi-1 data-structures files)
 
 (require-extension miscmacros)
 
 (define (make-platform)
   (let* ((program-filename (let ((actual (pathname-file (program-name))))
                              (if (equal? "csi" actual) "teve" actual)))
-         (home-dir (cadddr (cddr (user-information (current-user-id)))))
-         (user-data-dir (conc home-dir "/." program-filename))
+         (home-dir (get-environment-variable "HOME"))
+	 (user-data-dir (conc home-dir "/." program-filename))
          (system-config-file (if* (file-exists?
                                    (conc "/etc/" program-filename ".conf"))
                                   it
