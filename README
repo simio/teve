@@ -8,12 +8,13 @@ useless due to changes to svtplay.se.
 
 1. REQUIREMENTS
 
-Chicken Scheme is required to run and compile, preferably 4.8 or later.
-If your package manager does not contain Chicken, or contains only an
-outdated version, building it from source is mind-numbingly simple on
-most platforms.
+Chicken Scheme is required to run and compile teve, preferably Chicken
+version 4.8 or later. If your package manager does not provide Chicken,
+or provides only an outdated version, building Chicken from source is
+mind-numbingly simple on most platforms.
 
-The source code is available from the Chicken home page:
+The Chicken source code and pre-compiled binaries are available from the
+Chicken home page:
 
     http://code.call-cc.org/
 
@@ -21,7 +22,7 @@ After installing Chicken, you'll also need to install a few eggs:
 
     # make install-eggs
 
-Or if you'd like to see what you're installing:
+Or if you prefer to see what you're installing:
 
     # make print-eggs
     intarweb srfi-37 json http-client vector-lib packrat ...
@@ -29,7 +30,7 @@ Or if you'd like to see what you're installing:
 
 If chicken-install fails to build some egg, see 7. TROUBLESHOOTING below.
 
-teve currently uses other programs to download streams.
+teve currently invokes other programs to download streams.
 
   ffmpeg        For Apple HLS streams (SVT Play, Öppet arkiv)
   rtmpdump      For rtmp/rtmpe streams (old streams at SVT & TV4 Play)
@@ -40,8 +41,8 @@ teve currently uses other programs to download streams.
   curl          For ordinary HTTP downloads (SVT Play)
   mplayer       For mms and rtsp downloads (old streams at SVT Play)
 
-These tools must be in your $PATH, or teve won't find them (or see
-CONFIGURATION below).
+These tools must be present in your $PATH, or teve won't find them (or
+see CONFIGURATION below).
 
 
 2. BUILDING
@@ -123,25 +124,25 @@ which is the default, the -d parameter above may be omitted.
 
 5. CONFIGURATION
 
-The builtin default configuration values may be overridden in
-configuration files. The configuration under which teve is run is
-decided in the following order:
+The built-in default configuration values may be overridden in
+configuration files. The configuration with which teve is run is
+loaded in a cascading manner:
 
-  1. The builtin defaults are loaded.
-  2. If /etc/teve.conf is present, any values present in this file are
+  1. The built-in defaults are loaded first.
+  2. If /etc/teve.conf is present, any values set in this file are
      loaded. New values are added to the configuration, while already
-     present are replaced from this file.
-  3. If $HOME/.teverc is present, it is parsed and used as
+     present are replaced with the ones from this file.
+  3. If $HOME/.teverc is present, it is parsed and loaded as
      /etc/teve.conf above. You can specify an alternate location to
      look for this file by setting the TEVE_RC environment variable.
-  4. Any environment variables set are parsed, replacing or adding to
-     the configuration.
-  5. The command line parameters are parsed, overriding any previously
-     set configuration variables.
+  4. After the above files have been read, any environment variables set
+     are parsed, replacing or adding to the configuration.
+  5. The command line parameters are parsed last, overriding any
+     previously set configuration variables.
 
-The configuration files are parsed as standard ini files.
-See teve.conf.dist for a list of all configurable values,
-and their corresponding environment variables.
+The configuration files are parsed as standard ini files. See
+teve.conf.dist for a list of all configurable values, and their
+corresponding environment variables.
 
 
 6. SUPPORTED SITES
@@ -157,8 +158,8 @@ As of version 0.2, the following sites are supported:
 
  P: chicken-install fails to build the openssl egg.
  S: Make sure you have the OpenSSL libs and header files installed.
-    If they have been stashed away in some obscure places, you may
-    need to pass their locations to the compiler and linker:
+    If they have been stashed away into some obscure directory, you
+	may need to pass their locations to the compiler and linker:
 
       # env CSC_OPTIONS='-I /foo/include/openssl -L /foo/lib' \
                 make install-eggs
