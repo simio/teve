@@ -1,6 +1,7 @@
 teve
 *.swp
 *.core
+*.exe
 *.so
 *.import.scm
 deploy
