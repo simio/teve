@@ -12,6 +12,8 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+(use srfi-13)
+
 (require-extension miscmacros sha2 message-digest)
 
 (include "platform")
@@ -117,10 +119,11 @@
     (and (string? data)
          (with-input-from-string data reader))))
 
-(define (fetch uri #!key (ttl #t) (reader read-string))
-  (let ((value (network:cache-controller uri reader ttl)))
-    (if value
-        value
+(define (fetch u #!key (ttl #t) (reader read-string))
+  (let* ((uri (if (and (string? u) (string-contains (uri->base-path u) "akamaihd.net"))
+                  (make-emo-request u)
+                  u)))
+    (or (network:cache-controller uri reader ttl)
         (begin
           (stderr "The cache controller somehow failed for " (->string/uri uri))
           #f))))
