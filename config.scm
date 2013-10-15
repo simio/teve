@@ -34,67 +34,48 @@
 ;;;   (cfg 'branch 'leaf)		=> 5	; it's now set
 (define make-configuration
   (lambda sources
-    (let* ((default-configuration '((operators
-                                     (play? . #f)
-                                     (download? . #f)
-                                     (list? . #f)
-                                     (stream-id . #f)
-                                     (video-id . #f)
-                                     (output-filename . #f))
-                                    (external-programs
-                                     (rtmpdump . "rtmpdump")
-                                     (ffmpeg . "ffmpeg")
-                                     (mplayer . "mplayer")
-                                     (curl . "curl")
-                                     (php . "php")
-                                     (adobehds.php . "AdobeHDS.php"))
-                                    (preferences
-                                     (default-action . download)
-                                     (ideal-bitrate . 2500)
-                                     (ideal-pixel-width . 1280)
-                                     (use-cache . #t)
-                                     (cache-default-ttl . 300)
-                                     (cache-override-ttl . #f))))
-           (values (apply atree-fold-right
-                     (cons default-configuration sources))))
+    (let* ((default-configuration '((operators (play? . #f)
+                                               (download? . #f)
+                                               (list? . #f)
+                                               (stream-id . #f)
+                                               (video-id . #f)
+                                               (output-filename . #f))
+                                    (external-programs (rtmpdump . "rtmpdump")
+                                                       (ffmpeg . "ffmpeg")
+                                                       (mplayer . "mplayer")
+                                                       (curl . "curl")
+                                                       (php . "php")
+                                                       (adobehds.php . "AdobeHDS.php"))
+                                    (preferences (default-action . download)
+                                                 (ideal-bitrate . 2500)
+                                                 (ideal-pixel-width . 1280)
+                                                 (use-cache . #t)
+                                                 (cache-default-ttl . 300)
+                                                 (cache-override-ttl . #f))))
+           (values (apply atree-fold-right (cons default-configuration sources))))
       (lambda args
-        (cond
-         ((null? args) values)
-         ((equal? set: (car args))
-          (set! values (apply atree-update (cons values (cdr args))))
-          (cadr args))
-         (else
-          (apply atree-ref values args)))))))
+        (cond ((null? args) values)
+              ((equal? set: (car args))
+               (set! values (apply atree-update (cons values (cdr args))))
+               (cadr args))
+              (else
+               (apply atree-ref values args)))))))
 
 (define (env->conf env)
-  (let* ((env-to-conf-map `(("TEVE_DEFAULT_OPERATION"
-                             ,string->symbol operators default)
-                            ("RTMPDUMP"
-                             ,identity external-programs rtmpdump)
-                            ("TEVE_RTMPDUMP"
-                             ,identity external-programs rtmpdump)
-                            ("FFMPEG"
-                             ,identity external-programs ffmpeg)
-                            ("TEVE_FFMPEG"
-                             ,identity external-programs ffmpeg)
-                            ("MPLAYER"
-                             ,identity external-programs mplayer)
-                            ("TEVE_MPLAYER"
-                             ,identity external-programs mplayer)
-                            ("CURL"
-                             ,identity external-programs curl)
-                            ("TEVE_CURL"
-                             ,identity external-programs curl)
-                            ("PHP"
-                             ,identity external-programs php)
-                            ("TEVE_PHP"
-                             ,identity external-programs php)
-                            ("TEVE_ADOBEHDS_PHP"
-                             ,identity external-programs adobehds.php)
-                            ("TEVE_BITRATE"
-                             ,string->number preferences ideal-bitrate)
-                            ("TEVE_WIDTH"
-                             ,string->number preferences ideal-pixel-width)))
+  (let* ((env-to-conf-map `(("TEVE_DEFAULT_OPERATION" ,string->symbol operators default)
+                            ("RTMPDUMP" ,identity external-programs rtmpdump)
+                            ("TEVE_RTMPDUMP" ,identity external-programs rtmpdump)
+                            ("FFMPEG" ,identity external-programs ffmpeg)
+                            ("TEVE_FFMPEG" ,identity external-programs ffmpeg)
+                            ("MPLAYER" ,identity external-programs mplayer)
+                            ("TEVE_MPLAYER" ,identity external-programs mplayer)
+                            ("CURL" ,identity external-programs curl)
+                            ("TEVE_CURL" ,identity external-programs curl)
+                            ("PHP" ,identity external-programs php)
+                            ("TEVE_PHP" ,identity external-programs php)
+                            ("TEVE_ADOBEHDS_PHP" ,identity external-programs adobehds.php)
+                            ("TEVE_BITRATE" ,string->number preferences ideal-bitrate)
+                            ("TEVE_WIDTH" ,string->number preferences ideal-pixel-width)))
          (getenv (lambda (m)
                    (and-let* ((v (get-environment-variable (car m))))
                      ((cadr m) (get-environment-variable (car m))))))
@@ -105,9 +86,8 @@
        ((null? mappings) result)
        ((getenv (car mappings))
         (loop (cdr mappings)
-              (apply atree-update
-                (cons result (cons (getenv (car mappings))
-                                   (conf-path (car mappings)))))))
+              (apply atree-update (cons result (cons (getenv (car mappings))
+                                                     (conf-path (car mappings)))))))
        (else
         (loop (cdr mappings) result))))))
 
