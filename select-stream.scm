@@ -22,9 +22,8 @@
   (let* ((stream-width (if* (stream-ref 'video-width stream) it 0))
          (stream-bitrate (if* (stream-ref 'bitrate stream) it 0))
          (transport-weight-symbol (string->symbol
-                                (conc "transport-weight-"
-                                      (symbol->string
-                                       (stream-ref 'stream-type stream)))))
+                                   (conc "transport-weight-"
+                                         (symbol->string (stream-ref 'stream-type stream)))))
          (transport-weight (if* (*cfg* 'preferences transport-weight-symbol)
                                 it
                                 1)))
@@ -51,15 +50,13 @@
       ((not (stream? (car rest)))
        (calculate-distances distance-table (cdr rest) (+ 1 stream-id)))
       (else
-       (calculate-distances
-        (cons
-         (cons (stream-distance (car rest)
-                                (*cfg* 'preferences 'ideal-bitrate)
-                                (*cfg* 'preferences 'ideal-pixel-width))
-               (cons stream-id (car rest)))
-         distance-table)
-        (cdr rest)
-        (+ 1 stream-id)))))
+       (calculate-distances (cons (cons (stream-distance (car rest)
+                                                         (*cfg* 'preferences 'ideal-bitrate)
+                                                         (*cfg* 'preferences 'ideal-pixel-width))
+                                        (cons stream-id (car rest)))
+                                  distance-table)
+                            (cdr rest)
+                            (+ 1 stream-id)))))
    (lambda (a b)
      (< (car a) (car b)))))
 
