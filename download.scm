@@ -128,6 +128,25 @@
        (stream->mplayer/make-command stream filename))
       (else #f))))
 
+;;; Tries to find out whether a stream or stream-type is downloadable on
+;;; the current system, without invoking any external programs.
+;;; If the supplied value is a stream, the stream-type will be derived from it.
+;;; If the supplied value is a symbol, it is assumed to be a stream-type.
+;;; If a stream-type can be derived as above, and it seems downloadable, return #t.
+;;; Otherwise, return false.
+(define (downloadable? o)
+  (and-let* ((type (cond ((stream? o) (stream-ref 'stream-type o))
+                         ((symbol? o) o)
+                         (else #f))))
+    (case type
+      ((hds) (and (in-path? (*cfg* 'external-programs 'php))
+                  (file-exists? (*cfg* 'external-programs 'adobehds.php))))
+      ((hls) (in-path? (*cfg* 'external-programs 'ffmpeg)))
+      ((rtmp) (in-path? (*cfg* 'external-programs 'rtmpdump)))
+      ((http wmv) (in-path? (*cfg* 'external-programs 'curl)))
+      ((mms rtsp) (in-path? (*cfg* 'external-programs 'mplayer)))
+      (else #f))))
+       
 ;;; Create a temporary fifo and return it's absolute name
 (define (make-fifo extension)
   (create-temporary-file extension))

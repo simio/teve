@@ -12,7 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-1 data-structures files)
+(use srfi-1 data-structures files posix)
 
 (require-extension miscmacros)
 
@@ -22,6 +22,13 @@
     (and (string? str)
          (string-map (lambda (c) (if (char=? c needle) replacement c))
                      str))))
+
+(define (in-path? str)
+  (let*-values (((in out pid) (process (if (eq? 'windows (software-type))
+                                           (conc "where.exe " str " > NUL")
+                                           (conc "which " str " 2> /dev/null"))))
+                ((pid ok status) (process-wait pid)))
+    (= 0 status)))
 
 (define (make-platform)
   (let* ((nix/win (lambda (nix win)
