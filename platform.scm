@@ -17,10 +17,11 @@
 (require-extension miscmacros)
 
 (define (platform-dir-slashes str)
-  (and (string? str)
-       (if (eq? (software-type) 'windows)
-	   (string-replace-every "/" "\\" str)
-	   (string-replace-every "\\" "/" str))))
+  (let ((needle (if (eq? (software-type) 'windows) #\/ #\\))
+        (replacement (if (eq? (software-type) 'windows) #\\ #\/)))
+    (and (string? str)
+         (string-map (lambda (c) (if (char=? c needle) replacement c))
+                     str))))
 
 (define (make-platform)
   (let* ((nix/win (lambda (nix win)
