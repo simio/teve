@@ -72,17 +72,17 @@
         (stdout* data)
         (stderr* data))))
 
-(define (teve:play id video)
+(define (teve:play uri id video)
   (if (and (number? id) (<= 0 id (length video)))
       (let ((play-command (stream->play-command (video-ref id video))))
         (if play-command
             (system (debug play-command))
             (stderr "I don't know how to play #" id)))
       (stderr "Error: Could not find stream #" id "." #\newline
-              "Please verify that this stream-id exists for the specified url, by " #\newline
-              "checking the output of '" (*platform* 'program-filename) " -l " url "'")))
+              "Please verify that this stream-id exists for the specified uri, by " #\newline
+              "checking the output of '" (*platform* 'program-filename) " -l " uri "'")))
 
-(define (teve:download id video)
+(define (teve:download uri id video)
   (if (and (number? id) (<= 0 id (length video)))
       (let ((download-command (stream->download-command (video-ref id video)
                                                         (*cfg* 'operators 'output-filename))))
@@ -90,15 +90,15 @@
             (system (debug download-command))
             (stderr "I don't know how to download #" id)))
       (stderr "Error: Could not find stream #" id "." #\newline
-              "Please verify that this stream-id exists for the specified url, by " #\newline
-              "checking the output of '" (*platform* 'program-filename) " -l " url "'")))
+              "Please verify that this stream-id exists for the specified uri, by " #\newline
+              "checking the output of '" (*platform* 'program-filename) " -l " uri "'")))
 
 ;;; Bootstrap
 (receive (options operands)
   (args:parse (command-line-arguments) opts)
   (if (not (null? operands))
-      (let* ((url (car operands))
-             (videos (url->videos url)))
+      (let* ((uri (car operands))
+             (videos (url->videos uri)))
         (if (null? videos)
             (stderr "No videos found.")
             ;; Until multiple videos are supported, video-id is always #f,
@@ -114,9 +114,9 @@
                             it
                             (video->best-stream-id video))))
               (cond
-               ((equal? action 'repl) (teve:repl url id videos video))
-               ((equal? action 'tee) (teve:tee url id video))
+               ((equal? action 'repl) (teve:repl uri id videos video))
+               ((equal? action 'tee) (teve:tee uri id video))
                ((equal? action 'list) (teve:list video))
-               ((equal? action 'play) (teve:play id video))
-               ((equal? action 'download) (teve:download id video))
+               ((equal? action 'play) (teve:play uri id video))
+               ((equal? action 'download) (teve:download uri id video))
                (else (stderr "Pardon?"))))))))
