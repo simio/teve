@@ -33,9 +33,9 @@
 (include "sites/tv4.scm")
 
 ;;; Dispatcher
-;;; Each url->videos procedure is applied to the url. The resulting
+;;; Each uri->videos procedure is applied to the url. The resulting
 ;;; videos are appended into a video-list, which is returned.
-(define (url->videos url)
+(define (uri->videos url)
   (delete-duplicates
    (apply append
      (filter-map (lambda (u->v) (u->v (prepend-default-protocol url)))

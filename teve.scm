@@ -32,7 +32,7 @@
 (include "parse-flags.scm")     ; Should load after config.scm
 
 (include "video.scm")
-(include "url2vid.scm")
+(include "uri2vid.scm")
 (include "select-stream.scm")
 (include "download.scm")
 
@@ -98,7 +98,7 @@
   (args:parse (command-line-arguments) opts)
   (if (not (null? operands))
       (let* ((uri (car operands))
-             (videos (url->videos uri)))
+             (videos (uri->videos uri)))
         (if (null? videos)
             (stderr "No videos found.")
             ;; Until multiple videos are supported, video-id is always #f,
