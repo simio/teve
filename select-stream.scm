@@ -15,6 +15,7 @@
 (require-extension miscmacros)
 
 (include "video.scm")
+(include "download.scm")
 
 ;;; Calculate and return the distance between the supplied stream and
 ;;; the ideal size/bitrate.
@@ -47,7 +48,7 @@
                              (stream-id 0))
      (cond
       ((null? rest) distance-table)
-      ((not (stream? (car rest)))
+      ((not (downloadable? (car rest)))
        (calculate-distances distance-table (cdr rest) (+ 1 stream-id)))
       (else
        (calculate-distances (cons (cons (stream-distance (car rest)
@@ -61,7 +62,11 @@
      (< (car a) (car b)))))
 
 (define (video->best-stream video)
-  (cddar (video->stream-distance-table video)))
+  (let ((table (video->stream-distance-table video)))
+    (and (not (null? table))
+         (cddar table))))
 
 (define (video->best-stream-id video)
-  (cadar (video->stream-distance-table video)))
+  (let ((table (video->stream-distance-table video)))
+    (and (not (null? table))
+         (cadar table))))
