@@ -33,8 +33,8 @@
 
 (include "video.scm")
 (include "uri2vid.scm")
-(include "select-stream.scm")
 (include "download.scm")
+(include "select-stream.scm")
 
 (define (select-action default play? download? list? repl?)
   (debug* "Performing ")
@@ -49,17 +49,17 @@
     (else #f))))
 
 (define (teve:repl uri id videos video)
-  (let ((*preferred-id* id)
-        (*videos* videos)
-        (*video* video)
-        (*uri* uri))
-    (stderr program-display-name " " program-version)
-    (stderr " *uri*           " *uri*)
-    (stderr " *videos*        " (length *videos*))
-    (stderr " *video*         " (length *video*))
-    (stderr " *preferred-id*  " *preferred-id*)
-    (stderr "REPL READY.")
-    (repl)))
+  (set! *preferred-id* id)
+  (set! *videos* videos)
+  (set! *video* video)
+  (set! *uri* uri)
+  (stderr (conc program-display-name " " program-version))
+  (stderr (conc " *uri*           " *uri*))
+  (stderr (conc " *videos*        " (length *videos*)))
+  (stderr (conc " *video*         " (length *video*)))
+  (stderr (conc " *preferred-id*  " *preferred-id*))
+  (stderr "REPL READY.")
+  (repl))
 
 (define (teve:tee uri id video)
   (error "Teeing not yet implemented."))
@@ -78,9 +78,9 @@
         (if play-command
             (system (debug play-command))
             (stderr "I don't know how to play #" id)))
-      (stderr "Error: Could not find stream #" id "." #\newline
-              "Please verify that this stream-id exists for the specified uri, by " #\newline
-              "checking the output of '" (*platform* 'program-filename) " -l " uri "'")))
+      (stderr (conc "Error: Could not find stream #" id "." #\newline
+                    "Please verify that this stream-id exists for the specified uri, by " #\newline
+                    "checking the output of '" (*platform* 'program-filename) " -l " uri "'"))))
 
 (define (teve:download uri id video)
   (if (and (number? id) (<= 0 id (length video)))
@@ -89,9 +89,9 @@
         (if download-command
             (system (debug download-command))
             (stderr "I don't know how to download #" id)))
-      (stderr "Error: Could not find stream #" id "." #\newline
-              "Please verify that this stream-id exists for the specified uri, by " #\newline
-              "checking the output of '" (*platform* 'program-filename) " -l " uri "'")))
+      (stderr (conc "Error: Could not find stream #" id "." #\newline
+                    "Please verify that this stream-id exists for the specified uri, by " #\newline
+                    "checking the output of '" (*platform* 'program-filename) " -l " uri "'"))))
 
 ;;; Bootstrap
 (receive (options operands)
@@ -114,6 +114,8 @@
                             it
                             (video->best-stream-id video))))
               (cond
+               ((not id) (stderr (conc "Error: Video has no supported streams." #\newline
+                                       "Please verify that all external programs are available.")))
                ((equal? action 'repl) (teve:repl uri id videos video))
                ((equal? action 'tee) (teve:tee uri id video))
                ((equal? action 'list) (teve:list video))
