@@ -12,7 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-13)
+(use utils srfi-13)
 (require-extension miscmacros)
 
 (include "video.scm")
@@ -20,18 +20,18 @@
 (define (stream->curl/make-command stream outfile)
   (conc (*cfg* 'external-programs 'curl)
         " -L"
-        " -o " (shell-escape outfile)
-        " " (shell-escape (stream-ref 'url stream))))
+        " -o " (qs outfile)
+        " " (qs (stream-ref 'url stream))))
 
 (define (stream->rtmpdump/make-command stream outfile)
   (conc (*cfg* 'external-programs 'rtmpdump)
-        " -r " (shell-escape (stream-ref 'url stream))
+        " -r " (qs (stream-ref 'url stream))
         (if* (stream-ref 'swf-path stream)
-             (conc " -y" (shell-escape it))
+             (conc " -y" (qs it))
              "")
-        " -o " (shell-escape outfile)
+        " -o " (qs outfile)
         (if* (stream-ref 'swf-player stream)
-             (conc " -W " (shell-escape it))
+             (conc " -W " (qs it))
              "")
         (if (stream-ref 'live stream)
             (conc " -v")
@@ -39,31 +39,31 @@
 
 (define (stream->ffmpeg/make-command stream outfile)
   (conc (*cfg* 'external-programs 'ffmpeg)
-        " -i " (shell-escape (stream-ref 'url stream))
+        " -i " (qs (stream-ref 'url stream))
         " -codec copy"
         (if* (stream-ref 'ffmpeg-parameters stream)
              (conc " " it)
              "")
-        " " (shell-escape outfile)))
+        " " (qs outfile)))
 
 (define (stream->adobehds.php/make-command stream outfile)
   (conc (*cfg* 'external-programs 'php)
         " "
         (*cfg* 'external-programs 'adobehds.php)
         " --delete " ;; Script will clean up if not interrupted
-        " --manifest " (shell-escape (stream-ref 'url stream))
+        " --manifest " (qs (stream-ref 'url stream))
         (if* (stream-ref 'adobe.hds-parameters stream)
              (conc " " it)
              "")
-        " --outfile " (shell-escape outfile)))
+        " --outfile " (qs outfile)))
 
 (define (stream->mplayer/make-command stream outfile)
   (conc (*cfg* 'external-programs 'mplayer)
-        " -dumpstream -dumpfile " (shell-escape outfile)
+        " -dumpstream -dumpfile " (qs outfile)
         (if* (stream-ref 'mplayer-parameters stream)
              (conc " " it)
              "")
-        " " (shell-escape (stream-ref 'url stream))))
+        " " (qs (stream-ref 'url stream))))
 
 (define (extract-uri-path str)
   (let ((uri (uri-reference str)))

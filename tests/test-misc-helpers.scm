@@ -126,17 +126,6 @@
 (check (string-suffix? "()" (make-rnd-string 5 (list))) => #t)
 (check (string-length (make-rnd-string 5 (list))) => 7)
 
-;; shell-escape
-(define shell-special-chars "&|$\"'\\()[]{}<>#~=;,*")
-(define shell-normal-chars (conc "abcdefghijklmnopqrstuvwxyzåäö"
-                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ"
-                                 "0123456789_-.:!%/"))
-(check (shell-escape shell-special-chars)
-       => "\\&\\|\\$\\\"\\'\\\\\\(\\)\\[\\]\\{\\}\\<\\>\\#\\~\\=\\;\\,\\*")
-(check (shell-escape shell-normal-chars) => shell-normal-chars)
-(check/expect-error (shell-escape 'symbol))
-(check/expect-error (shell-escape (list)))
-
 ;; string-replace-every
 (check (string-replace-every "needle" "bear" "there's a needle in my box")
        => "there's a bear in my box")

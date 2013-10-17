@@ -80,17 +80,3 @@
 (define (create-user-config-dirs)
   (create-directory (*platform* 'user-data-dir) #t)
   (create-directory (*platform* 'cache-dir) #t))
-
-(define (shell-escape str)
-  (if (eq? 'windows (software-type))
-      (conc #\" str #\")
-      (let ((special-chars (string->list " &|$\"'\\()[]{}<>#~=;,*")))
-        (let escape ((rest (string->list str))
-                     (result '()))
-          (cond
-           ((null? rest)
-            (list->string (reverse result)))
-           ((member (car rest) special-chars)
-            (escape (cdr rest) (cons (car rest) (cons #\\ result))))
-           (else
-            (escape (cdr rest) (cons (car rest) result))))))))
