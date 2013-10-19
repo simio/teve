@@ -6,9 +6,6 @@ teve
 *.import.scm
 deploy
 
-# Licensing?
-AdobeHDS.php
-
 # Bad gnu!
 *~
 [#]*[#]

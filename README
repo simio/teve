@@ -36,9 +36,11 @@ teve currently invokes other programs to download streams.
   ffmpeg        For Apple HLS streams (SVT Play, �ppet arkiv)
   rtmpdump      For rtmp/rtmpe streams (old streams at SVT & TV4 Play)
   AdobeHDS.php  For HDS streams (SVT & TV4 Play, �ppet arkiv)
-                This requires a working php installation. The script
-                itself is available here:
-                https://raw.github.com/K-S-V/Scripts/master/AdobeHDS.php
+                This requires a working PHP installation. A suitable
+                version of this script is bundled with teve in the
+                gpl/ directory. To get the latest version of the
+                AdobeHDS.php script, please visit this page:
+                https://github.com/K-S-V/Scripts
   curl          For ordinary HTTP downloads (SVT Play)
   mplayer       For mms and rtsp downloads (old streams at SVT Play)
 
