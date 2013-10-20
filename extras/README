@@ -1,0 +1,28 @@
+keffmpeg is a tiny bat file, aimed at protecting windows users from the
+command line. It is included in the teve source distribution until reencoding
+functionality is implemented directly into teve.
+
+Unlike teve, keffmpeg.bat will talk to you in Swedish only.
+
+
+INSTALLATION
+
+1. Get a static ffmpeg build:
+
+     32-bit: http://ffmpeg.zeranoe.com/builds/win32/static/
+     64-bit: http://ffmpeg.zeranoe.com/builds/win64/static/
+
+   (You're looking for ffmpeg-latest-winXX-static.7z)
+
+2. Open the archive and extract the file
+
+     ffmpeg-git-HASH-win32-static\bin\ffmpeg.exe
+   
+   No other files are needed.
+
+3. Put keffmpeg.bat and ffmpeg.exe in the same directory.
+
+
+USAGE
+
+Double click keffmpeg.bat. Do as the batch file tells you.
