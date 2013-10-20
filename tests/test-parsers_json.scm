@@ -14,6 +14,10 @@
 
 (use srfi-78)
 
+(include "scheme-prelude/stdinerr")
+(include "scheme-prelude/prelude")
+(import prelude)
+
 (include "tests/global.scm")
 (include "parsers/json.scm")
 
@@ -120,7 +124,7 @@
 (check (with-input-from-string raw-json json-read->alist-tree) => sanitised-json)
 (check (with-input-from-string "blabla" json-read->alist-tree) => #f)
 
-;; json-ref (and quick-ref, since they're the same lambda)
+;; Check that the structure came out ok
 (check (json-ref sanitised-json "context" "title") => "30/9 21:00")
 (check (json-ref sanitised-json "finns inte") => #f)
 (check (json-ref 5 0) => #f)

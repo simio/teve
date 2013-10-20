@@ -17,25 +17,6 @@
 (include "tests/global.scm")
 (include "misc-helpers.scm")
 
-;;; I have no idea why, but if these long strings are not broken up
-;;; into pieces like this, csi as an inferior scheme in Emacs will
-;;; print a lot of ^G instead of whatever.
-
-(define test-sxml-sublist '((three items here) ("two" items) (1)))
-(define test-sxml `(5 symbol ,test-sxml-sublist))
-
-;; sxml-ref (test mostly differences from json-ref)
-(check (sxml-ref test-sxml) => test-sxml)
-(check (sxml-ref test-sxml 'symbol) => #f)
-(check (sxml-ref test-sxml 1) => 'symbol)
-(check (sxml-ref test-sxml "two") => #f)
-(check (sxml-ref test-sxml 2) => test-sxml-sublist)
-(check (sxml-ref test-sxml 2 "two") => 'items)
-(check (sxml-ref test-sxml 2 1) => '("two" items))
-(check (sxml-ref test-sxml 2 'three) => '(items here))
-(check (sxml-ref test-sxml 2 'three 1) => 'here)
-(check (sxml-ref test-sxml 2 'three 2) => #f)
-
 ;; url->protocol
 (check (url->protocol "http://www.example.com/") => "http")
 (check (url->protocol "https://www.example.com/") => "https")
@@ -98,18 +79,6 @@
 (check (x-sep-resolution->pair "aX1") => #f)
 (check (x-sep-resolution->pair "aXb") => #f)
 
-;; cdip
-(check (cdip '(a . b)) => 'b)
-(check (cdip '(a)) => '())
-(check (cdip 'symbol) => #f)
-(check (cdip (list)) => #f)
-
-;; caip
-(check (caip '(a . b)) => 'a)
-(check (caip '(a)) => 'a)
-(check (caip 'symbol) => #f)
-(check (caip (list)) => #f)
-
 ;; make-rnd-string
 (check (equal? (make-rnd-string 5) (make-rnd-string 5)) => #f)
 (check (string-length (make-rnd-string 50)) => 50)
@@ -125,16 +94,3 @@
        => 1000)
 (check (string-suffix? "()" (make-rnd-string 5 (list))) => #t)
 (check (string-length (make-rnd-string 5 (list))) => 7)
-
-;; string-replace-every
-(check (string-replace-every "needle" "bear" "there's a needle in my box")
-       => "there's a bear in my box")
-(check (string-replace-every "x" "/" "123x123") => "123/123")
-(check (string-replace-every "" "" "") => "")
-(check (string-replace-every "" "/" "xxx") => "xxx")
-(check (string-replace-every "x" (list) "x") => "()")
-(check/expect-error (string-replace-every 1 "" 3))
-(check/expect-error (string-replace-every "" "" 1))
-(check/expect-error (string-replace-every 1 "" ""))
-
-;; first-html-attribute
