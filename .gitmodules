@@ -1,0 +1,3 @@
+[submodule "scheme-prelude"]
+	path = scheme-prelude
+	url = git@github.com:simio/scheme-prelude.git

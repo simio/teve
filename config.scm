@@ -52,7 +52,7 @@
                                                  (use-cache . #t)
                                                  (cache-default-ttl . 300)
                                                  (cache-override-ttl . #f))))
-           (values (apply atree-fold-right (cons default-configuration sources))))
+           (values (apply atree-merge (reverse (cons default-configuration sources)))))
       (lambda args
         (cond ((null? args) values)
               ((equal? set: (car args))

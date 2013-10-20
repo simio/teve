@@ -20,8 +20,11 @@
 
 (include "platform.scm")
 
-(include "stdinerr")
+(include "scheme-prelude/stdinerr.scm")
 (import stdinerr)
+
+(include "scheme-prelude/prelude.scm")
+(import prelude)
 
 (include "misc-helpers.scm")
 
