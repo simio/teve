@@ -112,6 +112,14 @@
         appendix
         (make-rnd-string (- len 1) (conc char appendix)))))
 
+;;; Get (un)quoted value of first html attribute style key-value pair.
+(define (first-html-attribute attribute source . tail)
+  (let ((quote-char (if (null? tail) #\" (car tail))))
+    (and-let* ((attr-index (string-contains-ci source attribute))
+               (begin-index (+ 1 (string-index source quote-char attr-index)))
+               (end-index (string-index source quote-char begin-index)))
+      (substring/shared source begin-index end-index))))
+
 ;;; Thunk which reads XML from current-input-port and returns sxml.
 ;;; The ssax does not have a thunk reader (like json-read of the json egg).
 (define (xml-read)
