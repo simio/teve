@@ -6,16 +6,18 @@ PREFIX ?= /usr/opt
 SOURCE_FILES=*.scm sites/*.scm
 TEST_FILES=tests/*.scm
 TEST_RUNNER=run-tests.scm
-EXTRA_FILES=Makefile README
-DISTFILES=$(SOURCE_FILES) $(EXTRA_FILES)
+EXTRA_SOURCE_FILES=Makefile README
+DISTFILES=$(SOURCE_FILES) $(EXTRA_SOURCE_FILES)
 
 EGGS=intarweb args json http-client vector-lib packrat openssl base64 \
 	defstruct uri-common matchable uri-generic message-digest ssax \
-	ini-file message-digest sha2
+	ini-file message-digest sha2 input-parse srfi-37
 
 OTHER_DEPLOY_FILES=type-checks type-errors regex blob-hexadecimal to-hex \
 	string-hexadecimal variable-item blob-set-int md5 string-utils \
 	memoized-string lookup-table unicode-utils sendfile
+
+EXTRA_DEPLOY_FILES=extras gpl
 
 SO=.so
 
@@ -36,11 +38,11 @@ install: $(TARGET)
 install-eggs:
 	chicken-install -s $(EGGS)
 
-# wip, won't work
-deploy: $(SOURCE_FILES) deploy-eggs deploy-others
+deploy: $(SOURCE_FILES) deploy-eggs deploy-others $(EXTRA_DEPLOY_FILES)
 	mkdir -p $(DEPLOY_PATH)/$(TARGET)
 	env CSC_OPTIONS=$(DEPLOY_CSC_OPTIONS) \
 		csc -deploy -o $(DEPLOY_PATH)/$(TARGET) $(TARGET).scm
+	cp -r $(EXTRA_DEPLOY_FILES) $(DEPLOY_PATH)/$(TARGET)
 
 deploy-eggs:
 	mkdir -p $(DEPLOY_PATH)/$(TARGET)
