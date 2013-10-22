@@ -14,7 +14,7 @@
 
 (use srfi-78)
 
-(include "scheme-prelude/stdinerr")
+(include "scheme-prelude/stdouterr")
 (include "scheme-prelude/prelude")
 (import prelude)
 
