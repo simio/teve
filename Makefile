@@ -61,7 +61,6 @@ deploy-others:
 
 clean:
 	rm -f $(TARGET)
-	rm -f $(DISTNAME).tar.gz
 	rm -rf $(DEPLOY_PATH)
 
 source-tarball:
