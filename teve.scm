@@ -61,7 +61,7 @@
   (stderr (conc " *videos*        " (length *videos*)))
   (stderr (conc " *video*         " (length *video*)))
   (stderr (conc " *preferred-id*  " *preferred-id*))
-  (stderr "REPL READY.")
+  (stderr "READY.")
   (repl))
 
 (define (teve:tee uri id video)
