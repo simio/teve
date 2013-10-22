@@ -1,18 +1,18 @@
-;;; These functions are intendet to be feature equivalent with the dot-locking
-;;; egg, from which much of the code is borrowd. The dot-locking egg is written
-;;; by Olin Shivers and BSD licensed.
+;;; These functions are intended to be feature equivalent with the
+;;; dot-locking egg, from which much of the code is borrowd. The
+;;; dot-locking egg is written by Olin Shivers and BSD licensed.
 ;;;
 ;;; http://wiki.call-cc.org/eggref/4/dot-locking
 ;;;
-;;; Since the dot-locking egg tries to create a hard link between a file in
+;;; The dot-locking egg tries to create a hard link between a file in
 ;;; /tmp (created with create-temporary-directory) and the directory
-;;; of the file being locked, it is only capable of locking files on the same
-;;; hard disk partition as /tmp. Hard links cannot span partitions, though,
-;;; so this will fail whenever someone wisely chooses to mount /tmp as a
-;;; partition of its own.
+;;; of the file being locked. Hard links cannot span partitions,
+;;; though, so this will fail whenever someone chooses to mount /tmp
+;;; as a partition of its own (and someone should).
 ;;;
-;;; This alternative implementation instead creates any temporary files in the
-;;; directory of the file being locked.
+;;; This alternative implementation instead creates temporary
+;;; files in the same directory as the file being locked, thereby
+;;; circumventing the above problem.
 
 ;;; Copyright (c) 2013 Jesper Raftegard <jesper@huggpunkt.org>
 ;;;
