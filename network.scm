@@ -22,11 +22,11 @@
 
 ;;; Return a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
-(define (network:delay-download url . rest)
+(define (network:delay-download uri . rest)
   (let-optionals rest ((reader read-string))
     (delay
-      (ignore-errors
-       (with-input-from-request url #f reader)))))
+      (begin (debug (conc "Forcing delayed download of " (->string/uri uri)))
+             (ignore-errors (with-input-from-request uri #f reader))))))
 
 ;;; Tell whether a cache object is alive.
 ;;;
@@ -76,6 +76,7 @@
              (cache-object (with-input-from-file filename read))
              (up-to-date (network:cache-object-alive? cache-object))
              (data (quick-ref cache-object 'data)))
+    (debug (conc "Reading from cache: " (quick-ref cache-object 'uri)))
     data))
 
 ;;; Store data in cache and return data.
@@ -87,6 +88,7 @@
         (filename (network:key->filename key)))
     (if filename
         (with-dot-lock filename
+          (debug (conc "Attempting to cache " uri " in " filename))
           (with-output-to-file filename (lambda () (write object)))))
     (quick-ref object 'data)))
 
@@ -104,20 +106,21 @@
 ;;; the object is up-to-date.
 (define (network:cache-controller uri reader ttl)
   (let* ((download (network:delay-download uri))
-         (stringed-uri (->string/uri uri))
-         (key (network:uri->key stringed-uri))
+         (uri-string (->string/uri uri))
+         (key (network:uri->key uri-string))
          (ttl (cond
                ((not ttl) -1)
                ((number? ttl) ttl)
                (else (*cfg* 'preferences 'cache-default-ttl))))
          (data (cond
                 ((not (*cfg* 'preferences 'use-cache))
+                 (debug (conc "Cache disabled. Fetching " uri-string))
                  (force download))
                 ((network:get-entry key))
                 (else
                  ;; XXX: TTL should actually be derived from the
                  ;; relevant HTTP headers, if they exist...
-                 (network:store stringed-uri key ttl (force download))))))
+                 (network:store uri-string key ttl (force download))))))
     (and (string? data)
          (with-input-from-string data reader))))
 
