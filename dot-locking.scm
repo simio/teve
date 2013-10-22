@@ -34,7 +34,7 @@
                      with-dot-lock
                      with-dot-lock*)
 (import-for-syntax posix files srfi-18)
-(import scheme chicken posix extras data-structures srfi-18 files stdinerr)
+(import scheme chicken posix extras data-structures srfi-18 files)
 
 (define (dotlock:file->lock file)
   (let ((path (conc file ".lock")))
@@ -47,7 +47,7 @@
   (let ((filename (conc (dotlock:file->lock file)
                         (number->string (random 252016003)))))
     (with-output-to-file filename
-      (lambda () (stdout "lock")))
+      (lambda () (print "lock")))
     filename))
 
 (define (release-dot-lock file)
