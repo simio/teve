@@ -42,16 +42,15 @@
 (include "select-stream.scm")
 
 (define (select-action default play? download? list? repl?)
-  (debug* "Performing ")
-  (debug
-   (cond
-    (repl? 'repl)
-    ((and play? download? (not list?)) 'tee)
-    ((and play? (not list?) (not download?)) 'play)
-    ((and download? (not list?) (not play?)) 'download)
-    ((and list? (not play?) (not download?)) 'list)
-    ((not (or list? play? download?)) default)
-    (else #f))))
+  (debug "Selected action:")
+  (debug (cond
+          (repl? 'repl)
+          ((and play? download? (not list?)) 'tee)
+          ((and play? (not list?) (not download?)) 'play)
+          ((and download? (not list?) (not play?)) 'download)
+          ((and list? (not play?) (not download?)) 'list)
+          ((not (or list? play? download?)) default)
+          (else #f))))
 
 (define (teve:repl uri id videos video)
   (set! *preferred-id* id)
