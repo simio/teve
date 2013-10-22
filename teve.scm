@@ -29,6 +29,8 @@
 (include "misc-helpers.scm")
 
 (include "dot-locking.scm")
+(import dot-locking)
+
 (include "config.scm")
 (include "network.scm")
 

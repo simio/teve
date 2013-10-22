@@ -28,7 +28,13 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use posix extras srfi-18 files)
+(module dot-locking (release-dot-lock
+                     break-dot-lock
+                     obtain-dot-lock
+                     with-dot-lock
+                     with-dot-lock*)
+(import-for-syntax posix files srfi-18)
+(import scheme chicken posix extras data-structures srfi-18 files stdinerr)
 
 (define (dotlock:file->lock file)
   (let ((path (conc file ".lock")))
@@ -105,3 +111,5 @@
   (syntax-rules ()
     ((with-dot-lock file body ...)
      (with-dot-lock* file (lambda () body ...)))))
+
+)
