@@ -5,11 +5,12 @@ TARBALL = $(TARGET)-source-$(GITREV).tar.gz
 
 PREFIX ?= /usr/opt
 
-SOURCE_FILES=*.scm sites/*.scm
 TEST_FILES=tests/*.scm
 TEST_RUNNER=run-tests.scm
-EXTRA_SOURCE_FILES=Makefile README
-DISTFILES=$(SOURCE_FILES) $(EXTRA_SOURCE_FILES)
+SOURCE_FILES=*.scm sites/*.scm parsers/*.scm scheme-prelude/*.scm $(TEST_FILES)
+EXTRA_SOURCE_FILES=Makefile README LICENSE teve.conf.dist
+EXTRA_DEPLOY_FILES=extras gpl
+TARBALL_FILES=$(SOURCE_FILES) $(EXTRA_SOURCE_FILES) $(EXTRA_DEPLOY_FILES)
 
 EGGS=intarweb args json http-client vector-lib packrat openssl base64 \
 	defstruct uri-common matchable uri-generic message-digest ssax \
@@ -19,7 +20,6 @@ OTHER_DEPLOY_FILES=type-checks type-errors regex blob-hexadecimal to-hex \
 	string-hexadecimal variable-item blob-set-int md5 string-utils \
 	memoized-string lookup-table unicode-utils sendfile
 
-EXTRA_DEPLOY_FILES=extras gpl
 
 SO=.so
 
@@ -66,7 +66,7 @@ clean:
 	rm -rf $(DEPLOY_PATH)
 
 source-tarball:
-	tar -czf $(TARBALL) $(DISTFILES)
+	tar -czf $(TARBALL) $(TARBALL_FILES)
 
 distclean: clean
 	rm -f $(TARBALL)
