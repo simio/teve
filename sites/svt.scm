@@ -132,18 +132,19 @@
 
 (define (svt:url->videos url)
   (cond
-   ((or (string-contains url "://www.svtplay.se/")
-        (string-contains url "://svtplay.se/")
-	(string-contains url "://oppetarkiv.se/")
-        (string-contains url "://www.oppetarkiv.se/")
+   ((or (string-contains url "://svtplay.se/")
+        (string-contains url "://oppetarkiv.se/")
         (string-contains url "://öppetarkiv.se/")
+        (string-contains url "://svt.se/"))
+    (svt:url->videos (string-replace-every "://" "://www." url)))
+   ((or (string-contains url "://www.svtplay.se/")
+        (string-contains url "://www.oppetarkiv.se/")
         (string-contains url "://www.öppetarkiv.se/")
         (string-contains url "://xn--ppetarkiv-z7a.se/")
         (string-contains url "://www.xn--ppetarkiv-z7a.se/"))
     (filter video? (svt:json-url->videos
                     (add-http-get-query-var url "output" "json"))))
-   ((or (string-contains url "://www.svt.se/")
-        (string-contains url "://svt.se/"))
+   ((or (string-contains url "://www.svt.se/"))
     (and-let* ((json-url (svt:embedded-player->json-url url)))
       (filter video?
               (svt:json-url->videos (if (string-prefix? "http" json-url)
