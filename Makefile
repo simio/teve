@@ -1,5 +1,7 @@
 TARGET = teve
-DISTNAME = teve-prototype1
+GITREV != git rev-parse --short=10 HEAD
+
+TARBALL = $(TARGET)-source-$(GITREV).tar.gz
 
 PREFIX ?= /usr/opt
 
@@ -64,10 +66,10 @@ clean:
 	rm -rf $(DEPLOY_PATH)
 
 source-tarball:
-	tar -czf $(DISTNAME).tar.gz $(DISTFILES)
+	tar -czf $(TARBALL) $(DISTFILES)
 
 distclean: clean
-	rm -f $(DISTNAME).tar.gz
+	rm -f $(TARBALL)
 
 print-eggs:
 	@echo $(EGGS)
