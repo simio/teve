@@ -79,8 +79,9 @@
     data))
 
 ;;; Store data in cache and return data.
-(define (network:store key ttl data)
-  (let ((object `((timestamp . ,(current-seconds))
+(define (network:store uri key ttl data)
+  (let ((object `((uri . ,uri)
+                  (timestamp . ,(current-seconds))
                   (ttl . ,(if* ttl it (*cfg* 'preferences 'default-cache-ttl)))
                   (data . ,data)))
         (filename (network:key->filename key)))
@@ -103,7 +104,8 @@
 ;;; the object is up-to-date.
 (define (network:cache-controller uri reader ttl)
   (let* ((download (network:delay-download uri))
-         (key (network:uri->key (->string/uri uri)))
+         (stringed-uri (->string/uri uri))
+         (key (network:uri->key stringed-uri))
          (ttl (cond
                ((not ttl) -1)
                ((number? ttl) ttl)
@@ -115,7 +117,7 @@
                 (else
                  ;; XXX: TTL should actually be derived from the
                  ;; relevant HTTP headers, if they exist...
-                 (network:store key ttl (force download))))))
+                 (network:store stringed-uri key ttl (force download))))))
     (and (string? data)
          (with-input-from-string data reader))))
 
