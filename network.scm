@@ -118,9 +118,14 @@
                  (force download))
                 ((network:get-entry key))
                 (else
-                 ;; XXX: TTL should actually be derived from the
-                 ;; relevant HTTP headers, if they exist...
-                 (network:store uri-string key ttl (force download))))))
+                 (let-values (((result request-uri response) (force download)))
+                   (let* ((max-age (cdip (quick-ref (header-value 'cache-control
+                                                                  (response-headers response)))))
+                          (expires (header-value 'expires (response-headers response)))
+                          (ttl (or max-age expires ttl)))
+                     (debug (conc "ttl for upcoming cache storage is " ttl
+                                  ". (" max-age "/" expires ")"))
+                     (network:store uri-string key ttl result)))))))
     (and (string? data)
          (with-input-from-string data reader))))
 
