@@ -93,7 +93,7 @@
     ((streams->video streams)
      (apply make-video streams))))
 
-;;; 
+;;; A video is just a list of streams
 (define (video->streams video)
   video)
 
