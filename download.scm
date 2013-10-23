@@ -139,12 +139,12 @@
                          ((symbol? o) o)
                          (else #f))))
     (case type
-      ((hds) (and (in-path? (*cfg* 'external-programs 'php))
+      ((hds) (and (program-available? (*cfg* 'external-programs 'php))
                   (file-exists? (*cfg* 'external-programs 'adobehds.php))))
-      ((hls) (in-path? (*cfg* 'external-programs 'ffmpeg)))
-      ((rtmp) (in-path? (*cfg* 'external-programs 'rtmpdump)))
-      ((http wmv) (in-path? (*cfg* 'external-programs 'curl)))
-      ((mms rtsp) (in-path? (*cfg* 'external-programs 'mplayer)))
+      ((hls) (program-available? (*cfg* 'external-programs 'ffmpeg)))
+      ((rtmp) (program-available? (*cfg* 'external-programs 'rtmpdump)))
+      ((http wmv) (program-available? (*cfg* 'external-programs 'curl)))
+      ((mms rtsp) (program-available? (*cfg* 'external-programs 'mplayer)))
       (else #f))))
        
 ;;; Create a temporary fifo and return it's absolute name

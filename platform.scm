@@ -23,12 +23,15 @@
          (string-map (lambda (c) (if (char=? c needle) replacement c))
                      str))))
 
-(define (in-path? str)
-  (let*-values (((in out pid) (process (if (eq? 'windows (software-type))
-                                           (conc "where.exe " str " > NUL")
-                                           (conc "which " str " 2> /dev/null"))))
-                ((pid ok status) (process-wait pid)))
-    (= 0 status)))
+(define (program-available? str)
+  (let ((available? (if (eq? 'windows (software-type))
+			(or (file-exists? str) (file-exists? (conc str ".exe")))
+			(let*-values (((in out pid) (process (conc "which " str " 2> /dev/null")))
+				      ((pid ok status) (process-wait pid)))
+			  (= 0 status)))))
+    (debug* (conc "Checking availability of " str ": " available?))
+    available?))
+	    
 
 (define (make-platform)
   (let* ((nix/win (lambda (nix win)
