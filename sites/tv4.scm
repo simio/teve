@@ -20,10 +20,8 @@
 
 (define (tv4:download-xml-data xml-base-url)
   (and-let* ((xml-base (fetch xml-base-url #:reader xml-read))
-             (xml-play-hds (fetch (conc xml-base-url "/play")
-                             #:reader xml-read))
-             (xml-play-hls (fetch (conc xml-base-url "/play?protocol=hls")
-                                   #:reader xml-read)))
+             (xml-play-hds (fetch (conc xml-base-url "/play") #:reader xml-read))
+             (xml-play-hls (fetch (conc xml-base-url "/play?protocol=hls") #:reader xml-read)))
     (list (caddr xml-base)
           (caddr xml-play-hds)
           (caddr xml-play-hls))))
@@ -40,38 +38,34 @@
                                (update-stream
                                 stream
                                 (make-stream-value 'stream-type 'hls)
-                                (make-stream-value 'ffmpeg-parameters
-                                                   "-absf aac_adtstoasc")
+                                (make-stream-value 'ffmpeg-parameters "-absf aac_adtstoasc")
                                 (make-stream-value 'url url)))))
     (cond
      ((string=? mediaformat "flv")
       ;; Was/is this the correct value? Are there even any rtmp streams
       ;; left at TV4 Play?
-      (list
-       (make-stream (make-stream-value 'stream-type 'rtmp)
-                    (make-stream-value 'url url-form)
-                    (make-stream-value 'swf-path url)
-                    (make-stream-value 'bitrate bitrate))))
+      (list (make-stream (make-stream-value 'stream-type 'rtmp)
+                         (make-stream-value 'url url-form)
+                         (make-stream-value 'swf-path url)
+                         (make-stream-value 'bitrate bitrate))))
      ((and (string=? mediaformat "mp4")
            (string-suffix? ".m3u8" url-form))
       (map add-hls-values (hls-master->streams url)))
      ((and (string=? mediaformat "mp4")
            (string-suffix? ".f4m" url-form))
-      (list
-       (make-stream (make-stream-value 'stream-type 'hds)
-                    (make-stream-value 'url url)
-                    (make-stream-value 'bitrate bitrate))))
+      (list (make-stream (make-stream-value 'stream-type 'hds)
+                         (make-stream-value 'url url)
+                         (make-stream-value 'bitrate bitrate))))
      (else #f))))
 
 (define (tv4:xml-items->subtitles-url data)
-  (cond
-   ((or (null? data)
-        (not (string? (sxml-ref (car data) 'mediaFormat))))
-    #f)
-   ((string=? "smi" (sxml-ref (car data) 'mediaFormat))
-    (sxml-ref (car data) 'url))
-   (else
-    (tv4:xml-items->subtitles-url (cdr data)))))
+  (cond ((or (null? data)
+             (not (string? (sxml-ref (car data) 'mediaFormat))))
+         #f)
+        ((string=? "smi" (sxml-ref (car data) 'mediaFormat))
+         (sxml-ref (car data) 'url))
+        (else
+         (tv4:xml-items->subtitles-url (cdr data)))))
 
 (define (tv4:xml-data->video data)
   (and-let* ((playback-items (filter-map (lambda (x)
@@ -96,12 +90,9 @@
                                   (if subtitles
                                       (make-stream-value 'subtitles subtitles))
                                   (make-stream-value 'live is-live)
-                                  (make-stream-value 'default-filename
-                                                     (suggest-filename))
-                                  (if (eq? 'rtmp
-                                           (stream-ref 'stream-type stream))
-                                      (make-stream-value 'swf-player
-                                                         swf-player))))
+                                  (make-stream-value 'default-filename (suggest-filename))
+                                  (if (eq? 'rtmp (stream-ref 'stream-type stream))
+                                      (make-stream-value 'swf-player swf-player))))
                  (join (filter-map tv4:xml-item->streams xml-items)))))))
      playback-items))))
 
@@ -121,12 +112,8 @@
 
 (define (tv4:embedded-video->xml-url url)
   (and-let* ((source (fetch url))
-             (raw-flash-vars (first-html-attribute "data-flash-vars"
-                                                   source
-                                                   #\'))
-             (flash-vars (with-input-from-string
-                             raw-flash-vars
-                           json-read->alist-tree))
+             (raw-flash-vars (first-html-attribute "data-flash-vars" source #\'))
+             (flash-vars (with-input-from-string raw-flash-vars json-read->alist-tree))
              (raw-video-id (cdip (assoc "vid" flash-vars)))
              (video-id (string->number raw-video-id)))
     (tv4:video-id->xml-url video-id)))
@@ -135,12 +122,10 @@
   (cond
    ((or (string-contains url "://www.tv4play.se/")
         (string-contains url "://tv4play.se/"))
-    (filter video?
-            (list (tv4:xml-url->video (tv4:tv4play-url->xml-url url)))))
+    (filter video? (list (tv4:xml-url->video (tv4:tv4play-url->xml-url url)))))
    ((or (string-contains url "://www.tv4.se/")
         (string-contains url "://tv4.se/"))
-    (filter video?
-            (list (tv4:xml-url->video (tv4:embedded-video->xml-url url)))))
+    (filter video? (list (tv4:xml-url->video (tv4:embedded-video->xml-url url)))))
    (else
     #f)))
 
