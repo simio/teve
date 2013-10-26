@@ -45,7 +45,7 @@
                                                        (mplayer . "mplayer")
                                                        (curl . "curl")
                                                        (php . "php")
-                                                       (adobehds.php . "AdobeHDS.php"))
+                                                       (adobehds.php . "gpl/AdobeHDS.php"))
                                     (preferences (default-action . download)
                                                  (ideal-bitrate . 2500)
                                                  (ideal-pixel-width . 1280)

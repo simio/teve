@@ -1,26 +1,27 @@
 ; teve.conf.dist
-; The values below are the hardcoded defaults
+; The values set below are also the hardcoded defaults.
 
 [external-programs]
 ; These are the paths executed by teve to run external programs.
 ; The default values are just filenames, meaning you will have to
-; set up your $PATH to point to these files.
-; Paths can also be specified in the environment variables. Paths
-; specified in environment variables has priority over any paths supplied
+; either use absolute paths or set up your $PATH to point to these files.
+; Paths can also be specified in environment variables. Paths specified
+; in environment variables have priority over any paths supplied
 ; in configuration files.
-rtmpdump="rtmpdump"     ; $RTMPDUMP
-ffmpeg="ffmpeg"         ; $FFMPEG
-mplayer="mplayer"       ; $MPLAYER
-curl="curl"             ; $CURL
-php="php"               ; $PHP
+rtmpdump="rtmpdump"             ; $RTMPDUMP
+ffmpeg="ffmpeg"                 ; $FFMPEG
+mplayer="mplayer"               ; $MPLAYER
+curl="curl"                     ; $CURL
+php="php"                       ; $PHP
 
 ; If any of the above enironment variables, prefixed with TEVE_, are found,
 ; they will be used instead of the above. ($TEVE_RTMPDUMP takes precedence
 ; above $RTMPDUMP and so forth.)
 
 ; Setting $PATH to point to this file will not work, so it should
-; be modified to point to a copy of it.
-adobehds.php="AdobeHDS.php"
+; be modified to point to a copy of it. You should probably set this
+; value to an absolute path.
+adobehds.php="gpl/AdobeHDS.php"     ; $TEVE_ADOBEHDS_PHP
 
 [preferences]
 ; The default operation to perform when no operation
@@ -36,15 +37,15 @@ ideal-pixel-width=1280
 ; The automatic stream selection mechanism calculates the distance
 ; from an ideal stream for each stream present in a video, and selects
 ; the one with the shortest distance. If you want the stream transport
-; to influence this decision, you may associate weights to specific
-; transports below. The distances for each stream are multiplied with
-; these weights before comparison.
+; type to influence this decision, you may associate weights to specific
+; transport typess below. The distances for each stream are multiplied
+; with these weights before comparison.
 ;
-; The default value for all transport is 1, meaning that stream
-; transports do not influence which stream is selected.
+; The default value for all transport types is 1, meaning that stream
+; transport types do not influence which stream is selected.
 ;
 ; To double all distances for Adobe HDS streams, making the selection
-; mechanism prefer other available transports even though the HDS
+; mechanism prefer other available transport types even though the HDS
 ; stream is a better match, uncomment this:
 ;
 ;transport-weight-hds=2
@@ -57,7 +58,6 @@ ideal-pixel-width=1280
 ;  http         (HTTP and HTTPS)
 ;  rtsp
 ;  mms
-transport-weight-hds=2          ; AdobeHDS.php only when necessary
 
 ; Settings for the disk cache (used with remote objects). The default
 ; ttl is used for data without an inherent time-to-live (through for
