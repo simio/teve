@@ -12,7 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-13)
+(use srfi-13 posix)
 
 (require-extension miscmacros sha2 message-digest)
 
@@ -95,6 +95,14 @@
           (with-output-to-file filename (lambda () (write object)))))
     (quick-ref object 'data)))
 
+;;; Create a TTL in seconds, given a HTTP/1.1 Cache-control max-age
+;;; value, a HTTP/1.0 Expires value and a fallback (in seconds).
+(define (network:select-cache-ttl max-age expires fallback)
+  (cond ((number? max-age) max-age)
+        ((number? expires) expires)
+        ((vector? expires) (- (utc-time->seconds expires) (current-seconds)))
+        (else fallback)))
+
 ;;; Translate requests to data from cache or network.
 ;;;  1. If caching is disabled, download.
 ;;;  2. Otherwise, if the uri is cached and up-to-date, use cached data.
@@ -107,13 +115,13 @@
 ;;; ttl is the number of seconds a cached object is considered up to data
 ;;; to use when storing it, which is later used for subsequent checks if
 ;;; the object is up-to-date.
-(define (network:cache-controller uri reader ttl)
+(define (network:cache-controller uri reader ttl-param)
   (and-let* ((download (network:delay-download uri))
              (uri-string (->string/uri uri))
              (key (network:uri->key uri-string))
-             (ttl (cond
-                   ((not ttl) -1)
-                   ((number? ttl) ttl)
+             (fallback-ttl (cond
+                            ((not ttl-param) -1)
+                            ((number? ttl-param) ttl-param)
                    (else (*cfg* 'preferences 'cache-default-ttl))))
              (data (cond
                     ((not (*cfg* 'preferences 'use-cache))
@@ -129,7 +137,7 @@
                                    ;; The Cache-control max-age value should override the Expires
                                    ;; header value, if both are present. If none are present,
                                    ;; use the default ttl which the caller supplied.
-                                   (ttl (or max-age expires ttl)))
+                                   (ttl (network:select-cache-ttl max-age expires fallback-ttl)))
                               (debug (conc "Storing in cache; ttl "
                                            ttl " (" max-age "/" expires ")"))
                               (network:store uri-string key ttl result))))))))
