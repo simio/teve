@@ -22,11 +22,10 @@
 
 ;;; Make a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
-(define (network:delay-download uri . rest)
-  (let-optionals rest ((reader read-string))
-    (delay
-      (begin (debug (conc "Forcing delayed download of " (->string/uri uri)))
-             (with-input-from-request uri #f reader)))))
+(define (network:delay-download uri #!optional (reader read-string))
+  (delay
+    (begin (debug (conc "Forcing delayed download of " (->string/uri uri)))
+           (with-input-from-request uri #f reader))))
 
 ;;; Tell whether a cache object is alive.
 ;;;
@@ -44,15 +43,14 @@
 ;;;  4. Otherwise (for #t), the ttl stored in the cache is used.
 ;;;
 ;;; Returns #t iff the cached object is alive, otherwise #f.
-(define (network:cache-object-alive? obj . rest)
-  (let-optionals rest ((ttl #t))
-    (let ((ttl (cond
-                ((and (*cfg* 'preferences 'cache-override-ttl)
-                      (*cfg* 'preferences 'cache-default-ttl)))
-                ((not ttl) -1)
-                ((number? ttl) ttl)
-                (else (or (quick-ref obj 'ttl) -1)))))
-      (< (current-seconds) (+ ttl (quick-ref obj 'timestamp))))))
+(define (network:cache-object-alive? obj #!optional (ttl #t))
+  (let ((ttl (cond
+              ((and (*cfg* 'preferences 'cache-override-ttl)
+                    (*cfg* 'preferences 'cache-default-ttl)))
+              ((not ttl) -1)
+              ((number? ttl) ttl)
+              (else (or (quick-ref obj 'ttl) -1)))))
+    (< (current-seconds) (+ ttl (quick-ref obj 'timestamp)))))
 
 (define (network:uri->key uri)
   (message-digest-string (sha256-primitive) uri))
