@@ -119,8 +119,7 @@
                 ((network:get-entry key))
                 (else
                  (let-values (((result request-uri response) (force download)))
-                   (let* ((max-age (cdip (header-value 'cache-control
-                                                       (response-headers response))))
+                   (let* ((max-age (cdip (header-value 'cache-control (response-headers response))))
                           (expires (header-value 'expires (response-headers response)))
                           ;; The Cache-control max-age value should override the Expires
                           ;; header value, if both are present. If none are present,
