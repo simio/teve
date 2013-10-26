@@ -128,15 +128,15 @@
         (string-contains url "://www.öppetarkiv.se/")
         (string-contains url "://xn--ppetarkiv-z7a.se/")
         (string-contains url "://www.xn--ppetarkiv-z7a.se/"))
-    (filter video? (svt:json-url->videos (add-http-get-query-var url "output" "json"))))
+    (and-let* ((result (svt:json-url->videos (add-http-get-query-var url "output" "json"))))
+      (filter video? result)))
    ((or (string-contains url "://www.svt.se/"))
-    (and-let* ((json-url (svt:embedded-player->json-url url)))
-      (filter video?
-              (svt:json-url->videos (if (string-prefix? "http" json-url)
-                                        json-url
-                                        (conc (uri->base-path url) json-url))))))
-   (else
-    #f)))
+    (and-let* ((json-url (svt:embedded-player->json-url url))
+               (result (svt:json-url->videos (if (string-prefix? "http" json-url)
+                                                 json-url
+                                                 (conc (uri->base-path url) json-url)))))
+      (filter video? result)))
+   (else #f)))
 
 ;;; Add svt:url->video to global scraper-table
 (add-scraper svt:url->videos)
