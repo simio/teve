@@ -32,9 +32,9 @@
 (import dot-locking)
 
 (include "config.scm")
-(include "network.scm")
-
 (include "parse-flags.scm")     ; Should load after config.scm
+
+(include "network.scm")
 
 (include "video.scm")
 (include "uri2vid.scm")
