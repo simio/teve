@@ -24,8 +24,13 @@
 ;;; it is used as a reader. The default is read-string.
 (define (network:delay-download uri #!optional (reader read-string))
   (delay
-    (begin (debug (conc "Forcing delayed download of " (->string/uri uri)))
-           (with-input-from-request uri #f reader))))
+    (begin (debug (conc "Forcing delayed download of \"" uri "\""))
+           (handle-exceptions exn
+               (begin (stderr (conc "Failed to download \"" uri "\"" #\newline
+                                    ((condition-property-accessor 'exn 'message) exn)))
+                      (values #f #f #f #f))
+             (let-values (((result request response) (with-input-from-request uri #f reader)))
+               (values result request response #t))))))
 
 ;;; Tell whether a cache object is alive.
 ;;;
@@ -103,29 +108,31 @@
 ;;; to use when storing it, which is later used for subsequent checks if
 ;;; the object is up-to-date.
 (define (network:cache-controller uri reader ttl)
-  (let* ((download (network:delay-download uri))
-         (uri-string (->string/uri uri))
-         (key (network:uri->key uri-string))
-         (ttl (cond
-               ((not ttl) -1)
-               ((number? ttl) ttl)
-               (else (*cfg* 'preferences 'cache-default-ttl))))
-         (data (cond
-                ((not (*cfg* 'preferences 'use-cache))
-                 (debug (conc "Cache disabled. Fetching " uri-string))
-                 (force download))
-                ((network:get-entry key))
-                (else
-                 (let-values (((result request-uri response) (force download)))
-                   (let* ((max-age (cdip (header-value 'cache-control (response-headers response))))
-                          (expires (header-value 'expires (response-headers response)))
-                          ;; The Cache-control max-age value should override the Expires
-                          ;; header value, if both are present. If none are present,
-                          ;; use the default ttl which the caller supplied.
-                          (ttl (or max-age expires ttl)))
-                     (debug (conc "ttl for upcoming cache storage is " ttl
-                                  ". (" max-age "/" expires ")"))
-                     (network:store uri-string key ttl result)))))))
+  (and-let* ((download (network:delay-download uri))
+             (uri-string (->string/uri uri))
+             (key (network:uri->key uri-string))
+             (ttl (cond
+                   ((not ttl) -1)
+                   ((number? ttl) ttl)
+                   (else (*cfg* 'preferences 'cache-default-ttl))))
+             (data (cond
+                    ((not (*cfg* 'preferences 'use-cache))
+                     (debug (conc "Cache disabled. Fetching " uri-string))
+                     (force download))
+                    ((network:get-entry key))
+                    (else
+                     (let-values (((result request-uri response success) (force download)))
+                       (and success
+                            (let* ((max-age (cdip (header-value 'cache-control
+                                                                (response-headers response))))
+                                   (expires (header-value 'expires (response-headers response)))
+                                   ;; The Cache-control max-age value should override the Expires
+                                   ;; header value, if both are present. If none are present,
+                                   ;; use the default ttl which the caller supplied.
+                                   (ttl (or max-age expires ttl)))
+                              (debug (conc "Storing in cache; ttl "
+                                           ttl " (" max-age "/" expires ")"))
+                              (network:store uri-string key ttl result))))))))
     (and (string? data)
          (with-input-from-string data reader))))
 
@@ -133,7 +140,4 @@
   (let* ((uri (if (and (string? u) (string-contains (uri->base-path u) "akamaihd.net"))
                   (make-emo-request u)
                   u)))
-    (or (network:cache-controller uri reader ttl)
-        (begin
-          (stderr "The cache controller somehow failed for " (->string/uri uri))
-          #f))))
+    (network:cache-controller uri reader ttl)))
