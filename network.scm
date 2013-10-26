@@ -20,13 +20,13 @@
 (include "misc-helpers")
 (include "dot-locking")
 
-;;; Return a delayed download. If a second parameter is supplied,
+;;; Make a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
 (define (network:delay-download uri . rest)
   (let-optionals rest ((reader read-string))
     (delay
       (begin (debug (conc "Forcing delayed download of " (->string/uri uri)))
-             (ignore-errors (with-input-from-request uri #f reader))))))
+             (with-input-from-request uri #f reader)))))
 
 ;;; Tell whether a cache object is alive.
 ;;;
