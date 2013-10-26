@@ -28,7 +28,6 @@
       url
       (conc "http://" url)))
       
-
 (include "sites/svt.scm")
 (include "sites/tv4.scm")
 
@@ -36,7 +35,5 @@
 ;;; Each uri->videos procedure is applied to the url. The resulting
 ;;; videos are appended into a video-list, which is returned.
 (define (uri->videos url)
-  (delete-duplicates
-   (apply append
-     (filter-map (lambda (u->v) (u->v (prepend-default-protocol url)))
-                 *scraper-list*))))
+  (delete-duplicates (apply append (filter-map (lambda (u->v) (u->v (prepend-default-protocol url)))
+                                               *scraper-list*))))
