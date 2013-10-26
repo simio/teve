@@ -97,3 +97,4 @@
          (env-conf (env->conf (get-environment-variables))))
     (make-configuration sys-conf user-conf env-conf)))
 
+(client-software (cons (list program-display-name program-version #f) (client-software)))
