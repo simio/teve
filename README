@@ -65,7 +65,7 @@ wiki for more information:
 Just 'make' to get a binary, and then run it:
 
   $ ./teve -h
-  Usage: teve [options] <url>
+  Usage: teve [options] <uri>
    -d                       Download stream (default or specified with -i)
    -v                       Be verbose
    -o filename              Output filename
@@ -101,12 +101,12 @@ The simplest use case is downloading a video:
 
   1. In a web browser, go to the page where the video you want to
      download is played.
-  2. Copy the url (for example http://www.svtplay.se/aktuellt).
+  2. Copy the uri (for example http://www.svtplay.se/aktuellt).
   3. Run in a shell:
 
        $ teve http://www.svtplay.se/aktuellt
 
-If the video at that url is properly identified, teve will
+If the video at that uri is properly identified, teve will
 automatically pick a filename and start the appropriate downloader.
 
 If there are several streams available for the same video, teve will
