@@ -25,8 +25,8 @@
 (include "scheme-prelude/prelude.scm")   (import prelude)
 (include "misc-helpers.scm")             (import misc-helpers)
 (include "dot-locking.scm")              (import dot-locking)
+(include "config.scm")                   (import config)
 
-(include "config.scm")
 (include "parse-flags.scm")     ; Should load after config.scm
 
 (include "network.scm")

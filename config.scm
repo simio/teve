@@ -12,12 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use posix)
-
-(require-extension miscmacros ini-file http-client)
-
-(include "platform")
-(include "misc-helpers")
+(module config (*cfg*)
+(import scheme chicken posix data-structures
+        miscmacros ini-file
+        prelude platform misc-helpers)
 
 ;;; Create a configuration variable
 ;;;
@@ -97,4 +95,4 @@
          (env-conf (env->conf (get-environment-variables))))
     (make-configuration sys-conf user-conf env-conf)))
 
-(client-software (cons (list program-display-name program-version #f) (client-software)))
+)
