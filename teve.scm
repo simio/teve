@@ -42,10 +42,9 @@
 (include "download-commands.scm")
 (include "stream-selection.scm")
 
-;; This goofy row will go away soon enough.
-(import teve-http-client stdouterr prelude platform misc-helpers dot-locking config network json-parser apple-hls-parser video uri->video download-commands stream-selection)
+(import stdouterr video platform config uri->video stream-selection download-commands)
 
-;; This won't be modularised
+;; Let's find out what the user wants
 (include "parse-flags.scm")
 
 ;; Tack "teve" onto the http user agent string
