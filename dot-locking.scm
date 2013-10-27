@@ -36,28 +36,28 @@
 (import-for-syntax posix files srfi-18)
 (import scheme chicken posix extras data-structures srfi-18 files)
 
-(define (dotlock:file->lock file)
+(define (file->lock file)
   (let ((path (conc file ".lock")))
     (normalize-pathname
      (if (absolute-pathname? path)
          path
          (make-absolute-pathname (current-directory) path)))))
 
-(define (dotlock:create-rnd-lock file)
-  (let ((filename (conc (dotlock:file->lock file)
+(define (create-rnd-lock file)
+  (let ((filename (conc (file->lock file)
                         (number->string (random 252016003)))))
     (with-output-to-file filename
       (lambda () (print "lock")))
     filename))
 
 (define (release-dot-lock file)
-  (delete-file* (dotlock:file->lock file)))
+  (delete-file* (file->lock file)))
 
 (define break-dot-lock release-dot-lock)
 
-(define (dotlock:attempt-lock file)
-  (let ((rnd-lock (dotlock:create-rnd-lock file))
-        (lock (dotlock:file->lock file)))
+(define (attempt-lock file)
+  (let ((rnd-lock (create-rnd-lock file))
+        (lock (file->lock file)))
     (handle-exceptions ex
         (begin
           (delete-file rnd-lock)
@@ -70,12 +70,12 @@
   (let-optionals args ((retry-seconds 1)
                        (retry-number #f)
                        (stale-time 300))
-    (let ((lock-file-name (dotlock:file->lock file))
+    (let ((lock-file-name (file->lock file))
           (retry-interval retry-seconds))
       (let loop ((retry-number retry-number)
                  (broken? #f))
         (cond
-         ((dotlock:attempt-lock file)
+         ((attempt-lock file)
           (if broken? 'broken #t))
          ((and stale-time
                (handle-exceptions ex #f

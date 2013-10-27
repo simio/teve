@@ -19,7 +19,7 @@
 
 ;;; Make a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
-(define (network:delay-download uri #!optional (reader read-string))
+(define (delay-download uri #!optional (reader read-string))
   (let ((pretty-uri (->string/uri uri)))
     (delay
       (begin (debug (conc "Forcing delayed download of \"" pretty-uri "\""))
@@ -46,7 +46,7 @@
 ;;;  4. Otherwise (for #t), the ttl stored in the cache is used.
 ;;;
 ;;; Returns #t iff the cached object is alive, otherwise #f.
-(define (network:cache-object-alive? obj #!optional (ttl #t))
+(define (cache-object-alive? obj #!optional (ttl #t))
   (let ((ttl (cond
               ((and (*cfg* 'preferences 'cache-override-ttl)
                     (*cfg* 'preferences 'cache-default-ttl)))
@@ -55,10 +55,10 @@
               (else (or (quick-ref obj 'ttl) -1)))))
     (< (current-seconds) (+ ttl (quick-ref obj 'timestamp)))))
 
-(define (network:uri->key uri)
+(define (uri->key uri)
   (message-digest-string (sha256-primitive) uri))
 
-(define (network:key->filename key)
+(define (key->filename key)
   (and-let* ((base-dir (*platform* 'cache-dir))
              (exists (directory-exists? base-dir)))
     (conc base-dir "/" key)))
@@ -71,22 +71,22 @@
 ;;; number. This number will be used instead of the cached
 ;;; ttl value, to determine whether the cached data is considered
 ;;; up to date or not.
-(define (network:get-entry key)
-  (and-let* ((filename (network:key->filename key))
+(define (get-entry key)
+  (and-let* ((filename (key->filename key))
              (in-cache (file-exists? filename))
              (cache-object (with-input-from-file filename read))
-             (up-to-date (network:cache-object-alive? cache-object))
+             (up-to-date (cache-object-alive? cache-object))
              (data (quick-ref cache-object 'data)))
     (debug (conc "Reading from cache: " (quick-ref cache-object 'uri)))
     data))
 
 ;;; Store data in cache and return data.
-(define (network:store uri key ttl data)
+(define (store uri key ttl data)
   (let ((object `((uri . ,uri)
                   (timestamp . ,(current-seconds))
                   (ttl . ,(if* ttl it (*cfg* 'preferences 'default-cache-ttl)))
                   (data . ,data)))
-        (filename (network:key->filename key)))
+        (filename (key->filename key)))
     (if filename
         (with-dot-lock filename
           (debug (conc "Attempting to cache " uri " in " filename))
@@ -95,7 +95,7 @@
 
 ;;; Create a TTL in seconds, given a HTTP/1.1 Cache-control max-age
 ;;; value, a HTTP/1.0 Expires value and a fallback (in seconds).
-(define (network:select-cache-ttl max-age expires fallback)
+(define (select-cache-ttl max-age expires fallback)
   (cond ((number? max-age) max-age)
         ((number? expires) expires)
         ((vector? expires) (- (utc-time->seconds expires) (current-seconds)))
@@ -113,10 +113,10 @@
 ;;; ttl is the number of seconds a cached object is considered up to data
 ;;; to use when storing it, which is later used for subsequent checks if
 ;;; the object is up-to-date.
-(define (network:cache-controller uri reader ttl-param)
-  (and-let* ((download (network:delay-download uri))
+(define (cache-controller uri reader ttl-param)
+  (and-let* ((download (delay-download uri))
              (uri-string (->string/uri uri))
-             (key (network:uri->key uri-string))
+             (key (uri->key uri-string))
              (fallback-ttl (cond
                             ((not ttl-param) -1)
                             ((number? ttl-param) ttl-param)
@@ -125,7 +125,7 @@
                     ((not (*cfg* 'preferences 'use-cache))
                      (debug (conc "Cache disabled. Fetching " uri-string))
                      (force download))
-                    ((network:get-entry key))
+                    ((get-entry key))
                     (else
                      (let-values (((result request-uri response success) (force download)))
                        (and success
@@ -135,10 +135,10 @@
                                    ;; The Cache-control max-age value should override the Expires
                                    ;; header value, if both are present. If none are present,
                                    ;; use the default ttl which the caller supplied.
-                                   (ttl (network:select-cache-ttl max-age expires fallback-ttl)))
+                                   (ttl (select-cache-ttl max-age expires fallback-ttl)))
                               (debug (conc "Storing in cache; ttl "
                                            ttl " (" max-age "/" expires ")"))
-                              (network:store uri-string key ttl result))))))))
+                              (store uri-string key ttl result))))))))
     (and (string? data)
          (with-input-from-string data reader))))
 
@@ -146,6 +146,6 @@
   (let* ((uri (if (and (string? u) (string-contains (uri->base-path u) "akamaihd.net"))
                   (make-emo-request u)
                   u)))
-    (network:cache-controller uri reader ttl)))
+    (cache-controller uri reader ttl)))
 
 )
