@@ -15,6 +15,7 @@
 (require-extension srfi-1 srfi-13)
 
 (include "misc-helpers.scm")
+(include "parsers/json.scm")
 
 ;;; Stream/video makers, accessors and updaters
 ;;; An object is a valid video iff it is a list where every item is a stream.
