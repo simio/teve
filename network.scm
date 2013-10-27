@@ -23,14 +23,15 @@
 ;;; Make a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
 (define (network:delay-download uri #!optional (reader read-string))
-  (delay
-    (begin (debug (conc "Forcing delayed download of \"" uri "\""))
-           (handle-exceptions exn
-               (begin (stderr (conc "Failed to download \"" uri "\"" #\newline
-                                    ((condition-property-accessor 'exn 'message) exn)))
-                      (values #f #f #f #f))
-             (let-values (((result request response) (with-input-from-request uri #f reader)))
-               (values result request response #t))))))
+  (let ((pretty-uri (->string/uri uri)))
+    (delay
+      (begin (debug (conc "Forcing delayed download of \"" pretty-uri "\""))
+             (handle-exceptions exn
+                 (begin (stderr (conc "Failed to download \"" pretty-uri "\"" #\newline
+                                      ((condition-property-accessor 'exn 'message) exn)))
+                        (values #f #f #f #f))
+               (let-values (((result request response) (with-input-from-request uri #f reader)))
+                 (values result request response #t)))))))
 
 ;;; Tell whether a cache object is alive.
 ;;;
