@@ -12,10 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension miscmacros)
-
-(include "video.scm")
-(include "download-commands.scm")
+(module stream-selection (video->best-stream video->best-stream-id)
+(import scheme chicken data-structures
+        miscmacros
+        config video download-commands)
 
 ;;; Calculate and return the distance between the supplied stream and
 ;;; the ideal size/bitrate.
@@ -70,3 +70,5 @@
   (let ((table (video->stream-distance-table video)))
     (and (not (null? table))
          (cadar table))))
+
+)
