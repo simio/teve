@@ -42,8 +42,8 @@
 (include "select-stream.scm")
 
 (define (select-action default play? download? list? repl?)
-  (debug "Selected action:")
-  (debug (cond
+  (debug* prepend: "Selected action:"
+         (cond
           (repl? 'repl)
           ((and play? download? (not list?)) 'tee)
           ((and play? (not list?) (not download?)) 'play)

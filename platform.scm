@@ -29,9 +29,8 @@
 			(let*-values (((in out pid) (process (conc "which " str " 2> /dev/null")))
 				      ((pid ok status) (process-wait pid)))
 			  (= 0 status)))))
-    (debug* (conc "Checking availability of " str ": " available?))
-    available?))
-	    
+    (debug* prepend: (conc "Checking availability of " str)
+            available?)))
 
 (define (make-platform)
   (let* ((nix/win (lambda (nix win)
