@@ -12,8 +12,9 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-2 srfi-13)
-(require-extension intarweb uri-common)
+(module teve-http-client (make-emo-request)
+(import scheme chicken extras data-structures uri-common intarweb http-client)
+(reexport uri-common intarweb http-client)
 
 ;;; Akamai is emotionally unstable and needs special treatment.
 ;;; The http servers might choke on url:s in GET requests containing
@@ -57,3 +58,5 @@
                 uri: (absolute-uri url)
                 major: 1
                 minor: 0))
+
+)

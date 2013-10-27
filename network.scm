@@ -12,13 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-13 posix)
-
-(require-extension miscmacros sha2 message-digest)
-
-(include "platform")
-(include "misc-helpers")
-(include "dot-locking")
+(module network (fetch)
+(import scheme chicken srfi-13 posix ports data-structures extras
+        miscmacros sha2 message-digest
+        stdouterr prelude teve-http-client platform config misc-helpers dot-locking)
 
 ;;; Make a delayed download. If a second parameter is supplied,
 ;;; it is used as a reader. The default is read-string.
@@ -150,3 +147,5 @@
                   (make-emo-request u)
                   u)))
     (network:cache-controller uri reader ttl)))
+
+)

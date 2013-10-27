@@ -15,10 +15,11 @@
 (define program-display-name "teve")
 (define program-version "0.3-devel")
 
-;; Keep this here to avoid reimporting uri-common stuff
-(include "intarweb-hack.scm")   ; loads uri-common; don't load it elsewhere
+(require-extension ini-file ssax srfi-18 http-client sha2 message-digest)
 
-(use ini-file ssax http-client srfi-18)
+;; Keep this here to avoid reimporting uri-common stuff
+(include "http-client.scm")   ; loads uri-common; don't load it elsewhere
+(import teve-http-client)
 
 (include "scheme-prelude/stdouterr.scm")
 (include "scheme-prelude/prelude.scm")
@@ -26,10 +27,9 @@
 (include "misc-helpers.scm")
 (include "dot-locking.scm")
 (include "config.scm")
-
-(import stdouterr prelude platform misc-helpers dot-locking config)
-
 (include "network.scm")
+
+(import stdouterr prelude platform misc-helpers dot-locking config network)
 
 (include "video.scm")
 (include "uri2vid.scm")
