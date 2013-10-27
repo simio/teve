@@ -15,12 +15,9 @@
 (define program-display-name "teve")
 (define program-version "0.3-devel")
 
-(require-extension ini-file ssax srfi-18 http-client sha2 message-digest)
+(require-extension miscmacros ini-file ssax srfi-18 http-client sha2 message-digest json srfi-13)
 
-;; Keep this here to avoid reimporting uri-common stuff
-(include "http-client.scm")   ; loads uri-common; don't load it elsewhere
-(import teve-http-client)
-
+(include "http-client.scm")   ; reexports uri-common, intarweb and http-client
 (include "scheme-prelude/stdouterr.scm")
 (include "scheme-prelude/prelude.scm")
 (include "platform.scm")
@@ -28,10 +25,11 @@
 (include "dot-locking.scm")
 (include "config.scm")
 (include "network.scm")
-
-(import stdouterr prelude platform misc-helpers dot-locking config network)
-
+(include "parsers/json.scm")
 (include "video.scm")
+
+(import teve-http-client stdouterr prelude platform misc-helpers dot-locking config network json-parser video)
+
 (include "uri2vid.scm")
 (include "download.scm")
 (include "select-stream.scm")

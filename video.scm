@@ -12,10 +12,9 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension srfi-1 srfi-13)
-
-(include "misc-helpers.scm")
-(include "parsers/json.scm")
+(module video *
+(import scheme chicken srfi-1 srfi-13 data-structures ports
+        config misc-helpers json-parser)
 
 ;;; Stream/video makers, accessors and updaters
 ;;; An object is a valid video iff it is a list where every item is a stream.
@@ -130,3 +129,5 @@
                                  (string-pad-right "stream id:" 22) id #\newline
                                  (stream-printer (car rest)) #\newline))
                           (+ 1 id)))))))
+
+)

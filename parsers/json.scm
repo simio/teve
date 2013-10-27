@@ -12,11 +12,14 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-69)
-
-(require-extension json miscmacros)
-
-(include "misc-helpers.scm")
+(module json-parser (sanitise-json-input
+                     unsanitise-json-input
+                     json-read->alist-tree
+                     json-ref
+                     json-printer)
+(import scheme chicken srfi-1 srfi-69 ports
+        json miscmacros
+        prelude misc-helpers)
 
 ;; Recurse through the vector/alist mess returned by json-read,
 ;; converting vectors to alists.
@@ -64,3 +67,5 @@
   (with-output-to-string
     (lambda ()
       (json-write (unsanitise-json-input data)))))
+
+)
