@@ -14,7 +14,7 @@
 
 (use posix)
 
-(require-extension miscmacros ini-file)
+(require-extension miscmacros ini-file http-client)
 
 (include "platform")
 (include "misc-helpers")

@@ -28,6 +28,7 @@
 (import prelude)
 
 (include "misc-helpers.scm")
+(import misc-helpers)
 
 (include "dot-locking.scm")
 (import dot-locking)

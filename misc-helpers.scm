@@ -12,8 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension srfi-1 srfi-13)
-(require-extension miscmacros http-client ssax)
+(module misc-helpers *
+(import scheme chicken srfi-1 srfi-13 data-structures extras
+        miscmacros http-client intarweb uri-common ssax
+        stdouterr prelude)
 
 ;;; Get transport protocol identifier from a URL.
 ;;; Return values:
@@ -144,3 +146,5 @@
    ((uri? obj) (uri->string obj))
    ((string? obj) obj)
    (else #f)))
+
+)
