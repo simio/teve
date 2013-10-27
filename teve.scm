@@ -18,20 +18,13 @@
 ;; Keep this here to avoid reimporting uri-common stuff
 (include "intarweb-hack.scm")   ; loads uri-common; don't load it elsewhere
 
-(include "scheme-prelude/stdouterr.scm")
-(import stdouterr)
+(use ini-file ssax http-client srfi-18)
 
-(include "platform.scm")
-(import platform)
-
-(include "scheme-prelude/prelude.scm")
-(import prelude)
-
-(include "misc-helpers.scm")
-(import misc-helpers)
-
-(include "dot-locking.scm")
-(import dot-locking)
+(include "scheme-prelude/stdouterr.scm") (import stdouterr)
+(include "platform.scm")                 (import platform)
+(include "scheme-prelude/prelude.scm")   (import prelude)
+(include "misc-helpers.scm")             (import misc-helpers)
+(include "dot-locking.scm")              (import dot-locking)
 
 (include "config.scm")
 (include "parse-flags.scm")     ; Should load after config.scm
@@ -42,6 +35,8 @@
 (include "uri2vid.scm")
 (include "download.scm")
 (include "select-stream.scm")
+
+(client-software (cons (list program-display-name program-version #f) (client-software)))
 
 (define (select-action default play? download? list? repl?)
   (debug* prepend: "Selected action:"
