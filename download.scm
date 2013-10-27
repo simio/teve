@@ -12,10 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use utils srfi-13)
-(require-extension miscmacros)
-
-(include "video.scm")
+(module download-commands (downloadable? stream->download-command)
+(import scheme chicken srfi-13 data-structures files utils
+        miscmacros
+        teve-http-client platform config video)
 
 (define (stream->curl/make-command stream outfile)
   (conc (*cfg* 'external-programs 'curl)
@@ -165,3 +165,5 @@
     (conc (stream->download-command stream filename)
         "& \\" #\newline
         (player-command filename))))
+
+)
