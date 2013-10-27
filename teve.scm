@@ -15,8 +15,9 @@
 (define program-display-name "teve")
 (define program-version "0.3-devel")
 
-(require-extension miscmacros ini-file ssax srfi-18 http-client sha2 message-digest json srfi-13)
+(require-extension miscmacros ini-file ssax http-client sha2 message-digest json srfi-1 srfi-13 srfi-18)
 
+;; Ordering matters here
 (include "http-client.scm")   ; reexports uri-common, intarweb and http-client
 (include "scheme-prelude/stdouterr.scm")
 (include "scheme-prelude/prelude.scm")
@@ -25,17 +26,30 @@
 (include "dot-locking.scm")
 (include "config.scm")
 (include "network.scm")
+
+;; This ordering is particularly ugly
 (include "parsers/json.scm")
 (include "video.scm")
+(include "parsers/apple-hls.scm")
 
-(import teve-http-client stdouterr prelude platform misc-helpers dot-locking config network json-parser video)
+;; This should be automated
+(include "sites/svt.scm")
+(include "sites/tv4.scm")
 
+;; This should be renamed
 (include "uri2vid.scm")
+
+;; This goofy row will go away soon enough.
+(import teve-http-client stdouterr prelude platform misc-helpers dot-locking config network json-parser apple-hls-parser video uri->video)
+
+;; These are not yet modularised
 (include "download.scm")
 (include "select-stream.scm")
 
-(include "parse-flags.scm")     ; Should load after config.scm
+;; This won't be modularised
+(include "parse-flags.scm")
 
+;; Tack "teve" onto the http user agent string
 (client-software (cons (list program-display-name program-version #f) (client-software)))
 
 (define (select-action default play? download? list? repl?)

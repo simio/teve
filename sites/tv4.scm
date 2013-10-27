@@ -12,11 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension miscmacros)
-
-(include "misc-helpers.scm")
-(include "parsers/apple-hls.scm")
-(include "video.scm")
+(module tv4 (tv4:url->videos)
+(import scheme chicken srfi-1 srfi-13 data-structures ports
+        miscmacros
+        prelude misc-helpers apple-hls-parser json-parser network teve-http-client video)
 
 (define (tv4:download-xml-data xml-base-url)
   (and-let* ((xml-base (fetch xml-base-url #:reader xml-read))
@@ -129,4 +128,4 @@
    (else
     #f)))
 
-(add-scraper tv4:url->videos)
+)

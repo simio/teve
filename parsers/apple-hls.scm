@@ -15,12 +15,10 @@
 ;;; These procedures actually don't parse HLS playlists. All they
 ;;; do is pretend.
 
-(require-extension srfi-2)
-(require-extension miscmacros http-client)
-
-;(include "intarweb-hack.scm")
-(include "misc-helpers.scm")
-(include "video.scm")
+(module apple-hls-parser (hls-master->streams)
+(import scheme chicken srfi-1 srfi-13 data-structures
+        miscmacros
+        misc-helpers teve-http-client network video)
 
 (define (hls:parse-playlist str)
   (define (read-stream mesh slat)
@@ -59,3 +57,5 @@
                               (make-stream-value 'master-playlist
                                                  playlist-url))))
          (hls:parse-playlist playlist)))))
+
+)

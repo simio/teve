@@ -12,12 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(require-extension srfi-1 srfi-2 srfi-12 srfi-13)
-(require-extension miscmacros http-client)
-
-(include "misc-helpers.scm")
-(include "parsers/apple-hls.scm")
-(include "parsers/json.scm")
+(module svt (svt:url->videos)
+(import scheme chicken srfi-1 srfi-13 ports data-structures
+        miscmacros
+        prelude misc-helpers teve-http-client network json-parser apple-hls-parser video)
 
 (define (find-first-quoted-swf)
   (let ((ending (string-reverse ".swf")))
@@ -138,5 +136,4 @@
       (filter video? result)))
    (else #f)))
 
-;;; Add svt:url->video to global scraper-table
-(add-scraper svt:url->videos)
+)

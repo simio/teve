@@ -12,9 +12,9 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-1)
-
-(include "misc-helpers.scm")
+(module uri->video (uri->videos)
+(import scheme chicken srfi-1 data-structures
+        misc-helpers svt tv4)
 
 ;;; The scrape-list is a list of all url->video procedures
 (define *scraper-list* '())
@@ -28,8 +28,9 @@
       url
       (conc "http://" url)))
       
-(include "sites/svt.scm")
-(include "sites/tv4.scm")
+;;; Add svt:url->video to global scraper-table
+(add-scraper svt:url->videos)
+(add-scraper tv4:url->videos)
 
 ;;; Dispatcher
 ;;; Each uri->videos procedure is applied to the url. The resulting
@@ -37,3 +38,5 @@
 (define (uri->videos url)
   (delete-duplicates (apply append (filter-map (lambda (u->v) (u->v (prepend-default-protocol url)))
                                                *scraper-list*))))
+
+)
