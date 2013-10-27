@@ -179,7 +179,7 @@ As of version 0.2, the following sites are supported:
       # env CSC_OPTIONS='-I /foo/include/openssl -L /foo/lib' \
                 make install-eggs
 
- P: There's some stuttering in a H.264 encoded video I downloaded.
+ P: There's some stuttering in an H.264 encoded video I downloaded.
  S: This is a known problem with libavformat version 53 or older.
     Amongst others, VLC, MPlayer and FFmpeg uses libavformat. Make
     sure you have upgraded FFmpeg (for downloading HLS streams) and
