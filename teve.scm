@@ -40,7 +40,7 @@
 (include "uri2vid.scm")
 
 (include "download-commands.scm")
-(include "select-stream.scm")
+(include "stream-selection.scm")
 
 ;; This goofy row will go away soon enough.
 (import teve-http-client stdouterr prelude platform misc-helpers dot-locking config network json-parser apple-hls-parser video uri->video download-commands stream-selection)
