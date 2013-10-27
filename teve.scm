@@ -18,10 +18,11 @@
 ;; Keep this here to avoid reimporting uri-common stuff
 (include "intarweb-hack.scm")   ; loads uri-common; don't load it elsewhere
 
-(include "platform.scm")
-
 (include "scheme-prelude/stdouterr.scm")
 (import stdouterr)
+
+(include "platform.scm")
+(import platform)
 
 (include "scheme-prelude/prelude.scm")
 (import prelude)

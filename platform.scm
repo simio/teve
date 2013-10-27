@@ -12,9 +12,10 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(use srfi-1 data-structures files posix)
-
-(require-extension miscmacros)
+(module platform (platform-dir-slashes program-available? *platform*)
+(import scheme chicken srfi-1 srfi-13 data-structures files posix
+        miscmacros
+        stdouterr)
 
 (define (platform-dir-slashes str)
   (let ((needle (if (eq? (software-type) 'windows) #\/ #\\))
@@ -79,6 +80,4 @@
 
 (define *platform* (make-platform))
 
-(define (create-user-config-dirs)
-  (create-directory (*platform* 'user-data-dir) #t)
-  (create-directory (*platform* 'cache-dir) #t))
+)
