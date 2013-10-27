@@ -20,14 +20,14 @@
 
 (use ini-file ssax http-client srfi-18)
 
-(include "scheme-prelude/stdouterr.scm") (import stdouterr)
-(include "platform.scm")                 (import platform)
-(include "scheme-prelude/prelude.scm")   (import prelude)
-(include "misc-helpers.scm")             (import misc-helpers)
-(include "dot-locking.scm")              (import dot-locking)
-(include "config.scm")                   (import config)
+(include "scheme-prelude/stdouterr.scm")
+(include "scheme-prelude/prelude.scm")
+(include "platform.scm")
+(include "misc-helpers.scm")
+(include "dot-locking.scm")
+(include "config.scm")
 
-(include "parse-flags.scm")     ; Should load after config.scm
+(import stdouterr prelude platform misc-helpers dot-locking config)
 
 (include "network.scm")
 
@@ -35,6 +35,8 @@
 (include "uri2vid.scm")
 (include "download.scm")
 (include "select-stream.scm")
+
+(include "parse-flags.scm")     ; Should load after config.scm
 
 (client-software (cons (list program-display-name program-version #f) (client-software)))
 
