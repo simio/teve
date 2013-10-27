@@ -15,7 +15,7 @@
 (require-extension miscmacros)
 
 (include "video.scm")
-(include "download.scm")
+(include "download-commands.scm")
 
 ;;; Calculate and return the distance between the supplied stream and
 ;;; the ideal size/bitrate.
