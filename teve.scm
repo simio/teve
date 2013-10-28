@@ -51,7 +51,7 @@
 (client-software (cons (list program-display-name program-version #f) (client-software)))
 
 (define (select-action default play? download? list? repl?)
-  (debug* prepend: "Selected action:"
+  (debug* prepend: "Selected action"
          (cond
           (repl? 'repl)
           ((and play? download? (not list?)) 'tee)
