@@ -13,7 +13,7 @@
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 (define program-display-name "teve")
-(define program-version "0.2.4")
+(define program-version "0.2.5")
 
 ;; Keep this here to avoid reimporting uri-common stuff
 (include "intarweb-hack.scm")   ; loads uri-common; don't load it elsewhere
