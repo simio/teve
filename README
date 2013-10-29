@@ -8,10 +8,10 @@ useless due to changes to svtplay.se.
 
 1. REQUIREMENTS
 
-Chicken Scheme is required to run and compile teve, preferably Chicken
-version 4.8 or later. If your package manager does not provide Chicken,
-or provides only an outdated version, building Chicken from source is
-mind-numbingly simple on most platforms.
+Chicken Scheme 4.8 or later is required to run and compile teve. If your
+package manager does not provide Chicken Scheme 4.8, or provides only an
+outdated version, building Chicken from source is mind-numbingly simple
+on most platforms.
 
 The Chicken source code and pre-compiled binaries are available from the
 Chicken home page:
