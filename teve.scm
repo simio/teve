@@ -15,8 +15,8 @@
 (define program-display-name "teve")
 (define program-version "0.3-devel")
 
-(require-extension srfi-1 srfi-13 srfi-18 utils
-                   miscmacros ini-file ssax http-client sha2 message-digest json)
+(use srfi-1 srfi-13 srfi-18 srfi-69 data-structures extras files ports posix utils 
+     http-client ini-file intarweb json message-digest miscmacros ssax sha2 uri-common)
 
 ;; Ordering matters here
 (include "http-client.scm")   ; reexports uri-common, intarweb and http-client
