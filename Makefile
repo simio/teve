@@ -14,7 +14,7 @@ TARBALL_FILES=$(SOURCE_FILES) $(EXTRA_SOURCE_FILES) $(EXTRA_DEPLOY_FILES)
 
 EGGS=intarweb args json http-client vector-lib packrat openssl base64 \
 	defstruct uri-common matchable uri-generic message-digest ssax \
-	ini-file message-digest sha2 input-parse srfi-37
+	ini-file message-digest sha2 input-parse srfi-37 miscmacros
 
 OTHER_DEPLOY_FILES=type-checks type-errors regex blob-hexadecimal to-hex \
 	string-hexadecimal variable-item blob-set-int md5 string-utils \
