@@ -1,5 +1,5 @@
 TARGET = teve
-GITREV != git rev-parse --short=7 HEAD
+GITREV != git rev-parse --short=10 HEAD
 
 TARBALL = $(TARGET)-source-$(GITREV).tar.gz
 
