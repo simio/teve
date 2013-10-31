@@ -1,9 +1,18 @@
-TARGET = teve
-GITREV != git rev-parse --short=10 HEAD
+TARGET=teve
 
-TARBALL = $(TARGET)-source-$(GITREV).tar.gz
+# Hack to solve GNU/BSD Make inconsistency
+# On BSD Make, the second assignment overrides the effect of the first.
+# On GNU Make versions without the != operator, the first assignment
+# works as expected, while the second assignment assigns to another
+# variable named 'GITREV!' (including the bang).
+# End result: On BSD and GNU Make, there's a variable named GITREV which
+# contains the output of running git as below.
+GITREV:=	$(shell git rev-parse --short=10 HEAD)
+GITREV!=	git rev-parse --short=10 HEAD
 
-PREFIX ?= /usr/opt
+TARBALL=$(TARGET)-source-$(GITREV).tar.gz
+
+PREFIX?=/usr/opt
 
 TEST_FILES=tests/*.scm
 TEST_RUNNER=run-tests.scm
