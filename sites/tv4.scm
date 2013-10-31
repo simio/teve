@@ -89,6 +89,7 @@
                                   (if subtitles
                                       (make-stream-value 'subtitles subtitles))
                                   (make-stream-value 'live is-live)
+                                  (make-stream-value 'title (sxml-ref data 'playback 'title))
                                   (make-stream-value 'default-filename (suggest-filename))
                                   (if (eq? 'rtmp (stream-ref 'stream-type stream))
                                       (make-stream-value 'swf-player swf-player))))
