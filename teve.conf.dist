@@ -2,12 +2,11 @@
 ; The values set below are also the hardcoded defaults.
 
 [external-programs]
-; These are the paths executed by teve to run external programs.
-; The default values are just filenames, meaning you will have to
-; either use absolute paths or set up your $PATH to point to these files.
-; Paths can also be specified in environment variables. Paths specified
-; in environment variables have priority over any paths supplied
-; in configuration files.
+; These are the paths executed by teve to run external programs. The default
+; values are just filenames, meaning you will have to either use absolute
+; paths or set up your $PATH to point to these files. Paths can also be
+; specified in environment variables. Values specified in this file have
+; priority over values specified in environment variables.
 rtmpdump="rtmpdump"             ; $RTMPDUMP
 ffmpeg="ffmpeg"                 ; $FFMPEG
 mplayer="mplayer"               ; $MPLAYER
