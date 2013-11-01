@@ -134,7 +134,10 @@
                                    (expires (header-value 'expires (response-headers response)))
                                    ;; The Cache-control max-age value should override the Expires
                                    ;; header value, if both are present. If none are present,
-                                   ;; use the default ttl which the caller supplied.
+                                   ;; use the default ttl which the caller supplied. Note that
+                                   ;; this behaviour is not compliant; if neither max-age nor
+                                   ;; Expires was set and the page somehow requested us to not
+                                   ;; cache the data at all, we cache it with the default ttl.
                                    (ttl (select-cache-ttl max-age expires fallback-ttl)))
                               (debug (conc "Storing in cache; ttl "
                                            ttl " (" max-age "/" expires ")"))
