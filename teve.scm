@@ -62,6 +62,11 @@
           ((not (or list? play? download?)) default)
           (else #f))))
 
+;; Define before set! to silent some warnings
+(define *preferred-id* #f)
+(define *videos* #f)
+(define *video* #f)
+(define *uri* #f)
 (define (teve:repl uri id videos video)
   (set! *preferred-id* id)
   (set! *videos* videos)

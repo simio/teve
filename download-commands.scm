@@ -12,7 +12,9 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(module download-commands (downloadable? stream->download-command)
+(module download-commands (downloadable?
+                           stream->download-command
+                           stream->play-command)
 (import scheme chicken srfi-13 data-structures files utils
         miscmacros
         teve-http-client platform config video)
