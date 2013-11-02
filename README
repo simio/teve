@@ -186,6 +186,10 @@ As of version 0.2, the following sites are supported:
     are using the latest version of your media player of choice. If
     this does not remedy the problem, please file a bug report.
 
+ P: When trying to compile, csc fails with a message of an unbound
+    identifier 'alist-update'.
+ S: Your version of Chicken Scheme is outdated. Version 4.8 or higher
+    is required.
 
 9. CONTACT
 
