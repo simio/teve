@@ -23,11 +23,11 @@
   (conc (*cfg* 'external-programs 'curl)
         " -L"
         " -o " (qs outfile)
-        " " (qs (stream-ref 'url stream))))
+        " " (qs (stream-ref 'uri stream))))
 
 (define (stream->rtmpdump/make-command stream outfile)
   (conc (*cfg* 'external-programs 'rtmpdump)
-        " -r " (qs (stream-ref 'url stream))
+        " -r " (qs (stream-ref 'uri stream))
         (if* (stream-ref 'swf-path stream)
              (conc " -y" (qs it))
              "")
@@ -41,7 +41,7 @@
 
 (define (stream->ffmpeg/make-command stream outfile)
   (conc (*cfg* 'external-programs 'ffmpeg)
-        " -i " (qs (stream-ref 'url stream))
+        " -i " (qs (stream-ref 'uri stream))
         " -codec copy"
         (if* (stream-ref 'ffmpeg-parameters stream)
              (conc " " it)
@@ -53,7 +53,7 @@
         " "
         (*cfg* 'external-programs 'adobehds.php)
         " --delete " ;; Script will clean up if not interrupted
-        " --manifest " (qs (stream-ref 'url stream))
+        " --manifest " (qs (stream-ref 'uri stream))
         (if* (stream-ref 'adobe.hds-parameters stream)
              (conc " " it)
              "")
@@ -65,7 +65,7 @@
         (if* (stream-ref 'mplayer-parameters stream)
              (conc " " it)
              "")
-        " " (qs (stream-ref 'url stream))))
+        " " (qs (stream-ref 'uri stream))))
 
 (define (extract-uri-path str)
   (let ((uri (uri-reference str)))
@@ -77,8 +77,8 @@
   (let ((swf-path-ext (and (eq? 'rtmp (stream-ref 'stream-type stream))
                            (pathname-extension
                             (extract-uri-path (stream-ref 'swf-path stream)))))
-        (url-path-ext (pathname-extension
-                       (extract-uri-path (stream-ref 'url stream)))))
+        (uri-path-ext (pathname-extension
+                       (extract-uri-path (stream-ref 'uri stream)))))
     (cond
      ((stream-ref 'filename-extension stream))
      (swf-path-ext)
@@ -86,7 +86,7 @@
         ((hls hds) "mp4")
         ((wmv mms) "wmv")
         (else #f)))
-     (url-path-ext)
+     (uri-path-ext)
      (else "flv"))))
 
 (define (enforce-extension extension filename)
@@ -99,8 +99,8 @@
    ((stream-ref 'default-filename stream))
    ((stream-ref 'swf-path stream)
     (pathname-file (stream-ref 'swf-path stream)))
-   ((stream-ref 'url stream)
-    (pathname-file (stream-ref 'url stream)))
+   ((stream-ref 'uri stream)
+    (pathname-file (stream-ref 'uri stream)))
    (else "downloaded-video")))
 
 (define (stream->default-filename stream)

@@ -19,24 +19,24 @@
 
 ;;; Get transport protocol identifier from a URL.
 ;;; Return values:
-;;;   A string          (if url contains "://")
+;;;   A string          (if uri contains "://")
 ;;;   #f                (otherwise)
-;;; Unspecified if url is not a string or char.
-(define (url->protocol url)
-  (let ((index (and (string? url)
-                    (string-contains-ci url "://"))))
+;;; Unspecified if uri is not a string or char.
+(define (uri->protocol uri)
+  (let ((index (and (string? uri)
+                    (string-contains-ci uri "://"))))
     (if index
-        (string-take url index)
+        (string-take uri index)
         #f)))
 
-;;; Add a query var=value pair to a url
+;;; Add a query var=value pair to a uri
 ;;; Return values:
 ;;;   A string
-;;; Unspecified if url, var or val is not a string or char.
-(define (add-http-get-query-var url var val)
-  (if (string? url)
-      (conc url
-            (if (string-index url #\?)
+;;; Unspecified if uri, var or val is not a string or char.
+(define (add-http-get-query-var uri var val)
+  (if (string? uri)
+      (conc uri
+            (if (string-index uri #\?)
                 "&"
                 "?")
             var #\= val)
@@ -127,7 +127,7 @@
 (define (xml-read)
   (ssax:xml->sxml (current-input-port) '()))
 
-;;; Fed with a string containing a url, it will return
+;;; Fed with a string containing a uri, it will return
 ;;; "scheme://hostname[:non-default-port]"
 (define (uri->base-path str)
   (and-let* ((uri (uri-reference str)))

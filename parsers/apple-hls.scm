@@ -31,7 +31,7 @@
        (cons 'video-width (car resolution))
        (cons 'video-height (cdr resolution))
        (cons 'bitrate (/ (cdr bandwidth) 1000))
-       (cons 'url (uri-decode-string (car slat))))))
+       (cons 'uri (uri-decode-string (car slat))))))
   (let read-entries ((playlist (cdr (string-split str (string #\newline))))
                      (streams '()))
     (cond ((or (null? playlist)
@@ -43,8 +43,8 @@
                               (cons it streams)
                               streams))))))
 
-(define (hls-master->streams playlist-url)
-  (let ((playlist (fetch playlist-url)))
+(define (hls-master->streams playlist-uri)
+  (let ((playlist (fetch playlist-uri)))
     (if (not (and (string? playlist)
                   (string-contains playlist (string #\newline))))
         #f
@@ -55,7 +55,7 @@
                (update-stream stream
                               (make-stream-value 'stream-type 'hls)
                               (make-stream-value 'master-playlist
-                                                 playlist-url))))
+                                                 playlist-uri))))
          (hls:parse-playlist playlist)))))
 
 )

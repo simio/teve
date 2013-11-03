@@ -16,27 +16,27 @@
 (import scheme chicken srfi-1 data-structures
         misc-helpers svt tv4)
 
-;;; The scrape-list is a list of all url->video procedures
+;;; The scrape-list is a list of all uri->video procedures
 (define *scraper-list* '())
 
 ;;; Allow "plugins" in sites/ to add procedures to the scraper-list
 (define (add-scraper procedure)
   (set! *scraper-list* (cons procedure *scraper-list*)))
 
-(define (prepend-default-protocol url)
-  (if (url->protocol url)
-      url
-      (conc "http://" url)))
+(define (prepend-default-protocol uri)
+  (if (uri->protocol uri)
+      uri
+      (conc "http://" uri)))
       
-;;; Add svt:url->video to global scraper-table
-(add-scraper svt:url->videos)
-(add-scraper tv4:url->videos)
+;;; Add svt:uri->video to global scraper-table
+(add-scraper svt:uri->videos)
+(add-scraper tv4:uri->videos)
 
 ;;; Dispatcher
-;;; Each uri->videos procedure is applied to the url. The resulting
+;;; Each uri->videos procedure is applied to the uri. The resulting
 ;;; videos are appended into a video-list, which is returned.
-(define (uri->videos url)
-  (delete-duplicates (apply append (filter-map (lambda (u->v) (u->v (prepend-default-protocol url)))
+(define (uri->videos uri)
+  (delete-duplicates (apply append (filter-map (lambda (u->v) (u->v (prepend-default-protocol uri)))
                                                *scraper-list*))))
 
 )

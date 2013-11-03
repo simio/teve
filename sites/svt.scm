@@ -12,7 +12,7 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(module svt (svt:url->videos)
+(module svt (svt:uri->videos)
 (import scheme chicken srfi-1 srfi-13 ports data-structures
         miscmacros
         prelude misc-helpers teve-http-client network json-parser apple-hls-parser video)
@@ -33,13 +33,13 @@
                              (not-if (char=? #\" ch) is-discarding)
                              (read-char)))))))
 
-(define (svt:swf-player-in url)
-  (and-let* ((swf (with-input-from-string (fetch url)
+(define (svt:swf-player-in uri)
+  (and-let* ((swf (with-input-from-string (fetch uri)
                     find-first-quoted-swf)))
     (conc "http://www.svtplay.se" swf)))
 
-(define (svt:stream-type-of url bitrate player-type)
-  (let ((protocol (url->protocol url)))
+(define (svt:stream-type-of uri bitrate player-type)
+  (let ((protocol (uri->protocol uri)))
     (cond ((string=? player-type "ios")
            'hls)
           ((and (string=? player-type "wmv")
@@ -53,7 +53,7 @@
            'rtmp)
           ((and (string=? player-type "flash")
                 (string-prefix? "http" protocol))
-           (if (string-suffix? ".f4m" url)
+           (if (string-suffix? ".f4m" uri)
                'hds
                'http))
           ((and (string=? player-type "wmv")
@@ -62,23 +62,23 @@
           (else #f))))
 
 (define (svt:json-stream->streams jstr)
-  (and-let* ((supplied-url (cdip (assoc "url" jstr)))
+  (and-let* ((supplied-uri (cdip (assoc "url" jstr)))
              (bitrate (cdip (assoc "bitrate" jstr)))
              (player-type (cdip (assoc "playerType" jstr)))
-             (stream-type (svt:stream-type-of supplied-url bitrate player-type))
-             (url (if (eq? stream-type 'hds)
-                      (conc supplied-url "?hdcore=2.9.4&g=" (string-upcase (make-rnd-string 12)))
-                      supplied-url)))
+             (stream-type (svt:stream-type-of supplied-uri bitrate player-type))
+             (uri (if (eq? stream-type 'hds)
+                      (conc supplied-uri "?hdcore=2.9.4&g=" (string-upcase (make-rnd-string 12)))
+                      supplied-uri)))
     (case stream-type
-      ((hls) (hls-master->streams url))
-      (else (list (make-stream (make-stream-value 'url url)
+      ((hls) (hls-master->streams uri))
+      (else (list (make-stream (make-stream-value 'uri uri)
                                (make-stream-value 'stream-type stream-type)
                                (if (< 0 bitrate)
                                    (make-stream-value 'bitrate bitrate))))))))
 
 ;;; Return a list of videos constructed from the json object
-;;; downloaded from the supplied url, or return #f.
-(define (svt:json-url->videos path)
+;;; downloaded from the supplied uri, or return #f.
+(define (svt:json-uri->videos path)
   (and-let* ((uri (uri-reference path))
              (json-data (fetch path #:reader json-read->alist-tree))
              (references (json-ref json-data "video" "videoReferences")))
@@ -107,32 +107,32 @@
                                   '()
                                   (filter-map svt:json-stream->streams references)))))))
 
-;;; Return a JSON url extracted from an embedded svtplay video, or
+;;; Return a JSON uri extracted from an embedded svtplay video, or
 ;;; return #f.
-(define (svt:embedded-player->json-url url)
-  (and-let* ((source (fetch url))
+(define (svt:embedded-player->json-uri uri)
+  (and-let* ((source (fetch uri))
              (value (first-html-attribute "data-json-href" source)))
     (string-replace-every "&amp;" "&" (uri-decode-string value))))
 
-(define (svt:url->videos url)
+(define (svt:uri->videos uri)
   (cond
-   ((or (string-contains url "://svtplay.se/")
-        (string-contains url "://oppetarkiv.se/")
-        (string-contains url "://öppetarkiv.se/")
-        (string-contains url "://svt.se/"))
-    (svt:url->videos (string-replace-every "://" "://www." url)))
-   ((or (string-contains url "://www.svtplay.se/")
-        (string-contains url "://www.oppetarkiv.se/")
-        (string-contains url "://www.öppetarkiv.se/")
-        (string-contains url "://xn--ppetarkiv-z7a.se/")
-        (string-contains url "://www.xn--ppetarkiv-z7a.se/"))
-    (and-let* ((result (svt:json-url->videos (add-http-get-query-var url "output" "json"))))
+   ((or (string-contains uri "://svtplay.se/")
+        (string-contains uri "://oppetarkiv.se/")
+        (string-contains uri "://öppetarkiv.se/")
+        (string-contains uri "://svt.se/"))
+    (svt:uri->videos (string-replace-every "://" "://www." uri)))
+   ((or (string-contains uri "://www.svtplay.se/")
+        (string-contains uri "://www.oppetarkiv.se/")
+        (string-contains uri "://www.öppetarkiv.se/")
+        (string-contains uri "://xn--ppetarkiv-z7a.se/")
+        (string-contains uri "://www.xn--ppetarkiv-z7a.se/"))
+    (and-let* ((result (svt:json-uri->videos (add-http-get-query-var uri "output" "json"))))
       (filter video? result)))
-   ((or (string-contains url "://www.svt.se/"))
-    (and-let* ((json-url (svt:embedded-player->json-url url))
-               (result (svt:json-url->videos (if (string-prefix? "http" json-url)
-                                                 json-url
-                                                 (conc (uri->base-path url) json-url)))))
+   ((or (string-contains uri "://www.svt.se/"))
+    (and-let* ((json-uri (svt:embedded-player->json-uri uri))
+               (result (svt:json-uri->videos (if (string-prefix? "http" json-uri)
+                                                 json-uri
+                                                 (conc (uri->base-path uri) json-uri)))))
       (filter video? result)))
    (else #f)))
 

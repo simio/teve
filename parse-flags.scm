@@ -68,7 +68,7 @@
 (define (usage)
   (with-output-to-port (current-error-port)
     (lambda ()
-      (print "Usage: " (*platform* 'program-filename) " [options] <url>"
+      (print "Usage: " (*platform* 'program-filename) " [options] <uri>"
              #\newline (args:usage opts)
              (conc "Please report bugs to jesper at huggpunkt.org or"
                    " https://github.com/simio/teve"))))

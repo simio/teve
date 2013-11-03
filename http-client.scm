@@ -17,12 +17,12 @@
 (reexport uri-common intarweb http-client)
 
 ;;; Akamai is emotionally unstable and needs special treatment.
-;;; The http servers might choke on url:s in GET requests containing
-;;; url-encoded commas. This could be worked around in many ways, but
+;;; The http servers might choke on uri:s in GET requests containing
+;;; uri-encoded commas. This could be worked around in many ways, but
 ;;; better not mess with the low level stuff. Instead, just redefine the
 ;;; http-1.0-request-unparser to use a write-request-line which specifically
 ;;; decodes commas.
-(define (hacks:url-decode-commas str)
+(define (hacks:uri-decode-commas str)
   (string-translate* str '(("%2C" . ","))))
 
 ;;; This function UNMODIFIED from intarweb.scm
@@ -32,7 +32,7 @@
 (define (write-request-line/decode-commas request)
   (display (sprintf "~A ~A HTTP/~A.~A\r\n"
                     (http-method->string (request-method request))
-                    (hacks:url-decode-commas		;; Only mod here.
+                    (hacks:uri-decode-commas		;; Only mod here.
                      (uri->string (request-uri request)))
                     (request-major request)
                     (request-minor request))
@@ -53,9 +53,9 @@
                          http-1.0-request-unparser/decode-commas))
 
 ;;; Finally, a request maker which guarantees niceness to fragile Akamai.
-(define (make-emo-request url)
+(define (make-emo-request uri)
   (make-request method: 'GET
-                uri: (absolute-uri url)
+                uri: (absolute-uri uri)
                 major: 1
                 minor: 0))
 
