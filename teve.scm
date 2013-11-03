@@ -15,33 +15,7 @@
 (define program-display-name "teve")
 (define program-version "0.3-devel")
 
-(use srfi-1 srfi-13 srfi-18 srfi-69 data-structures extras files ports posix utils 
-     http-client ini-file intarweb json message-digest miscmacros ssax sha2 uri-common)
-
-;; Ordering matters here
-(include "http-client.scm")   ; reexports uri-common, intarweb and http-client
-(include "scheme-prelude/stdouterr.scm")
-(include "scheme-prelude/prelude.scm")
-(include "platform.scm")
-(include "misc-helpers.scm")
-(include "dot-locking.scm")
-(include "config.scm")
-(include "network.scm")
-
-;; This ordering is particularly ugly
-(include "parsers/json.scm")
-(include "video.scm")
-(include "parsers/apple-hls.scm")
-
-;; This should be automated
-(include "sites/svt.scm")
-(include "sites/tv4.scm")
-
-;; This should be renamed
-(include "uri2vid.scm")
-
-(include "download-commands.scm")
-(include "stream-selection.scm")
+(include "build-system.scm")
 
 (import stdouterr video platform config uri->video stream-selection download-commands)
 
