@@ -14,6 +14,8 @@
 
 (use srfi-78)
 
+(include "build-system.scm")
+
 (define-syntax check/expect-error
   (syntax-rules ()
     ((check/expect-errors args ...)

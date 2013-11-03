@@ -15,7 +15,8 @@
 (use srfi-78 srfi-12)
 
 (include "tests/global.scm")
-(include "video.scm")
+
+(import video)
 
 ;; Stream values
 (check (make-stream-value 'key 5) => '(key . 5))
@@ -27,60 +28,60 @@
 ;; Streams
 (check (make-stream) => '())
 (check (make-stream
-        (make-stream-value 'url "http://example.com/")
+        (make-stream-value 'uri "http://example.com/")
         (make-stream-value "invalid" "value")
         (make-stream-value 'bitrate 192)
         (list '(sublist . isivanlid)))
-       => '((url . "http://example.com/")(bitrate . 192)))
+       => '((uri . "http://example.com/")(bitrate . 192)))
 
 (define test-stream (make-stream
-                     (make-stream-value 'url "http://example.com/")
+                     (make-stream-value 'uri "http://example.com/")
                      (make-stream-value "invalid" "value")
                      (make-stream-value 'bitrate 192)))
 
 (define test-stream-2 (make-stream
-                       (make-stream-value 'url "http://example.net/")
+                       (make-stream-value 'uri "http://example.net/")
                        "not-a-stream-value"
                        (make-stream-value 'bitrate 256)
-                       (make-stream-value 'url "http://double.example.net/")))
-(check test-stream-2 => (list (cons 'url "http://example.net/")
+                       (make-stream-value 'uri "http://double.example.net/")))
+(check test-stream-2 => (list (cons 'uri "http://example.net/")
                               (cons 'bitrate 256)))
 
 (check (stream? test-stream) => #t)
 (check (stream? '(a . 4)) => #f)
 (check (stream? 'symbol) => #f)
-(check (stream? (list (make-stream-value 'url "http://example.com/") #f))
+(check (stream? (list (make-stream-value 'uri "http://example.com/") #f))
        => #f)
 
-(check (stream-ref 'url test-stream) => "http://example.com/")
-(check (stream-value? (assoc 'url test-stream)) => #t)
+(check (stream-ref 'uri test-stream) => "http://example.com/")
+(check (stream-value? (assoc 'uri test-stream)) => #t)
 (check (stream-ref 'invalid test-stream) => #f)
-(check (stream-ref 'url 'not-a-stream) => #f)
+(check (stream-ref 'uri 'not-a-stream) => #f)
 
 (check (update-stream (make-stream)) => '())
 (check (update-stream test-stream
                       (make-stream-value 'bitrate 256))
        => '((bitrate . 256)
-            (url . "http://example.com/")))
+            (uri . "http://example.com/")))
 (check (update-stream test-stream
                       (make-stream-value 'referer "http://example.org/"))
        => '((referer . "http://example.org/")
-            (url . "http://example.com/")
+            (uri . "http://example.com/")
             (bitrate . 192)))
 (check (update-stream test-stream
                       (make-stream-value 'referer "http://example.org/")
                       (make-stream-value 'bitrate 256))
        => '((referer . "http://example.org/")
             (bitrate . 256)
-            (url . "http://example.com/")))
+            (uri . "http://example.com/")))
 
 (check (pairs->stream (list
                        '(a . b)
                        '("fail" . 'here)
-                       (assoc 'url test-stream)))
+                       (assoc 'uri test-stream)))
        => (make-stream
            (make-stream-value 'a 'b)
-           (make-stream-value 'url "http://example.com/")))
+           (make-stream-value 'uri "http://example.com/")))
 (check/expect-error
  (expand '(pairs->stream)))
 (check (pairs->stream '()) => '())
@@ -123,7 +124,7 @@
 (define test-video-2 (make-video test-stream test-stream-2))
 
 (check (video-ref 0 test-video)
-       => '((url . "http://example.com/")
+       => '((uri . "http://example.com/")
             (bitrate . 192)))
 (check (stream? (video-ref 1 test-video-2)) => #t)
 (check (video-ref 3 test-video-2) => #f)

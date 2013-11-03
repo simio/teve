@@ -14,12 +14,8 @@
 
 (use srfi-78)
 
-(include "scheme-prelude/stdouterr")
-(include "scheme-prelude/prelude")
-(import prelude)
-
 (include "tests/global.scm")
-(include "parsers/json.scm")
+(import prelude json-parser)
 
 ;;; I have no idea why, but if these long strings are not broken up
 ;;; into pieces like this, csi as an inferior scheme in Emacs will

@@ -15,15 +15,16 @@
 (use srfi-13 srfi-14 srfi-78)
 
 (include "tests/global.scm")
-(include "misc-helpers.scm")
 
-;; url->protocol
-(check (url->protocol "http://www.example.com/") => "http")
-(check (url->protocol "https://www.example.com/") => "https")
-(check (url->protocol "hvhs:http://www.example.com/") => "hvhs:http")
-(check (url->protocol "://tjo") => "")
-(check (url->protocol "http") => #f)
-(check (url->protocol 5) => #f)
+(import misc-helpers)
+
+;; uri->protocol
+(check (uri->protocol "http://www.example.com/") => "http")
+(check (uri->protocol "https://www.example.com/") => "https")
+(check (uri->protocol "hvhs:http://www.example.com/") => "hvhs:http")
+(check (uri->protocol "://tjo") => "")
+(check (uri->protocol "http") => #f)
+(check (uri->protocol 5) => #f)
 
 ;; add-http-get-query-var
 (check (add-http-get-query-var "http://www.example.org/?var=val" "var1" "val1")
