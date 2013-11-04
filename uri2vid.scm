@@ -14,7 +14,7 @@
 
 (module uri->video (uri->videos)
 (import scheme chicken srfi-1 data-structures
-        misc-helpers svt tv4)
+        misc-helpers config svt tv4)
 
 ;;; The scrape-list is a list of all uri->video procedures
 (define *scraper-list* '())
@@ -32,11 +32,17 @@
 (add-scraper svt:uri->videos)
 (add-scraper tv4:uri->videos)
 
+;;; Expand preset strings into uri:s
+(define (expand-channels str)
+  (or (*cfg* 'channels str) str))
+
 ;;; Dispatcher
 ;;; Each uri->videos procedure is applied to the uri. The resulting
 ;;; videos are appended into a video-list, which is returned.
 (define (uri->videos uri)
-  (delete-duplicates (apply append (filter-map (lambda (u->v) (u->v (prepend-default-protocol uri)))
-                                               *scraper-list*))))
+  (delete-duplicates
+   (apply append (filter-map (lambda (u->v)
+                               (u->v (prepend-default-protocol (expand-channels uri))))
+                             *scraper-list*))))
 
 )
