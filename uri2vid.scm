@@ -34,7 +34,7 @@
 
 ;;; Expand preset strings into uri:s
 (define (expand-channels str)
-  (or (*cfg* 'channels str) str))
+  (or (*cfg* 'channels (string->symbol str)) str))
 
 ;;; Dispatcher
 ;;; Each uri->videos procedure is applied to the uri. The resulting
