@@ -190,6 +190,11 @@ As of version 0.2, the following sites are supported:
     identifier 'alist-update'.
  S: Your version of Chicken Scheme is outdated. Version 4.8 or higher
     is required.
+ 
+ P: make complains about targets not found in scheme-prelude/ and
+    refuses to do anything.
+ S: You need to 'git submodule update --init', or fetch the files
+    manually from https://github.com/simio/scheme-prelude
 
 9. CONTACT
 
