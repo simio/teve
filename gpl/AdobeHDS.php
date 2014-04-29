@@ -7,6 +7,7 @@
   define('CODEC_ID_AAC', 0x0A);
   define('AVC_SEQUENCE_HEADER', 0x00);
   define('AAC_SEQUENCE_HEADER', 0x00);
+  define('AVC_NALU', 0x01);
   define('AVC_SEQUENCE_END', 0x02);
   define('FRAMEFIX_STEP', 40);
   define('INVALID_TIMESTAMP', -1);
@@ -36,16 +37,16 @@
                   if ($isSwitch)
                       $arg = preg_replace('/^-+/', '', $arg);
 
-                  if ($paramSwitch && $isSwitch)
+                  if ($paramSwitch and $isSwitch)
                       $this->error("[param] expected after '$paramSwitch' switch (" . self::$ACCEPTED[1][$paramSwitch] . ')');
-                  else if (!$paramSwitch && !$isSwitch)
+                  else if (!$paramSwitch and !$isSwitch)
                     {
                       if ($handleUnknown)
                           $this->params['unknown'][] = $arg;
                       else
                           $this->error("'$arg' is an invalid option, use --help to display valid switches.");
                     }
-                  else if (!$paramSwitch && $isSwitch)
+                  else if (!$paramSwitch and $isSwitch)
                     {
                       if (isset($this->params[$arg]))
                           $this->error("'$arg' switch can't occur more than once");
@@ -56,7 +57,7 @@
                       else if (!isset(self::$ACCEPTED[0][$arg]))
                           $this->error("there's no '$arg' switch, use --help to display all switches.");
                     }
-                  else if ($paramSwitch && !$isSwitch)
+                  else if ($paramSwitch and !$isSwitch)
                     {
                       $this->params[$paramSwitch] = $arg;
                       $paramSwitch                = false;
@@ -66,7 +67,7 @@
 
           // Final check
           foreach ($this->params as $k => $v)
-              if (isset(self::$ACCEPTED[1][$k]) && $v === true)
+              if (isset(self::$ACCEPTED[1][$k]) and $v === true)
                   $this->error("[param] expected after '$k' switch (" . self::$ACCEPTED[1][$k] . ')');
         }
 
@@ -96,20 +97,21 @@
   class cURL
     {
       var $headers, $user_agent, $compression, $cookie_file;
-      var $active, $cert_check, $fragProxy, $proxy, $response;
+      var $active, $cert_check, $fragProxy, $maxSpeed, $proxy, $response;
       var $mh, $ch, $mrc;
       static $ref = 0;
 
       function cURL($cookies = true, $cookie = 'Cookies.txt', $compression = 'gzip', $proxy = '')
         {
           $this->headers     = $this->headers();
-          $this->user_agent  = 'Mozilla/5.0 (Windows NT 5.1; rv:23.0) Gecko/20100101 Firefox/23.0';
+          $this->user_agent  = 'Mozilla/5.0 (Windows NT 5.1; rv:26.0) Gecko/20100101 Firefox/26.0';
           $this->compression = $compression;
           $this->cookies     = $cookies;
           if ($this->cookies == true)
               $this->cookie($cookie);
           $this->cert_check = false;
           $this->fragProxy  = false;
+          $this->maxSpeed   = 0;
           $this->proxy      = $proxy;
           self::$ref++;
         }
@@ -259,6 +261,8 @@
             }
           if ($this->fragProxy and $this->proxy)
               $this->setProxy($download['ch'], $this->proxy);
+          if ($this->maxSpeed > 0)
+              curl_setopt($process, CURLOPT_MAX_RECV_SPEED_LARGE, $this->maxSpeed);
           curl_multi_add_handle($this->mh, $download['ch']);
           do
             {
@@ -494,6 +498,8 @@
                       $bitrate = $childManifest['bitrate'];
                   else
                       $bitrate = $count++;
+                  while (isset($this->media[$bitrate]))
+                      $bitrate++;
                   $streamId = isset($stream[strtolower('streamId')]) ? $stream[strtolower('streamId')] : "";
                   $mediaEntry =& $this->media[$bitrate];
 
@@ -501,6 +507,18 @@
                   $mediaEntry['url']     = $stream['url'];
                   if (isRtmpUrl($mediaEntry['baseUrl']) or isRtmpUrl($mediaEntry['url']))
                       LogError("Provided manifest is not a valid HDS manifest");
+
+                  // Use embedded auth information when available
+                  $idx = strpos($mediaEntry['url'], '?');
+                  if ($idx !== false)
+                    {
+                      $mediaEntry['queryString'] = substr($mediaEntry['url'], $idx);
+                      $mediaEntry['url']         = substr($mediaEntry['url'], 0, $idx);
+                      if (strlen($this->auth) != 0 and strcmp($this->auth, $mediaEntry['queryString']) != 0)
+                          LogDebug("Manifest overrides 'auth': " . $mediaEntry['queryString']);
+                    }
+                  else
+                      $mediaEntry['queryString'] = $this->auth;
 
                   if (isset($stream[strtolower('bootstrapInfoId')]))
                       $bootstrap = $xml->xpath("/ns:manifest/ns:bootstrapInfo[@id='" . $stream[strtolower('bootstrapInfoId')] . "']");
@@ -767,10 +785,13 @@
               $this->fragCount += $current['fragmentsPerSegment'];
               $prev = $current;
             }
-          if ($this->fragCount > 0)
+          if (!($this->fragCount & 0x80000000))
               $this->fragCount += $firstFragment['firstFragment'] - 1;
-          else
+          if ($this->fragCount & 0x80000000)
+            {
+              $this->fragCount  = 0;
               $invalidFragCount = true;
+            }
           if ($this->fragCount < $lastFragment['firstFragment'])
               $this->fragCount = $lastFragment['firstFragment'];
 
@@ -842,6 +863,8 @@
           $this->lastFrag  = $fragNum;
           $opt['cc']       = $cc;
           $opt['duration'] = 0;
+          $firstFragment   = reset($this->fragTable);
+          LogInfo(sprintf("Fragments Total: %s, First: %s, Start: %s, Parallel: %s", $this->fragCount, $firstFragment['firstFragment'], $fragNum + 1, $this->parallel));
 
           // Extract baseFilename
           $this->baseFilename = $this->media['url'];
@@ -908,7 +931,7 @@
 
                   LogDebug("Adding fragment $fragNum to download queue");
                   $segNum = $this->GetSegmentFromFragment($fragNum);
-                  $cc->addDownload($this->fragUrl . "Seg" . $segNum . "-Frag" . $fragNum . $this->auth, $fragNum);
+                  $cc->addDownload($this->fragUrl . "Seg" . $segNum . "-Frag" . $fragNum . $this->media['queryString'], $fragNum);
                 }
 
               $downloads = $cc->checkDownloads();
@@ -943,6 +966,12 @@
                         }
                       else if ($download['status'] == 403)
                           LogError("Access Denied! Unable to download fragments.");
+                      else if ($download['status'] == 503)
+                        {
+                          LogDebug("Fragment " . $download['id'] . " seems temporary unavailable");
+                          LogDebug("Adding fragment " . $download['id'] . " to download queue");
+                          $cc->addDownload($download['url'], $download['id']);
+                        }
                       else
                         {
                           LogDebug("Fragment " . $download['id'] . " doesn't exist, Status: " . $download['status']);
@@ -1051,20 +1080,18 @@
               $fixedTS   = $lastTS + FRAMEFIX_STEP;
               if (($this->baseTS == INVALID_TIMESTAMP) and (($packetType == AUDIO) or ($packetType == VIDEO)))
                   $this->baseTS = $packetTS;
-              if ($this->baseTS > 1000)
-                {
-                  if ($packetTS >= $this->baseTS)
-                      $packetTS -= $this->baseTS;
-                  else
-                      $packetTS = $fixedTS;
-                }
+              if (($this->baseTS > 1000) and ($packetTS >= $this->baseTS))
+                  $packetTS -= $this->baseTS;
               if ($lastTS != INVALID_TIMESTAMP)
                 {
                   $timeShift = $packetTS - $lastTS;
                   if ($timeShift > $this->fixWindow)
                     {
                       LogDebug("Timestamp gap detected: PacketTS=" . $packetTS . " LastTS=" . $lastTS . " Timeshift=" . $timeShift, $debug);
-                      $this->baseTS += $timeShift - FRAMEFIX_STEP;
+                      if ($this->baseTS < $packetTS)
+                          $this->baseTS += $timeShift - FRAMEFIX_STEP;
+                      else
+                          $this->baseTS = $timeShift - FRAMEFIX_STEP;
                       $packetTS = $fixedTS;
                     }
                   else
@@ -1201,6 +1228,16 @@
                             }
                           if ($packetSize > 0)
                             {
+                              $pts = $packetTS;
+                              if (($CodecID == CODEC_ID_AVC) and ($AVC_PacketType == AVC_NALU))
+                                {
+                                  $cts = ReadInt24($frag, $fragPos + $this->tagHeaderLen + 2);
+                                  $cts = ($cts + 0xff800000) ^ 0xff800000;
+                                  $pts = $packetTS + $cts;
+                                  if ($cts != 0)
+                                      LogDebug("DTS: $packetTS CTS: $cts PTS: $pts", $debug);
+                                }
+
                               // Check for packets with non-monotonic video timestamps and fix them
                               if (!(($CodecID == CODEC_ID_AVC) and (($AVC_PacketType == AVC_SEQUENCE_HEADER) or ($AVC_PacketType == AVC_SEQUENCE_END) or $this->prevAVC_Header)))
                                   if (($this->prevVideoTS != INVALID_TIMESTAMP) and ($packetTS <= $this->prevVideoTS))
@@ -1247,7 +1284,10 @@
                       else if (($packetType == 40) or ($packetType == 41))
                           LogError("This stream is encrypted with FlashAccess DRM. Decryption of such streams isn't currently possible with this script.", 2);
                       else
-                          LogError("Unknown packet type " . $packetType . " encountered! Unable to proceed.");
+                        {
+                          LogInfo("Unknown packet type " . $packetType . " encountered! Unable to process fragment $fragNum");
+                          break 2;
+                        }
               }
               $fragPos += $totalTagLen;
             }
@@ -1518,7 +1558,7 @@
 
       foreach ($inSegs as $seg)
         {
-          if ($seg == '' || $seg == '.')
+          if ($seg == '' or $seg == '.')
               continue;
           if ($seg == '..')
               array_pop($outSegs);
@@ -1645,13 +1685,13 @@
       if ($strict)
         {
           foreach ($haystack as $item)
-              if (isset($item[$needle_field]) && $item[$needle_field] === $needle)
+              if (isset($item[$needle_field]) and $item[$needle_field] === $needle)
                   return true;
         }
       else
         {
           foreach ($haystack as $item)
-              if (isset($item[$needle_field]) && $item[$needle_field] == $needle)
+              if (isset($item[$needle_field]) and $item[$needle_field] == $needle)
                   return true;
         }
       return false;
@@ -1662,13 +1702,13 @@
       if ($strict)
         {
           foreach ($haystack as $item)
-              if (isset($item[$needle_field]) && $item[$needle_field] === $needle)
+              if (isset($item[$needle_field]) and $item[$needle_field] === $needle)
                   return $item[$value_field];
         }
       else
         {
           foreach ($haystack as $item)
-              if (isset($item[$needle_field]) && $item[$needle_field] == $needle)
+              if (isset($item[$needle_field]) and $item[$needle_field] == $needle)
                   return $item[$value_field];
         }
       return false;
@@ -1687,6 +1727,7 @@
   $fragCount    = 0;
   $fragNum      = 0;
   $manifest     = "";
+  $maxSpeed     = 0;
   $metadata     = true;
   $outDir       = "";
   $outFile      = "";
@@ -1715,6 +1756,7 @@
           'fragments' => 'base filename for fragments',
           'fixwindow' => 'timestamp gap between frames to consider as timeshift',
           'manifest' => 'manifest file for downloading of fragments',
+          'maxspeed' => 'maximum bandwidth consumption (KB) for fragment downloading',
           'outdir' => 'destination folder for output file',
           'outfile' => 'filename to use for output file',
           'parallel' => 'number of fragments to download simultaneously',
@@ -1744,14 +1786,17 @@
     }
 
   // Check for required extensions
-  $extensions = array(
+  $required_extensions = array(
       "bcmath",
       "curl",
       "SimpleXML"
   );
-  foreach ($extensions as $extension)
-      if (!extension_loaded($extension))
-          LogError("You don't have '$extension' extension installed. please install it before continuing.");
+  $missing_extensions  = array_diff($required_extensions, get_loaded_extensions());
+  if ($missing_extensions)
+    {
+      $msg = "You have to install the following extension(s) to continue: '" . implode("', '", $missing_extensions) . "'";
+      LogError($msg);
+    }
 
   // Initialize classes
   $cc  = new cURL();
@@ -1792,6 +1837,8 @@
       $baseFilename = $cli->getParam('fragments');
   if ($cli->getParam('manifest'))
       $manifest = $cli->getParam('manifest');
+  if ($cli->getParam('maxspeed'))
+      $maxSpeed = $cli->getParam('maxspeed');
   if ($cli->getParam('outdir'))
       $outDir = $cli->getParam('outdir');
   if ($cli->getParam('outfile'))
@@ -1829,6 +1876,13 @@
         }
       else
           LogError("Failed to update script");
+    }
+
+  // Set overall maximum bandwidth for fragment downloading
+  if ($maxSpeed > 0)
+    {
+      $cc->maxSpeed = ($maxSpeed * 1024) / $f4f->parallel;
+      LogDebug(sprintf("Setting maximum speed to %.2f KB per fragment (overall $maxSpeed KB)", $cc->maxSpeed / 1024));
     }
 
   // Create output directory
