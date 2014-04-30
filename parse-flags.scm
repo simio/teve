@@ -16,6 +16,9 @@
 
 (args:width 14)
 
+(define (version-string)
+  (conc program-display-name " " program-version))
+
 (define opts
   (list
    (args:make-option (c) (optional: "type")
@@ -63,13 +66,16 @@
    ;;                  (conc "Play stream (default or specified with -i)")
    ;;                  (*cfg* set: #t 'operators 'play?))
    (args:make-option (v) #:none "Be verbose"
-                     (print-debug-messages? #t))))
+                     (print-debug-messages? #t))
+   (args:make-option (V) #:none "Print version information"
+                     (stdout (version-string)))))
 
 (define (usage)
   (with-output-to-port (current-error-port)
     (lambda ()
-      (print "Usage: " (*platform* 'program-filename) " [options] <uri>"
-             #\newline (args:usage opts)
+      (print (version-string) #\newline
+             "Usage: " (*platform* 'program-filename) " [options] <uri>" #\newline
+             (args:usage opts)
              (conc "Please report bugs to jesper at huggpunkt.org or"
                    " https://github.com/simio/teve"))))
   (exit 1))
