@@ -73,9 +73,9 @@
 (define (usage)
   (with-output-to-port (current-error-port)
     (lambda ()
-      (print (version-string) #\newline
-             "Usage: " (*platform* 'program-filename) " [options] <uri>" #\newline
-             (args:usage opts)
-             (conc "Please report bugs to jesper at huggpunkt.org or"
-                   " https://github.com/simio/teve"))))
+      (stderr (version-string) #\newline
+              "Usage: " (*platform* 'program-filename) " [options] <uri>" #\newline
+              (args:usage opts)
+              (conc "Please report bugs to jesper at huggpunkt.org or"
+                    " https://github.com/simio/teve"))))
   (exit 1))
