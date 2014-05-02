@@ -91,10 +91,13 @@
                             ((string-prefix? "http" popout-path) popout-path)
                             (else (conc base-path popout-path))))
            (swf-player (delay (svt:swf-player-in play-path)))
+           (title (json-ref json-data "context" "title"))
+           (suggest-filename (lambda () (or title (conc "svt-video-" video-id))))
            (add-video-values (lambda (stream)
                                (update-stream
                                 stream
-                                (make-stream-value 'default-filename (conc "svt-video-" video-id))
+                                (make-stream-value 'title title)
+                                (make-stream-value 'default-filename (suggest-filename))
                                 (make-stream-value 'subtitles subtitles)
                                 (make-stream-value 'view-at play-path)
                                 (make-stream-value 'live is-live)

@@ -79,9 +79,8 @@
                 (is-live (string=? "true" (sxml-ref data 'playback 'live)))
                 (video-id (sxml-ref data 'playback '@ 'assetId))
                 (suggest-filename (lambda ()
-                                    (if* (sxml-ref data 'playback 'title)
-                                         it
-                                         (conc "tv4-video-" video-id))))
+                                    (or (sxml-ref data 'playback 'title)
+                                        (conc "tv4-video-" video-id))))
                 (swf-player "http://www.tv4play.se/flash/tv4playflashlets.swf"))
            (streams->video
             (map (lambda (stream)
