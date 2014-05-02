@@ -1,6 +1,5 @@
-teve [te:ve:] is a work-in-progress CLI streamer and downloader for
-online TV sites. The name is derived from "tee video", which is one of
-the main points of the program.
+teve [te:ve:] is a CLI downloader for online video streams, aimed
+primarily at Swedish television sites.
 
 teve replaces SVTPlay.sh, which is outdated, unsupported and essentially
 useless due to changes to svtplay.se.
@@ -33,29 +32,31 @@ listed in section 7. TROUBLESHOOTING below, please send a bug report.
 
 teve currently invokes other programs to download streams.
 
-  ffmpeg        For Apple HLS streams (SVT Play, ï¿½ppet arkiv, TV4 Play)
-  rtmpdump      For rtmp/rtmpe streams (old streams at SVT & TV4 Play)
-  AdobeHDS.php  For HDS streams (SVT & TV4 Play, ï¿½ppet arkiv)
+  FFmpeg        For Apple HLS streams (SVT Play, Öppet arkiv, TV4 Play)
+  RTMPdump      For rtmp/rtmpe streams (old streams at SVT & TV4 Play)
+  AdobeHDS.php  For HDS streams (SVT & TV4 Play, Öppet arkiv)
                 This requires a working PHP installation. A suitable
                 version of this script is bundled with teve in the
                 gpl/ directory. To get the latest version of the
                 AdobeHDS.php script, please visit this page:
                 https://github.com/K-S-V/Scripts
-  curl          For ordinary HTTP downloads (SVT Play)
-  mplayer       For mms and rtsp downloads (old streams at SVT Play)
+  cURL          For ordinary HTTP downloads (SVT Play)
+  MPlayer       For mms and rtsp downloads (old streams at SVT Play)
 
 These tools must be present in your $PATH, or teve won't find them (or
 see section 6. CONFIGURATION below).
 
-You actually do not need both ffmpeg and AdobeHDS.php, as teve does not
+You actually do not need both FFmpeg and AdobeHDS.php, as teve does not
 try to use tools it cannot find. If you opt to use just one of the two,
 you are recommended to use ffmpeg.
 
 
 2. WINDOWS
 
-Windows support is considered experimental. Please refer to the GitHub
-wiki for more information:
+teve is functional on Windows, though neither an automated build
+process nor pre-compiled binaries are currently provided.
+
+Please refer to the GitHub wiki to roll your own:
 
     https://github.com/simio/teve/wiki/Windows-support
 
@@ -64,14 +65,21 @@ wiki for more information:
 
 Just 'make' to get a binary, and then run it:
 
-  $ ./teve -h
+  kaja$ teve -h
+  teve 0.3-devel
   Usage: teve [options] <uri>
-   -d                       Download stream (default or specified with -i)
-   -v                       Be verbose
-   -o filename              Output filename
-   -l                       List all streams (or specified with -i)
-   -i id                    Stream #id to use
-   -h                       Display this text
+   -c [type]     Machine-readable output.
+                 Different types are available:
+                   s  Scheme data [default]
+                   j  JSON
+   -d            Download stream (default or specified with -i)
+   -e            Enter REPL for each video.
+   -h            Display this text
+   -i id         Stream #id to use
+   -l            List all streams (or specified with -i)
+   -o filename   Set output filename
+   -v            Be verbose
+   -V            Print version information
   Please report bugs to jesper at huggpunkt.org or https://github.com/simio/teve
 
 You may optionally install it somewhere:
@@ -148,7 +156,7 @@ loaded in a cascading manner:
      loaded. New values are added to the configuration, while already
      present are replaced with the ones from this file.
   3. If $HOME/.teverc is present, it is parsed and loaded as
-     /etc/teve.conf above. You can specify an alternate location to
+     /etc/teve.conf above. You may specify an alternate location to
      look for this file by setting the TEVE_RC environment variable.
   4. After the above files have been read, any environment variables set
      are parsed, replacing or adding to the configuration.
@@ -174,7 +182,7 @@ As of version 0.2, the following sites are supported:
  P: chicken-install fails to build the openssl egg.
  S: Make sure you have the OpenSSL libs and header files installed.
     If they have been stashed away into some obscure directory, you
-	may need to pass their locations to the compiler and linker:
+    may need to pass their locations to the compiler and linker:
 
       # env CSC_OPTIONS='-I /foo/include/openssl -L /foo/lib' \
                 make install-eggs
@@ -196,7 +204,8 @@ As of version 0.2, the following sites are supported:
  S: You need to 'git submodule update --init', or fetch the files
     manually from https://github.com/simio/scheme-prelude
 
+
 9. CONTACT
 
-Direct any questions to either the (Swedish) bb at planka.huggpunkt.org
+Direct any questions to either the (Swedish) BB at planka.huggpunkt.org
 or directly to jesper at huggpunkt.org.
