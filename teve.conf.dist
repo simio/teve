@@ -65,3 +65,14 @@ ideal-pixel-width=1920
 use-cache=#t                    ; #t of #f
 cache-default-ttl=300           ; In seconds
 cache-override-ttl=#f           ; Always use default value
+
+[channels]
+; Here be shorthands. If you add a key which is already present in the
+; builtin default configuration, your value will override the builtin.
+;
+; Examples (from the builtin defaults):
+;
+;  aktuellt="http://www.svtplay.se/aktuellt"
+;  svt1="http://www.svtplay.se/kanaler/svt1"
+;  barnkanalen="http://www.svtplay.se/kanaler/barnkanalen"
+

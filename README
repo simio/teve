@@ -28,7 +28,7 @@ Or if you prefer to see what you're installing:
     # chicken-install $(make print-eggs)
 
 If chicken-install fails to build some egg, and there is no solution
-listed in section 7. TROUBLESHOOTING below, please send a bug report.
+listed in section 9. TROUBLESHOOTING below, please send a bug report.
 
 teve currently invokes other programs to download streams.
 
@@ -177,7 +177,27 @@ As of version 0.2, the following sites are supported:
   tv4play.se
 
 
-8. TROUBLESHOOTING
+8. CHANNELS
+
+"Channels" refers to a bookmark-like functionality in teve, with which
+you are able to define shorthands for URI:s, which are then
+automatically expanded. For example, the following two invocations of
+teve are functionally equivalent.
+
+    $ teve svt1
+    $ teve http://www.svtplay.se/kanaler/svt1
+
+The "svt1" channel is predefined in the builtin configuration, meaning
+you may override the associated uri in teve.conf by adding the
+following line under the "[channels]" section:
+
+    [channels]
+    svt1="http://www.svtplay.se/my-favourite-slug"
+
+You may also add any number of new channels in this way.
+
+
+9. TROUBLESHOOTING
 
  P: chicken-install fails to build the openssl egg.
  S: Make sure you have the OpenSSL libs and header files installed.
@@ -205,7 +225,7 @@ As of version 0.2, the following sites are supported:
     manually from https://github.com/simio/scheme-prelude
 
 
-9. CONTACT
+10. CONTACT
 
 Direct any questions to either the (Swedish) BB at planka.huggpunkt.org
 or directly to jesper at huggpunkt.org.
