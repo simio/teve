@@ -30,8 +30,8 @@ default-action=download
 
 ; These values are used for automatic selection of a stream to download.
 ; See the USAGE section in the README file for more information.
-ideal-bitrate=2500
-ideal-pixel-width=1280
+ideal-bitrate=3000
+ideal-pixel-width=1920
 
 ; The automatic stream selection mechanism calculates the distance
 ; from an ideal stream for each stream present in a video, and selects
