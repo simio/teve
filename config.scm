@@ -44,6 +44,7 @@
                                   (mplayer . "mplayer")
                                   (curl . "curl")
                                   (php . "php")
+                                  (youtube-dl . "youtube-dl")
                                   (adobehds.php . "gpl/AdobeHDS.php"))
                (preferences (default-action . download)
                             (ideal-bitrate . 3000)

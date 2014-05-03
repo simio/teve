@@ -14,7 +14,7 @@
 
 (module uri->video (uri->videos)
 (import scheme chicken srfi-1 data-structures
-        misc-helpers config svt tv4)
+        misc-helpers config svt tv4 youtube-dl)
 
 ;;; The scrape-list is a list of all uri->video procedures
 (define *scraper-list* '())
@@ -31,6 +31,7 @@
 ;;; Add svt:uri->video to global scraper-table
 (add-scraper svt:uri->videos)
 (add-scraper tv4:uri->videos)
+(add-scraper youtube-dl:uri->videos)
 
 ;;; Expand preset strings into uri:s
 (define (expand-channels str)

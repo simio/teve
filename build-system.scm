@@ -33,6 +33,7 @@
 ;; This should be automated
 (include "sites/svt.scm")
 (include "sites/tv4.scm")
+(include "sites/youtube-dl.scm")
 
 ;; This should be renamed
 (include "uri2vid.scm")

@@ -12,10 +12,15 @@
 ;;; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ;;; OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-(module platform (platform-dir-slashes program-available? *platform*)
+(module platform (stderr-to-null platform-dir-slashes program-available? *platform*)
 (import scheme chicken srfi-1 srfi-13 data-structures files posix
         miscmacros
         stdouterr)
+
+(define (stderr-to-null cmd)
+  (if (eq? (software-type) 'windows)
+      (conc cmd " 2> NUL")
+      (conc cmd " 2> /dev/null")))
 
 (define (platform-dir-slashes str)
   (let ((needle (if (eq? (software-type) 'windows) #\/ #\\))

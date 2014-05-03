@@ -67,6 +67,12 @@
              "")
         " " (qs (stream-ref 'uri stream))))
 
+(define (stream->youtube-dl/make-command stream outfile)
+  (conc (*cfg* 'external-programs 'youtube-dl)
+        " -o " (qs outfile)
+        " -f " (qs (stream-ref 'youtube-format-id stream))
+        " " (qs (stream-ref 'youtube-dl-uri stream))))
+
 (define (extract-uri-path str)
   (let ((uri (uri-reference str)))
     (if (not uri)
@@ -80,7 +86,7 @@
         (uri-path-ext (pathname-extension
                        (extract-uri-path (stream-ref 'uri stream)))))
     (cond
-     ((stream-ref 'filename-extension stream))
+     ((stream-ref 'default-extension stream))
      (swf-path-ext)
      ((case (stream-ref 'stream-type stream)
         ((hls hds) "mp4")
@@ -126,6 +132,8 @@
        (stream->rtmpdump/make-command stream filename))
       ((http wmv)
        (stream->curl/make-command stream filename))
+      ((youtube-dl)
+       (stream->youtube-dl/make-command stream filename))
       ((mms rtsp)
        (stream->mplayer/make-command stream filename))
       (else #f))))
@@ -147,6 +155,7 @@
       ((rtmp) (program-available? (*cfg* 'external-programs 'rtmpdump)))
       ((http wmv) (program-available? (*cfg* 'external-programs 'curl)))
       ((mms rtsp) (program-available? (*cfg* 'external-programs 'mplayer)))
+      ((youtube-dl) (program-available? (*cfg* 'external-programs 'youtube-dl)))
       (else #f))))
        
 ;;; Create a temporary fifo and return it's absolute name
