@@ -20,7 +20,15 @@
 (define (json-data->video data uri)
   (let* ((default-filename (json-ref data "_filename"))
          (title (json-ref data "title"))
-         (streams-data (json-ref data "formats"))
+         ;; youtube-dl populates a sublist with the key "formats" with
+         ;; the data for each stream/encoding variant of a video,
+         ;; while also putting the data of the automatically selected
+         ;; format in the top-level. For videos where only one stream
+         ;; is available, the "formats" sublist is not
+         ;; created. Therefor, use the "formats" sublist for streams
+         ;; data if it is available, and if it isn't, wrap top-level
+         ;; in a list and pretend it's a "formats" sublist.
+         (streams-data (or (json-ref data "formats") (list data)))
          (video-id (json-ref data "id"))
          (youtube-dl-extractor (json-ref data "extractor"))
          (add-video-values (lambda (stream)
