@@ -63,7 +63,10 @@ Please refer to the GitHub wiki to roll your own:
 
 3. BUILDING
 
-Just 'make' to get a binary, and then run it:
+If you have not already, make sure the "scheme-prelude" git submodule is
+initialised and current. (See 9. TROUBLESHOOTING below for details.)
+
+Then, just 'make' to get a binary. Runnit it should look something like this:
 
   kaja$ teve -h
   teve 0.3-devel
