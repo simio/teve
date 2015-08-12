@@ -1,3 +1,14 @@
+
+THIS REPOSITORY IS OUT-OF-DATE
+
+teve has migrated from Git to Fossil, and from GitHub to Chiselapp.
+
+Please update your bookmarks, if anyone still uses such, to:
+
+    https://chiselapp.com/user/jesper/repository/teve/
+
+========================================================================
+
 teve [te:ve:] is a CLI downloader for online video streams, aimed
 primarily at Swedish television sites.
 
@@ -32,9 +43,9 @@ listed in section 9. TROUBLESHOOTING below, please send a bug report.
 
 teve currently invokes other programs to download streams.
 
-  FFmpeg        For Apple HLS streams (SVT Play, Öppet arkiv, TV4 Play)
+  FFmpeg        For Apple HLS streams (SVT Play, Ã–ppet arkiv, TV4 Play)
   RTMPdump      For rtmp/rtmpe streams (old streams at SVT & TV4 Play)
-  AdobeHDS.php  For HDS streams (SVT & TV4 Play, Öppet arkiv)
+  AdobeHDS.php  For HDS streams (SVT & TV4 Play, Ã–ppet arkiv)
                 This requires a working PHP installation. A suitable
                 version of this script is bundled with teve in the
                 gpl/ directory. To get the latest version of the
