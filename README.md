@@ -1,7 +1,3 @@
-# This repo is out-of-date
+# DISCONTINUED
 
-teve has migrated from Git to Fossil for version control.
-
-The project is now hosted at Chiselapp, at the following address:
-
- * https://chiselapp.com/user/jesper/repository/teve/
+teve was discontinued. You're better off using youtube-dl.
